@@ -14,6 +14,8 @@ local C = {
     held = { 0.85, 0.68, 0.2, 1 },
     line = { 0.92, 0.92, 0.95, 0.55 },
     dim = 0.4,
+    press = { 0.35, 0.85, 1, 1 },
+    dot = { 1, 0.85, 0.4, 1 },
 }
 
 local QUESTION_MARK = 134400 -- placeholder icon of icon-less macros
@@ -142,7 +144,7 @@ function View.Build(def, buttons)
             row.label:SetPoint("LEFT", row.icon, "RIGHT", 6, 0)
         end
         row.glyph:SetPoint("CENTER", row.badge, "CENTER")
-        row.glyph:SetText(Glyphs.Label(def.family, r.button))
+        row.glyph:SetText(Glyphs.For(def, r.button))
         local face = Glyphs.FACE_COLOR[r.button]
         if face then
             row.glyph:SetTextColor(face[1], face[2], face[3])
@@ -153,7 +155,7 @@ function View.Build(def, buttons)
             local a, b = r.line[i], r.line[i + 1]
             row.lines[i] = line(frame, a[1], a[2], b[1], b[2])
         end
-        row.dot = tex(frame, "OVERLAY", { 1, 0.85, 0.4, 1 })
+        row.dot = tex(frame, "OVERLAY", C.dot)
         row.dot:SetSize(5, 5)
         row.dot:SetPoint("CENTER", frame, "TOPLEFT", r.anchor.x, -r.anchor.y)
 
@@ -180,8 +182,45 @@ function View.Build(def, buttons)
         card.columns[r.side][#card.columns[r.side] + 1] = r.button
     end
 
+    -- front / back switch, for controllers with a back view
+    local other = def.view == "back" and def.front or def.back
+    if other then
+        local t = ns.Wow.CreateFrame("Button", nil, frame)
+        t:SetSize(96, 22)
+        t:SetPoint("TOP", frame, "TOP", 2 * (tabW + 6) + 6, -10)
+        t:SetScript("OnClick", function()
+            if card.onFlip then
+                card.onFlip()
+            end
+        end)
+        t.bg = tex(t, "ARTWORK", C.row)
+        t.bg:SetAllPoints()
+        t.label = text(t, "GameFontHighlightSmall", "CENTER")
+        t.label:SetPoint("CENTER")
+        t.label:SetText(def.view == "back" and "< Front" or "Back >")
+        card.flipTab = t
+        card.tabs[#card.tabs + 1] = t
+    end
+
     card.footer = text(frame, "GameFontDisableSmall", "CENTER")
     card.footer:SetPoint("BOTTOM", 0, 10)
+
+    ---Lights up the rows of buttons that are held down right now.
+    ---@param pressed table<string, boolean>
+    function card:SetPressed(pressed)
+        for _, row in ipairs(self.rows) do
+            local on = pressed[row.button] == true
+            if row.pressed ~= on then
+                row.pressed = on
+                row.badge:SetColorTexture(unpack(on and C.press or (row.badgeColor or C.badge)))
+                row.dot:SetSize(on and 11 or 5, on and 11 or 5)
+                row.dot:SetColorTexture(unpack(on and C.press or C.dot))
+                if on then
+                    row:SetAlpha(1)
+                end
+            end
+        end
+    end
 
     ---Rows and tabs take the mouse only while the card is pinned (editing).
     ---@param editable boolean
@@ -219,13 +258,15 @@ function View.Build(def, buttons)
                 row.label:SetText(
                     held and "|cffffd100held|r" or ("hold: " .. Glyphs.LayerTrigger(def.family, holds) .. " layer")
                 )
-                row.badge:SetColorTexture(unpack(held and C.held or C.badge))
+                row.badgeColor = held and C.held or C.badge
+                row.badge:SetColorTexture(unpack(row.badgeColor))
             elseif state.pinKey and prefix .. row.button == state.pinKey then
                 -- the pin key is a priority binding: it wins over whatever the profile has here
                 row.icon:SetTexture("Interface\\Icons\\INV_Misc_Book_09")
                 row.icon:Show()
                 row.label:SetText("|cffc8a2ffController setup|r")
-                row.badge:SetColorTexture(unpack(C.badge))
+                row.badgeColor = C.badge
+                row.badge:SetColorTexture(unpack(row.badgeColor))
             elseif action then
                 local icon, name = ns.Wow.DescribeAction(action)
                 if icon and icon ~= QUESTION_MARK then
@@ -233,10 +274,12 @@ function View.Build(def, buttons)
                     row.icon:Show()
                 end
                 row.label:SetText(name or "?")
-                row.badge:SetColorTexture(unpack(C.badge))
+                row.badgeColor = C.badge
+                row.badge:SetColorTexture(unpack(row.badgeColor))
             else
                 row.label:SetText("|cff6c707a-|r")
-                row.badge:SetColorTexture(unpack(C.badge))
+                row.badgeColor = C.badge
+                row.badge:SetColorTexture(unpack(row.badgeColor))
                 on = false
             end
             local focused = state.focus == row.button
@@ -246,6 +289,7 @@ function View.Build(def, buttons)
             if focused then
                 on = true
             end
+            row.pressed = nil
             row:SetAlpha(on and 1 or C.dim)
             for _, l in ipairs(row.lines) do
                 l:SetAlpha(on and 1 or C.dim)

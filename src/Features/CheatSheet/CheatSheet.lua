@@ -64,6 +64,8 @@ local pinned = false
 local peek = { heldFor = 0 }
 local shownLayer
 local focus, setupMode -- set by the Setup slice while the controller setup is open
+local view = "front" -- "front" | "back"
+local lastPressed = {}
 
 ---Card size: the player's choice, else fit ~90% of the screen width (big on a
 ---Steam Deck, sensible on a monitor).
@@ -77,11 +79,25 @@ local function settings()
     return ns.db.settings
 end
 
-local function currentCard()
+local function frontDef()
     local profile = ns.Profiles.ActiveProfile()
-    local id = ns.Controllers.Detect.Resolve(profile.controller)
+    return ns.Controllers.Registry.Get(ns.Controllers.Detect.Resolve(profile.controller)), profile
+end
+
+local function currentDef()
+    local R = ns.Controllers.Registry
+    local front, profile = frontDef()
+    if view == "back" and R.BackOf(front) then
+        return R.BackOf(front), profile
+    end
+    return front, profile
+end
+
+local function currentCard()
+    local def, profile = currentDef()
+    local id = def.id
     if not cards[id] then
-        local built = ns.CheatSheet.View.Build(ns.Controllers.Registry.Get(id), ns.Bindings.Model.BUTTONS)
+        local built = ns.CheatSheet.View.Build(def, ns.Bindings.Model.BUTTONS)
         built.onRow = function(button, kind)
             if pinned and shownLayer then
                 ns.Editor.OnRow(shownLayer, button, kind)
@@ -89,6 +105,9 @@ local function currentCard()
         end
         built.onTab = function(layer)
             CheatSheet.Toggle(layer)
+        end
+        built.onFlip = function()
+            CheatSheet.Flip()
         end
         cards[id] = built
     end
@@ -198,6 +217,50 @@ function CheatSheet.SetSetup(layer, button, active)
     end
 end
 
+---Shows the other side of the controller (front <-> back).
+---@param want? "front"|"back" (default: the other one)
+---@return string view now shown
+function CheatSheet.Flip(want)
+    view = want or (view == "back" and "front" or "back")
+    if not ns.Controllers.Registry.BackOf((frontDef())) then
+        view = "front"
+    end
+    if shownLayer then
+        render(shownLayer)
+    end
+    return view
+end
+
+---@return string "front"|"back"
+function CheatSheet.ViewName()
+    return view
+end
+
+---Highlights held buttons; a held button that only exists on the other side
+---(L4, a paddle...) flips the card to that side.
+---@param pressed table<string, boolean>
+function CheatSheet.ShowPressed(pressed)
+    if not (shownLayer and card) then
+        return
+    end
+    local def = card.def
+    local front = def.view == "back" and ns.Controllers.Registry.Get(def.front) or def
+    for button in pairs(pressed) do
+        if not lastPressed[button] then
+            local _, side = ns.Controllers.Registry.ViewFor(front, button)
+            if side and side ~= view and not def.anchors[button] then
+                CheatSheet.Flip(side)
+                if CheatSheet.onFlipped then
+                    CheatSheet.onFlipped(button)
+                end
+                break
+            end
+        end
+    end
+    lastPressed = pressed
+    card:SetPressed(pressed)
+end
+
 ---Re-renders the card if it is showing.
 function CheatSheet.Refresh()
     if shownLayer then
@@ -242,6 +305,7 @@ function M:OnEnable()
         if want ~= shownLayer then
             render(want)
         end
+        CheatSheet.ShowPressed(ns.Wow.PressedButtons())
     end)
 
     ns.Events.On("PROFILE_CHANGED", refresh)

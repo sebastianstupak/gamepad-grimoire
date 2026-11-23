@@ -53,6 +53,7 @@ function Diagnostics.Run()
         controller = controller,
         controllerReason = reason,
         atlases = atlases,
+        buttons = ns.Wow.KnownButtons(),
         profile = profileName,
         bound = bound,
         applied = applied and applied.applied or 0,
@@ -99,6 +100,7 @@ function Diagnostics.Format(r)
             r.controllerReason
         ),
         "glyph atlases: " .. table.concat(atl, ", "),
+        "buttons the game sees: " .. (#(r.buttons or {}) > 0 and table.concat(r.buttons, " ") or "none"),
         ("profile %s: %d binds, %d applied, %d skipped"):format(r.profile, r.bound, r.applied, r.skipped),
     }
 end

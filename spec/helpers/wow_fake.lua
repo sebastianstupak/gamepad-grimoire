@@ -174,6 +174,12 @@ function Fake.new()
         end
         return nil, action.name or tostring(action.id)
     end
+    function W.PressedButtons()
+        return state.pressed or {}
+    end
+    function W.KnownButtons()
+        return state.knownButtons or {}
+    end
     function W.ListSpells()
         local out = {}
         for id, name in pairs(state.spells) do

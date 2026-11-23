@@ -83,6 +83,50 @@ function W.GetGamePadDevice()
     }
 end
 
+local function mappedState()
+    if not (C_GamePad and C_GamePad.GetActiveDeviceID and C_GamePad.GetDeviceMappedState) then
+        return nil
+    end
+    local id = C_GamePad.GetActiveDeviceID()
+    return id and C_GamePad.GetDeviceMappedState(id)
+end
+
+---Binding name of mapped button `i` (1-based index into the mapped state).
+local function buttonName(i)
+    return C_GamePad.ButtonIndexToBinding and C_GamePad.ButtonIndexToBinding(i - 1)
+end
+
+---Gamepad buttons held right now, by binding name ("PAD1", "PADPADDLE1"...).
+---Read-only polling: it never takes input away from the game.
+---@return table<string, boolean>
+function W.PressedButtons()
+    local out = {}
+    local st = mappedState()
+    if st and st.buttons then
+        for i, down in ipairs(st.buttons) do
+            if down then
+                local name = buttonName(i)
+                if name then
+                    out[name] = true
+                end
+            end
+        end
+    end
+    return out
+end
+
+---Every button the active controller reports, in index order (for /gg diag:
+---shows whether back buttons / paddles reach the game at all).
+---@return string[]
+function W.KnownButtons()
+    local out = {}
+    local st = mappedState()
+    for i = 1, st and st.buttons and #st.buttons or 0 do
+        out[i] = buttonName(i) or ("#" .. (i - 1))
+    end
+    return out
+end
+
 ---@return string key "Name-Realm"
 function W.CharacterKey()
     -- GetRealmName() can be "" early on (and on WoW: Forever), so fall back through

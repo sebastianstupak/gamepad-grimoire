@@ -15,9 +15,10 @@ describe("CheatSheet", function()
         end
 
         it("fits every row and line inside the card for every controller", function()
-            for _, def in ipairs(ns.Controllers.Registry.All()) do
+            for _, def in ipairs(ns.Controllers.Registry.All(true)) do
                 local g = compute(def.id)
-                assert.is_true(#g.rows >= 14, def.id .. " rows")
+                -- front: every button; back: triggers, bumpers and back buttons
+                assert.is_true(#g.rows >= (def.view == "back" and 4 or 14), def.id .. " rows")
                 for _, r in ipairs(g.rows) do
                     assert.is_true(r.x >= 0 and r.x + r.w <= g.width, def.id .. " " .. r.button .. " x")
                     assert.is_true(r.y >= 0 and r.y + r.h <= g.height, def.id .. " " .. r.button .. " y")
@@ -28,7 +29,7 @@ describe("CheatSheet", function()
         end)
 
         it("shows each button once, on the side of the picture it is on", function()
-            for _, def in ipairs(ns.Controllers.Registry.All()) do
+            for _, def in ipairs(ns.Controllers.Registry.All(true)) do
                 local g = compute(def.id)
                 local seen = {}
                 for _, r in ipairs(g.rows) do
@@ -43,7 +44,7 @@ describe("CheatSheet", function()
         end)
 
         it("orders rows top to bottom like their buttons, so leader lines do not cross", function()
-            for _, def in ipairs(ns.Controllers.Registry.All()) do
+            for _, def in ipairs(ns.Controllers.Registry.All(true)) do
                 local g = compute(def.id)
                 for _, side in ipairs({ "left", "right" }) do
                     local prev
@@ -204,6 +205,52 @@ describe("CheatSheet", function()
             wow.slash.handler("controller xbox")
             wow.slash.handler("show")
             assert.is_true(has(texts(card()), "Xbox Series"))
+        end)
+    end)
+
+    describe("pressed buttons and the back view", function()
+        local ns, wow
+        before_each(function()
+            ns, wow = Addon.start()
+            ns.Profiles.ActiveProfile().controller = "steamdeck"
+            ns.CheatSheet.Toggle()
+        end)
+
+        local function row(button)
+            for _, r in ipairs(ns.CheatSheet.Card().rows) do
+                if r.button == button then
+                    return r
+                end
+            end
+        end
+
+        it("lights up the row of a held button and lets go on release", function()
+            wow.pressed = { PAD1 = true }
+            wow.tick(0.1)
+            assert.is_true(rawget(row("PAD1"), "pressed"))
+            assert.is_falsy(rawget(row("PAD2"), "pressed"))
+            wow.pressed = {}
+            wow.tick(0.1)
+            assert.is_false(rawget(row("PAD1"), "pressed"))
+        end)
+
+        it("turns the card around when a back button is pressed", function()
+            assert.are.equal("front", ns.CheatSheet.ViewName())
+            wow.pressed = { PADPADDLE3 = true } -- L4
+            wow.tick(0.1)
+            assert.are.equal("back", ns.CheatSheet.ViewName())
+            assert.are.equal("steamdeck_back", ns.CheatSheet.Card().def.id)
+            assert.is_true(rawget(row("PADPADDLE3"), "pressed"))
+            assert.are.equal("front", ns.CheatSheet.Flip())
+        end)
+
+        it("stays on the front for controllers without a back view of that button", function()
+            ns.Profiles.ActiveProfile().controller = "switchpro"
+            ns.CheatSheet.Refresh()
+            wow.pressed = { PADPADDLE1 = true }
+            wow.tick(0.1)
+            assert.are.equal("front", ns.CheatSheet.ViewName())
+            assert.are.equal("back", ns.CheatSheet.Flip()) -- triggers-only back still exists
         end)
     end)
 end)

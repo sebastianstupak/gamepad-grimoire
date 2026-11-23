@@ -1,6 +1,6 @@
 # Lua 5.1 toolchain matching the WoW client's Lua dialect:
 # busted (tests) + luacov (coverage) + luacheck (lint) + LuaLS (type check).
-FROM debian:bookworm-slim
+FROM debian:bookworm-slim@sha256:734a72b3d6142a71993b4bc580ca01d8ca687f77a2c422d96a961d3376b179bc
 
 ARG LUALS_VERSION=3.19.2
 RUN apt-get update \

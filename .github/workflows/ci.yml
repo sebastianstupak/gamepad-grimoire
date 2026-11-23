@@ -50,7 +50,7 @@ jobs:
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: "3.13"
-      - run: pip install -r tools/art/requirements.txt pytest==9.0.2 ruff==0.14.11
+      - run: pip install --require-hashes -r tools/requirements-ci.txt
       - run: ruff check tools && ruff format --check tools
       - run: pytest -q
       - name: Generated art matches its sources

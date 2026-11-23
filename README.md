@@ -93,7 +93,7 @@ npm run check        # format, lint, types, tests + coverage (also the pre-push 
 
 Lua tools (busted, luacov, luacheck, LuaLS) run in a small Docker image (`tools/docker/`)
 so they behave the same on every OS and in CI; set `GG_NATIVE_LUA=1` to use local installs.
-Python tools need `pip install -r tools/art/requirements.txt pytest ruff`.
+Python tools: `pip install --require-hashes -r tools/requirements-ci.txt` (hash-locked).
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [CONTRIBUTING.md](CONTRIBUTING.md),
 [AGENTS.md](AGENTS.md) (guide for AI coding agents) and [SECURITY.md](SECURITY.md).

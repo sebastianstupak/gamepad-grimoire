@@ -36,8 +36,43 @@ jobs:
         run: npm run typecheck
       - name: Tests + coverage (busted, luacov >= 90%)
         run: |
-          node tools/lua.mjs sh -c "busted --coverage -o gtest && luacov"
+          node tools/lua.mjs sh -c 'busted --coverage -o utfTerminal > busted.out; s=$?; cat busted.out; luacov; exit $s'
           node tools/coverage.mjs 90
+      - name: Badge data
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: node tools/badges.mjs
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        with:
+          name: badges
+          path: badges/
+          retention-days: 7
+
+  badges:
+    name: Publish badges
+    needs: lua
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write # push to the badges branch only
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: badges
+          path: badges
+      - name: Push to the badges branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          cd badges
+          git init -q -b badges
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "chore(ci): update badges"
+          git push -q --force "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" badges
 
   python:
     name: Python tools - ruff, pytest, generated art

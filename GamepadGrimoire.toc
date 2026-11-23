@@ -18,5 +18,6 @@ src\Features\Controllers\Definitions.lua
 
 src\Features\Bindings\Model.lua
 src\Features\Bindings\Applier.lua
+src\Features\Profiles\Profiles.lua
 
 src\Bootstrap.lua

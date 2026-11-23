@@ -35,6 +35,8 @@ local HELP = {
     "/gg profile use <name> - switch this character to a profile",
     "/gg profile new <name> - new empty profile",
     "/gg profile copy <name> - copy the active profile",
+    "/gg profile rename <old> = <new> - rename a profile",
+    "/gg profile delete <name> - delete an unused profile",
     "/gg controller [auto|xbox|dualsense|switchpro|steamdeck] - which picture to show",
     "/gg capture <name> - new profile from your current controller keybinds",
     "/gg export [profile] - share string of a profile (default: the active one)",
@@ -70,6 +72,14 @@ function handlers.profile(sub, name)
         ok, err = P.Create(name)
     elseif sub == "copy" then
         ok, err = P.Create(name, P.ActiveName())
+    elseif sub == "delete" then
+        ok, err = P.Delete(name)
+    elseif sub == "rename" then
+        local old, new = (name or ""):match("^(.-)%s*=%s*(.+)$")
+        if not old then
+            return say("usage: /gg profile rename <old> = <new>")
+        end
+        ok, err = P.Rename(old, new)
     else
         return handlers.help()
     end

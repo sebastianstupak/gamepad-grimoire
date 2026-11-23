@@ -105,6 +105,11 @@ class Deck:
         print("  screenshot", os.path.relpath(path, ROOT))
         return path
 
+    def bnet_running(self):
+        # anchored: must not match this ssh command's own command line
+        pattern = r"^C:.Program Files .x86..Battle\.net.Battle\.net\.exe --from-launcher"
+        return self.sh(f"pgrep -f '{pattern}' >/dev/null && echo yes || echo no", check=False).strip() == "yes"
+
     def wow_running(self):
         return self.sh("pgrep -x Wow.exe >/dev/null && echo yes || echo no", check=False).strip() == "yes"
 
@@ -170,20 +175,62 @@ def restore_addons(deck):
     print("  restored", len(out.split()), "AddOns.txt")
 
 
+def keep_awake(deck, on=True):
+    """Blocks sleep / idle / lid suspend for the whole run. A user service, so it
+    survives the SSH session that starts it (a nohup'ed child does not)."""
+    if on:
+        out = deck.sh(
+            "systemctl --user is-active -q gg-e2e-awake || systemd-run --user --unit=gg-e2e-awake"
+            " systemd-inhibit --what=idle:sleep:handle-lid-switch --who=gamepad-grimoire --why=e2e-test sleep 3600"
+            " >/dev/null 2>&1; systemctl --user is-active gg-e2e-awake",
+            check=False,
+        ).strip()
+        if out != "active":
+            raise SystemExit("could not stop the Deck from sleeping")
+        print("  Deck kept awake for the run")
+    else:
+        deck.sh("systemctl --user stop gg-e2e-awake", check=False)
+
+
+def ensure_gaming_mode(deck):
+    """The click positions are for Gaming Mode (gamescope); switch if in Desktop Mode."""
+
+    def active():
+        return deck.sh("systemctl --user is-active gamescope-session", check=False).strip() == "active"
+
+    if active():
+        return
+    print("  switching the Deck to Gaming Mode")
+    deck.sh("(steamos-session-select gamescope >/dev/null 2>&1 &)", check=False)
+    for _ in range(30):
+        time.sleep(3)
+        if active():
+            time.sleep(20)  # Steam UI
+            return
+    raise SystemExit("could not switch the Deck to Gaming Mode")
+
+
 def launch(deck):
     print("== launch")
-    deck.sh(
-        "pgrep -f 'systemd-inhibit.*gg-e2e' >/dev/null"
-        " || (nohup systemd-inhibit --what=idle:sleep --why=gg-e2e sleep 3600 >/dev/null 2>&1 &)",
-        check=False,
-    )
-    deck.x(":0", "mousemove_relative 5 5")
+    ensure_gaming_mode(deck)
+    deck.x(":0", "mousemove_relative 5 5")  # wake Steam's screensaver
     deck.sh(
         "export DISPLAY=:0 XAUTHORITY=$(ls /run/user/1000/xauth_* 2>/dev/null | head -1); "
         f"steam -ifrunning steam://rungameid/{GAME_ID} >/dev/null 2>&1 &",
         check=False,
     )
-    time.sleep(8)
+    if not deck.bnet_running():
+        print("  starting Battle.net")
+        for _ in range(60):
+            time.sleep(3)
+            if deck.bnet_running():
+                break
+        else:
+            raise SystemExit("Battle.net did not start")
+        time.sleep(45)  # UI + automatic sign-in
+    else:
+        time.sleep(8)
+    deck.screenshot("00-battlenet")
     deck.click(WOWF_ICON)
     time.sleep(3)
     deck.click(PLAY)
@@ -193,9 +240,17 @@ def launch(deck):
             break
     else:
         raise SystemExit("WoW did not start")
+    args = deck.sh(r"tr '\0' ' ' < /proc/$(pgrep -x Wow.exe | head -1)/cmdline", check=False)
+    if "-launcherlogin" not in args:
+        print("  ! WoW started without a Battle.net login (wow-guard restarts Battle.net) - retrying once")
+        time.sleep(60)
+        deck.click(WOWF_ICON)
+        time.sleep(3)
+        deck.click(PLAY)
+        time.sleep(20)
     print("  WoW started, waiting for character select")
     time.sleep(45)
-    deck.screenshot("00-character-select")
+    deck.screenshot("01-character-select")
     deck.click(ENTER_WORLD)
     print("  entering world")
     time.sleep(50)
@@ -204,6 +259,8 @@ def launch(deck):
 def scenario(deck):
     print("== scenario")
     deck.chat("/gg diag")
+    deck.chat("/gg profile use Default")
+    deck.chat("/gg profile delete E2E")  # leftovers of an earlier run
     deck.chat("/gg capture E2E")
     deck.chat("/gg profile use E2E")
     time.sleep(1)
@@ -298,6 +355,9 @@ def main():
     ap.add_argument("--readme", action="store_true", help="update docs/images from the screenshots")
     a = ap.parse_args()
     deck = Deck(a.host, a.key)
+    keep_awake(deck)
+    if not deck.wow_running():
+        restore_addons(deck)  # leftovers of an interrupted run (WoW rewrites AddOns.txt on exit)
     if not a.no_launch:
         install(deck)
         disable_conflicting(deck)
@@ -308,6 +368,7 @@ def main():
     logout(deck)
     if not deck.wow_running():
         restore_addons(deck)
+    keep_awake(deck, False)
     sv = saved_variables(deck)
     os.makedirs(OUT, exist_ok=True)
     with open(os.path.join(OUT, "SavedVariables.lua"), "w", encoding="utf-8") as f:

@@ -16,7 +16,7 @@ fix(share): reject strings with trailing data
 docs(repo): explain the Wow adapter rule
 ```
 
-Allowed scopes: `core controllers bindings profiles share commands cheatsheet editor
+Allowed scopes: `core controllers bindings profiles share commands cheatsheet diagnostics editor
 art deps ci repo release`.
 
 ## Controller art

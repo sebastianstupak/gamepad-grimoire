@@ -34,6 +34,24 @@ describe("Commands", function()
         assert.truthy(run("controller gamecube"):find("unknown controller"))
     end)
 
+    it("captures the player's current controller keybinds into a profile", function()
+        wow.keybinds = { PAD1 = "JUMP", ["SHIFT-PAD3"] = "ACTIONBUTTON2", ["CTRL-PADDUP"] = "MACRO Rotace", Q = "X" }
+        assert.truthy(run("capture My Old Binds"):find("captured 3"))
+        local p = ns.Profiles.Get("My Old Binds")
+        assert.same({ type = "command", command = "ACTIONBUTTON2" }, p.layers.LT.PAD3)
+        assert.same({ type = "command", command = "MACRO Rotace" }, p.layers.RT.PADDUP)
+    end)
+
+    it("sets the cheat sheet scale within limits", function()
+        assert.truthy(run("scale 1.3"):find("1.30"))
+        assert.equal(1.3, ns.db.settings.scale)
+        assert.truthy(run("scale 9"):find("usage"))
+    end)
+
+    it("prints a diagnostics report", function()
+        assert.truthy(run("diag"):find("share round trip"))
+    end)
+
     it("shows help for anything else", function()
         assert.truthy(run("wat"):find("/gg profile"))
     end)

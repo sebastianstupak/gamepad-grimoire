@@ -145,6 +145,28 @@ function Model.LayerModifiers(getCVar)
     return mods
 end
 
+---Builds a layout from the player's current keybinds (migration from manual
+---setups or other addons). Every bound gamepad key becomes a command action.
+---@param getBindingAction fun(key: string): string?
+---@param modifiers table<string, string> from LayerModifiers
+---@return table layout, number count
+function Model.FromKeybinds(getBindingAction, modifiers)
+    local layout, count = Model.New(), 0
+    for _, layer in ipairs(Model.LAYERS) do
+        local prefix = layer == "BASE" and "" or (modifiers[layer] and modifiers[layer] .. "-")
+        if prefix then
+            for _, button in ipairs(Model.BUTTONS) do
+                local command = getBindingAction(prefix .. button)
+                if command and command ~= "" and #command <= 255 then
+                    layout.layers[layer][button] = { type = "command", command = command }
+                    count = count + 1
+                end
+            end
+        end
+    end
+    return layout, count
+end
+
 ---Flattens a layout into concrete keys, sorted for stable output.
 ---A layer whose trigger emulates no modifier cannot be reached and is reported.
 ---@param layout table

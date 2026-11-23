@@ -2,4 +2,4 @@
 #   uv pip compile --generate-hashes --python-version 3.13 --python-platform x86_64-manylinux_2_28 tools/requirements-ci.in -o tools/requirements-ci.txt
 -r art/requirements.txt
 pytest==9.0.2
-ruff==0.14.11
+ruff==0.17.5

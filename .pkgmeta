@@ -18,6 +18,12 @@ ignore:
   - .luarc.json
   - .editorconfig
   - CONTRIBUTING.md
+  - AGENTS.md
+  - CLAUDE.md
+  - SECURITY.md
+  - pyproject.toml
+  - .luacov
+  - .github
 
 manual-changelog:
   filename: CHANGELOG.md

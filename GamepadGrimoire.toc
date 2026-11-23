@@ -12,4 +12,8 @@ src\Core\Wow.lua
 src\Core\Events.lua
 src\Core\Store.lua
 
+src\Features\Controllers\Registry.lua
+src\Features\Controllers\Detect.lua
+src\Features\Controllers\Definitions.lua
+
 src\Bootstrap.lua

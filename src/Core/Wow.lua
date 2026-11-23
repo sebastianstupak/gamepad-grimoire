@@ -127,6 +127,33 @@ function W.KnownButtons()
     return out
 end
 
+---Adds a page to the game's Settings > AddOns (modern Settings API, or the
+---classic Interface Options on older clients). Returns false when neither exists.
+---@param name string
+---@param frame table canvas frame
+---@return boolean
+function W.RegisterSettingsPage(name, frame)
+    if Settings and Settings.RegisterCanvasLayoutCategory then
+        local category = Settings.RegisterCanvasLayoutCategory(frame, name)
+        Settings.RegisterAddOnCategory(category)
+        return true
+    elseif InterfaceOptions_AddCategory then
+        frame.name = name
+        InterfaceOptions_AddCategory(frame)
+        return true
+    end
+    return false
+end
+
+---Closes the Settings window if it is open (so the card is not hidden behind it).
+function W.CloseSettings()
+    if SettingsPanel and SettingsPanel:IsShown() then
+        HideUIPanel(SettingsPanel)
+    elseif InterfaceOptionsFrame and InterfaceOptionsFrame:IsShown() then
+        HideUIPanel(InterfaceOptionsFrame)
+    end
+end
+
 ---@return string key "Name-Realm"
 function W.CharacterKey()
     -- GetRealmName() can be "" early on (and on WoW: Forever), so fall back through

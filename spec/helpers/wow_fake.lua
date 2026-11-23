@@ -174,6 +174,14 @@ function Fake.new()
         end
         return nil, action.name or tostring(action.id)
     end
+    state.settingsPages, state.settingsClosed = {}, 0
+    function W.RegisterSettingsPage(name)
+        state.settingsPages[#state.settingsPages + 1] = name
+        return true
+    end
+    function W.CloseSettings()
+        state.settingsClosed = state.settingsClosed + 1
+    end
     function W.PressedButtons()
         return state.pressed or {}
     end

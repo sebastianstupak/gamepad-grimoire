@@ -40,6 +40,8 @@ src\Features\Setup\Setup.lua
 
 src\Features\Diagnostics\Diagnostics.lua
 
+src\Features\Options\Options.lua
+
 src\Features\Commands\Commands.lua
 
 src\Bootstrap.lua

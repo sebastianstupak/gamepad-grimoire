@@ -43,6 +43,7 @@ local HELP = {
     "/gg diag - check this client and the addon (saved for bug reports)",
 }
 
+---@type table<string, fun(arg?: string, arg2?: string, rest?: string)>
 local handlers = {}
 
 function handlers.help()

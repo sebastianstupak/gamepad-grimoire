@@ -33,7 +33,7 @@ end
 
 ---Which bindable buttons this controller shows, and on which side.
 ---@param buttons string[] candidate buttons (Bindings.Model.BUTTONS)
----@return { button: string, side: "left"|"right", point: table }[]
+---@return table[] left, table[] right rows { button, side, point }, sorted top to bottom
 function Layout.Assign(def, buttons)
     local left, right, middle = {}, {}, {}
     for _, b in ipairs(buttons) do

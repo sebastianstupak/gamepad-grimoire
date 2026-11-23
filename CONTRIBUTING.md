@@ -4,7 +4,9 @@
 2. Docker must be running (lint and tests run in `tools/docker`), or set
    `GG_NATIVE_LUA=1` with `luacheck` and `busted` installed for Lua 5.1.
 3. Work inside one slice (`src/Features/<Name>/`) and add or update its `*_spec.lua`.
-4. `npm run check` before pushing (the pre-push hook runs it too).
+4. `npm run check` before pushing (the pre-push hook runs it too): StyLua + ruff format,
+   luacheck + ruff, LuaLS type check, busted with a 90 % coverage gate, pytest.
+5. Gameplay changes: run `npm run e2e` on a Steam Deck rig (see tools/e2e/deck_e2e.py).
 
 ## Commit messages
 

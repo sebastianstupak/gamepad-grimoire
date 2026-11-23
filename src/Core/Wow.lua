@@ -1,5 +1,7 @@
 -- The only file allowed to touch WoW's global API (enforced by .luacheckrc).
 -- Slices call ns.Wow.*; tests inject a fake before this file runs.
+-- WoW globals are only allowed here; luacheck keeps them out of every other file.
+---@diagnostic disable: undefined-global
 local _, ns = ...
 if ns.Wow then
     return

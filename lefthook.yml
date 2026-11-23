@@ -1,5 +1,5 @@
 # Git hooks (installed by `npm install` -> lefthook install).
-# Lua lint/tests run in the project's Docker image (tools/lua.mjs), same as CI.
+# Lua tools run in the project's Docker image (tools/lua.mjs), the same as CI.
 
 pre-commit:
   parallel: true
@@ -10,6 +10,9 @@ pre-commit:
     luacheck:
       glob: "*.lua"
       run: node tools/lua.mjs luacheck {staged_files}
+    ruff:
+      glob: "*.py"
+      run: python -m ruff check {staged_files} && python -m ruff format --check {staged_files}
 
 commit-msg:
   commands:
@@ -18,9 +21,5 @@ commit-msg:
 
 pre-push:
   commands:
-    format:
-      run: npm run format:check
-    lint:
-      run: npm run lint
-    test:
-      run: npm test
+    check:
+      run: npm run check

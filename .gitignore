@@ -8,3 +8,6 @@ __pycache__/
 tools/art/out/
 .DS_Store
 Thumbs.db
+tools/e2e/out/
+.pytest_cache/
+.ruff_cache/

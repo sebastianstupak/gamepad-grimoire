@@ -35,9 +35,12 @@ The addon is Lua 5.1 (the client's dialect). Tooling:
 
 | | |
 |---|---|
-| Format | [StyLua](https://github.com/JohnnyMorganz/StyLua) (`npm run format`) |
-| Lint | [luacheck](https://github.com/lunarmodules/luacheck) (`npm run lint`) |
-| Tests | [busted](https://lunarmodules.github.io/busted/) (`npm test`) |
+| Format | [StyLua](https://github.com/JohnnyMorganz/StyLua), [ruff](https://docs.astral.sh/ruff/) (`npm run format`) |
+| Lint | [luacheck](https://github.com/lunarmodules/luacheck), ruff (`npm run lint`) |
+| Types | [lua-language-server](https://luals.github.io) `--check` with LuaLS annotations (`npm run typecheck`) |
+| Tests | [busted](https://lunarmodules.github.io/busted/) unit + integration, pytest for tools (`npm test`) |
+| Coverage | [luacov](https://lunarmodules.github.io/luacov/), CI fails under 90 % (`npm run coverage`) |
+| End to end | real Steam Deck over SSH: install, play, screenshot, verify saved data (`npm run e2e`) |
 | Commits | [Conventional Commits](https://www.conventionalcommits.org), checked by commitlint |
 | Hooks | [lefthook](https://github.com/evilmartians/lefthook) – format/lint on commit, message check, tests on push |
 | Art | `python tools/art/build.py` (Pillow + resvg) |
@@ -45,11 +48,12 @@ The addon is Lua 5.1 (the client's dialect). Tooling:
 
 ```sh
 npm install          # dev tools + git hooks
-npm run check        # format check, lint, tests
+npm run check        # format, lint, types, tests + coverage (also the pre-push hook)
 ```
 
-Lint and tests run in a small Docker image (`tools/docker/`) so they behave the same
-on every OS; set `GG_NATIVE_LUA=1` to use locally installed `luacheck`/`busted`.
+Lua tools (busted, luacov, luacheck, LuaLS) run in a small Docker image (`tools/docker/`)
+so they behave the same on every OS and in CI; set `GG_NATIVE_LUA=1` to use local installs.
+Python tools need `pip install -r tools/art/requirements.txt pytest ruff`.
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
 

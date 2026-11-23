@@ -1,8 +1,8 @@
 {
   "$schema": "https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json",
   "runtime.version": "Lua 5.1",
-  "workspace.library": [],
-  "workspace.ignoreDir": ["node_modules", "tools", ".github"],
-  "diagnostics.globals": ["describe", "it", "before_each", "after_each", "setup", "teardown", "assert", "spy", "stub", "mock"],
+  "workspace.library": ["${3rd}/busted/library", "${3rd}/luassert/library"],
+  "workspace.checkThirdParty": false,
+  "workspace.ignoreDir": ["node_modules", "tools", ".github", ".luarocks"],
   "type.weakUnionCheck": true
 }

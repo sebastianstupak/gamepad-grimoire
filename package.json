@@ -9,12 +9,16 @@
   },
   "scripts": {
     "prepare": "lefthook install",
-    "format": "stylua src spec",
-    "format:check": "stylua --check src spec",
-    "lint": "node tools/lua.mjs luacheck .",
-    "test": "node tools/lua.mjs busted",
-    "check": "npm run format:check && npm run lint && npm run test",
-    "lua:image": "node tools/lua.mjs --build"
+    "format": "stylua src spec && python -m ruff format tools",
+    "format:check": "stylua --check src spec && python -m ruff format --check tools",
+    "lint": "node tools/lua.mjs luacheck . && python -m ruff check tools",
+    "typecheck": "node tools/lua.mjs lua-language-server --check=. --checklevel=Warning --check_format=pretty --configpath=.luarc.json",
+    "test": "node tools/lua.mjs busted && python -m pytest -q",
+    "coverage": "node tools/lua.mjs sh -c \"busted --coverage -o utfTerminal && luacov\" && node tools/coverage.mjs 90",
+    "check": "npm run format:check && npm run lint && npm run typecheck && npm run coverage && python -m pytest -q",
+    "lua:image": "node tools/lua.mjs --build",
+    "art": "python tools/art/build.py",
+    "e2e": "python tools/e2e/deck_e2e.py"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",

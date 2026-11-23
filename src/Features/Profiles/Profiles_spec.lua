@@ -1,3 +1,5 @@
+-- luassert accepts a failure message as the last argument; its LuaLS definitions do not.
+---@diagnostic disable: redundant-parameter
 local Addon = require("spec.helpers.addon")
 
 describe("Profiles", function()

@@ -9,6 +9,7 @@
 3. src/Features/Controllers/Definitions.lua is generated with button anchors in
    canvas coordinates (0..1), so the addon needs no per-controller maths.
 """
+
 import json
 import os
 import sys
@@ -52,9 +53,9 @@ def split_shoulders(anchors):
     if not band:
         return
     for side in ("L", "R"):
-        trig = anchors.get("PAD%sTRIGGER" % side)
-        if trig and "PAD%sSHOULDER" % side not in anchors:
-            anchors["PAD%sSHOULDER" % side] = dict(x=trig["x"], y=band["y"], w=trig["w"] * 1.4, h=band["h"])
+        trig = anchors.get(f"PAD{side}TRIGGER")
+        if trig and f"PAD{side}SHOULDER" not in anchors:
+            anchors[f"PAD{side}SHOULDER"] = dict(x=trig["x"], y=band["y"], w=trig["w"] * 1.4, h=band["h"])
 
 
 def back_grips(anchors):
@@ -83,13 +84,17 @@ def write_definitions(defs, path):
     for d in defs:
         out.append("Register({")
         for k in ("id", "name", "family", "labelStyle", "texture"):
-            out.append("    %s = %s," % (k, lua_str(d[k])))
+            out.append(f"    {k} = {lua_str(d[k])},")
         hidden = ", ".join(lua_str(h) for h in d["hidden"])
-        out.append("    hidden = { %s }," % hidden if hidden else "    hidden = {},")  # StyLua's format
+        out.append(f"    hidden = {{ {hidden} }}," if hidden else "    hidden = {},")  # StyLua's format
         out.append("    anchors = {")
         for b in sorted(d["anchors"]):
             a = d["anchors"][b]
-            out.append("        %s = { x = %.4f, y = %.4f, w = %.4f, h = %.4f }," % (b, a["x"], a["y"], a["w"], a["h"]))
+            out.append(
+                "        {} = {{ x = {:.4f}, y = {:.4f}, w = {:.4f}, h = {:.4f} }},".format(
+                    b, a["x"], a["y"], a["w"], a["h"]
+                )
+            )
         out.append("    },")
         out.append("})")
         out.append("")
@@ -102,7 +107,8 @@ def main():
     restyle.STYLE = "lineart"
     restyle.OUT_W = RENDER_W
     restyle.main(os.path.join(HERE, "sources"), out_dir)
-    measured = json.load(open(os.path.join(out_dir, "anchors.json")))
+    with open(os.path.join(out_dir, "anchors.json"), encoding="utf-8") as f:
+        measured = json.load(f)
 
     media = os.path.join(ROOT, "media", "controllers")
     os.makedirs(media, exist_ok=True)
@@ -113,16 +119,27 @@ def main():
         canvas, (x, y, w, h) = fit(img)
         canvas.save(os.path.join(media, cid + ".tga"))
         anchors = {
-            b: dict(x=(x + a["cx"] * w) / CANVAS[0], y=(y + a["cy"] * h) / CANVAS[1],
-                    w=a["w"] * w / CANVAS[0], h=a["h"] * h / CANVAS[1])
+            b: dict(
+                x=(x + a["cx"] * w) / CANVAS[0],
+                y=(y + a["cy"] * h) / CANVAS[1],
+                w=a["w"] * w / CANVAS[0],
+                h=a["h"] * h / CANVAS[1],
+            )
             for b, a in m["anchors"].items()
         }
         split_shoulders(anchors)
         if cid == "steamdeck":
             back_grips(anchors)
-        defs.append(dict(id=cid, name=m["name"], texture="Interface\\AddOns\\GamepadGrimoire\\media\\controllers\\" + cid,
-                         anchors=anchors, **META[cid]))
-        print("%-10s %2d anchors -> media/controllers/%s.tga" % (cid, len(anchors), cid))
+        defs.append(
+            dict(
+                id=cid,
+                name=m["name"],
+                texture="Interface\\AddOns\\GamepadGrimoire\\media\\controllers\\" + cid,
+                anchors=anchors,
+                **META[cid],
+            )
+        )
+        print(f"{cid:<10} {len(anchors):2d} anchors -> media/controllers/{cid}.tga")
     write_definitions(defs, os.path.join(ROOT, "src", "Features", "Controllers", "Definitions.lua"))
 
 

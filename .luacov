@@ -1,0 +1,11 @@
+-- Line coverage of the addon (npm run coverage). Excluded:
+--   *_spec            the tests themselves
+--   Definitions       generated data
+--   Core/Wow          the real WoW adapter - replaced by the fake in unit tests and
+--                     exercised in game by tools/e2e/deck_e2e.py instead
+return {
+    include = { "src/" },
+    exclude = { "_spec$", "src/Features/Controllers/Definitions$", "src/Core/Wow$" },
+    statsfile = "luacov.stats.out",
+    reportfile = "luacov.report.out",
+}

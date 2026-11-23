@@ -33,7 +33,7 @@ function CheatSheet.HeldLayer(shift, ctrl, modifiers)
 end
 
 ---Peek / pin state machine step. Pure.
----@param s { heldLayer: string?, heldFor: number }
+---@param s { heldLayer: string?, heldFor: number, pinnedLayer: string? }
 ---@param held string|nil layer currently held
 ---@param dt number seconds since last step
 ---@param pinned boolean
@@ -101,6 +101,27 @@ local function render(layer)
     })
     c.frame:Show()
     shownLayer = layer
+    CheatSheet.RecordScreenRect(c)
+end
+
+---Remembers where the card is on screen, as fractions of the screen size
+---(used by tools/e2e to crop screenshots; harmless otherwise).
+function CheatSheet.RecordScreenRect(c)
+    local f, ui = c.frame, ns.Wow.UIParent
+    local l, t, r, b = f:GetLeft(), f:GetTop(), f:GetRight(), f:GetBottom()
+    if not (l and t and r and b) then
+        return
+    end
+    local k = f:GetEffectiveScale() / ui:GetEffectiveScale()
+    local w, h = ui:GetWidth(), ui:GetHeight()
+    ns.db.debug = ns.db.debug or {}
+    ns.db.debug.cards = ns.db.debug.cards or {}
+    ns.db.debug.cards[c.def.id] = {
+        left = l * k / w,
+        right = r * k / w,
+        top = 1 - t * k / h,
+        bottom = 1 - b * k / h,
+    }
 end
 
 ---Pin / unpin the card (also bound to the pin key).

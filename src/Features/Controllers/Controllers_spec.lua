@@ -15,7 +15,10 @@ describe("Controllers", function()
                 ids[#ids + 1] = def.id
                 assert.truthy(def.texture:match("^Interface\\AddOns\\GamepadGrimoire\\"), def.id)
             end
-            assert.same({ "xbox", "dualsense", "switchpro", "steamdeck" }, ids)
+            assert.same(
+                { "xbox", "dualsense", "switchpro", "steamdeck", "dualshock4", "xbox360", "steamcontroller" },
+                ids
+            )
         end)
 
         it("has an anchor inside the picture for the core buttons of every controller", function()
@@ -46,8 +49,8 @@ describe("Controllers", function()
 
         it("has a back view for every controller, left out of the controller list", function()
             local R = ns.Controllers.Registry
-            assert.are.equal(4, #R.All())
-            assert.are.equal(8, #R.All(true))
+            assert.are.equal(7, #R.All())
+            assert.are.equal(14, #R.All(true))
             for _, def in ipairs(R.All()) do
                 local back = R.BackOf(def)
                 assert.is_table(back, def.id)
@@ -85,6 +88,8 @@ describe("Controllers", function()
             assert.equal("dualshock4", (Detect.FromDevice({ vendorID = 0x054C, productID = 0x09CC })))
             assert.equal("switchpro", (Detect.FromDevice({ vendorID = 0x057E, productID = 0x2009 })))
             assert.equal("xbox", (Detect.FromDevice({ vendorID = 0x045E, productID = 0x028E })))
+            assert.equal("steamcontroller", (Detect.FromDevice({ vendorID = 0x28DE, productID = 0x1142 })))
+            assert.equal("steamdeck", (Detect.FromDevice({ vendorID = 0x28DE, productID = 0x1205 })))
         end)
 
         it("falls back to the button label style, then the device name", function()
@@ -99,8 +104,10 @@ describe("Controllers", function()
             assert.equal("switchpro", (Detect.Resolve("auto")))
             wow.device = nil
             assert.equal("xbox", (Detect.Resolve("auto")))
-            -- DualShock 4 has no picture yet -> default, with the reason kept
             wow.device = { vendorID = 0x054C, productID = 0x09CC }
+            assert.equal("dualshock4", (Detect.Resolve("auto")))
+            -- an unknown controller -> default, with the reason kept
+            wow.device = { vendorID = 0x1234, productID = 0x0001, name = "Mystery Pad" }
             local id, reason = Detect.Resolve("auto")
             assert.equal("xbox", id)
             assert.truthy(reason:find("default"))

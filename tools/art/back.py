@@ -35,6 +35,13 @@ PADDLES = {
     },
     # Switch Pro: no back buttons, the back shows ZL / ZR / L / R only
     "switchpro": {},
+    "dualshock4": {},
+    "xbox360": {},
+    # Steam Controller grip buttons
+    "steamcontroller": {
+        "PADPADDLE3": ("LG", 0.17, 0.66, 0.05, 0.17),
+        "PADPADDLE1": ("RG", 0.83, 0.66, 0.05, 0.17),
+    },
 }
 
 SUBTITLE = {
@@ -42,6 +49,9 @@ SUBTITLE = {
     "xbox": "Xbox Elite (back)",
     "dualsense": "DualSense Edge (back)",
     "switchpro": "Switch Pro (back)",
+    "dualshock4": "DualShock 4 (back)",
+    "xbox360": "Xbox 360 (back)",
+    "steamcontroller": "Steam Controller (back)",
 }
 
 SHOULDERS = ("PADLTRIGGER", "PADRTRIGGER", "PADLSHOULDER", "PADRSHOULDER")

@@ -31,8 +31,11 @@ META = {
     "xbox": dict(family="xbox", labelStyle="Letters", hidden=[]),
     "dualsense": dict(family="playstation", labelStyle="Shapes", hidden=["MUTE"]),
     "switchpro": dict(family="nintendo", labelStyle="Reverse", hidden=[]),
+    "dualshock4": dict(family="playstation", labelStyle="Shapes", hidden=[]),
+    "xbox360": dict(family="xbox", labelStyle="Letters", hidden=[], labels={"PADBACK": "Back", "PADFORWARD": "Start"}),
+    "steamcontroller": dict(family="valve", labelStyle="Letters", hidden=[], labels={"PADDPAD": "LPad"}),
 }
-ORDER = ["xbox", "dualsense", "switchpro", "steamdeck"]
+ORDER = ["xbox", "dualsense", "switchpro", "steamdeck", "dualshock4", "xbox360", "steamcontroller"]
 
 
 def fit(img):

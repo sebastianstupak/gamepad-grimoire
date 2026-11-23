@@ -16,8 +16,8 @@ share setups with friends.
 > Status: early development. Verified in game on WoW: Forever 1.60.1 (Steam Deck)
 > by an automated end-to-end test. Not yet released on CurseForge or Wago.
 
-- **Any controller.** Xbox, PlayStation (DualSense), Switch Pro and Steam Deck
-  pictures in one consistent line-art style.
+- **Any controller.** Xbox Series, Xbox 360, DualSense, DualShock 4, Switch Pro,
+  Steam Deck and Steam Controller pictures in one consistent line-art style.
 - **Never touches your keybinds.** Binds are applied as override bindings owned by
   the addon; disable it and your normal keybinds are back. Changes made in combat
   wait until combat ends.
@@ -87,7 +87,7 @@ the keyboard fallback.
 | `/gg profile copy <name>` | Copy the active profile |
 | `/gg profile rename <old> = <new>` | Rename a profile |
 | `/gg profile delete <name>` | Delete an unused profile |
-| `/gg controller <id\|auto>` | Picture to show: `xbox`, `dualsense`, `switchpro`, `steamdeck` |
+| `/gg controller <id\|auto>` | Picture to show: `xbox`, `xbox360`, `dualsense`, `dualshock4`, `switchpro`, `steamdeck`, `steamcontroller` |
 | `/gg capture <name>` | New profile from your current controller keybinds |
 | `/gg export [profile]` | Share string of a profile (copy box) |
 | `/gg import` | Paste a share string to add it as a new profile |
@@ -104,14 +104,14 @@ Controller support (front view, then back view where the device has buttons ther
 | Steam Deck (LCD, OLED) | Done | Done: L4, L5, R4, R5 |
 | Xbox Series X/S, Xbox One | Done | Done (triggers and bumpers) |
 | Xbox Elite Series 2 | Uses the Xbox picture | Done: paddles P1 to P4 |
-| Xbox 360 | Planned | |
+| Xbox 360 | Done | Done (triggers and bumpers) |
 | PlayStation DualSense | Done | |
 | PlayStation DualSense Edge | Uses the DualSense picture | Done: the two back buttons |
-| PlayStation DualShock 4 | Planned (detected already) | |
+| PlayStation DualShock 4 | Done | Done (triggers and bumpers) |
 | Nintendo Switch Pro | Done | Done (triggers and bumpers) |
 | Nintendo Switch 2 Pro | Planned | Planned: GL / GR back buttons |
 | 8BitDo Pro 2, Ultimate | Planned | Planned: back buttons |
-| Steam Controller | Planned | Planned: back grips |
+| Steam Controller | Done | Done: grip buttons LG, RG |
 | ROG Ally, Legion Go, MSI Claw | Planned | Planned: back buttons where present |
 | Generic gamepad | Planned | |
 

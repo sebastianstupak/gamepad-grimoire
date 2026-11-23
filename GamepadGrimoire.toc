@@ -1,0 +1,15 @@
+## Interface: 16001
+## Title: Gamepad Grimoire
+## Notes: Controller bindings and an on-screen controller cheat sheet for every gamepad.
+## Author: Sebastian Stupak
+## Version: @project-version@
+## SavedVariables: GamepadGrimoireDB
+## Category: Interface Enhancements
+## X-License: MIT
+
+src\Core\Namespace.lua
+src\Core\Wow.lua
+src\Core\Events.lua
+src\Core\Store.lua
+
+src\Bootstrap.lua

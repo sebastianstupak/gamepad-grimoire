@@ -9,6 +9,7 @@ Register({
     family = "xbox",
     labelStyle = "Letters",
     texture = "Interface\\AddOns\\GamepadGrimoire\\media\\controllers\\xbox",
+    back = "xbox_back",
     hidden = {},
     anchors = {
         PAD1 = { x = 0.7017, y = 0.5361, w = 0.0543, h = 0.1048 },
@@ -30,11 +31,34 @@ Register({
 })
 
 Register({
+    id = "xbox_back",
+    name = "Xbox Elite (back)",
+    family = "xbox",
+    labelStyle = "Letters",
+    texture = "Interface\\AddOns\\GamepadGrimoire\\media\\controllers\\xbox_back",
+    view = "back",
+    front = "xbox",
+    hidden = {},
+    labels = { PADPADDLE1 = "P1", PADPADDLE2 = "P2", PADPADDLE3 = "P3", PADPADDLE4 = "P4" },
+    anchors = {
+        PADLSHOULDER = { x = 0.2732, y = 0.1493, w = 0.1166, h = 0.1199 },
+        PADLTRIGGER = { x = 0.2732, y = 0.0950, w = 0.0833, h = 0.1274 },
+        PADPADDLE1 = { x = 0.6508, y = 0.5938, w = 0.0339, h = 0.1500 },
+        PADPADDLE2 = { x = 0.6206, y = 0.7812, w = 0.0339, h = 0.1500 },
+        PADPADDLE3 = { x = 0.3492, y = 0.5938, w = 0.0339, h = 0.1500 },
+        PADPADDLE4 = { x = 0.3794, y = 0.7812, w = 0.0339, h = 0.1500 },
+        PADRSHOULDER = { x = 0.7204, y = 0.1493, w = 0.1145, h = 0.1199 },
+        PADRTRIGGER = { x = 0.7204, y = 0.0874, w = 0.0818, h = 0.1123 },
+    },
+})
+
+Register({
     id = "dualsense",
     name = "DualSense",
     family = "playstation",
     labelStyle = "Shapes",
     texture = "Interface\\AddOns\\GamepadGrimoire\\media\\controllers\\dualsense",
+    back = "dualsense_back",
     hidden = { "MUTE" },
     anchors = {
         MUTE = { x = 0.5016, y = 0.7662, w = 0.0472, h = 0.0371 },
@@ -59,11 +83,32 @@ Register({
 })
 
 Register({
+    id = "dualsense_back",
+    name = "DualSense Edge (back)",
+    family = "playstation",
+    labelStyle = "Shapes",
+    texture = "Interface\\AddOns\\GamepadGrimoire\\media\\controllers\\dualsense_back",
+    view = "back",
+    front = "dualsense",
+    hidden = {},
+    labels = { PADPADDLE1 = "RB", PADPADDLE3 = "LB" },
+    anchors = {
+        PADLSHOULDER = { x = 0.2284, y = 0.1998, w = 0.1252, h = 0.1433 },
+        PADLTRIGGER = { x = 0.2338, y = 0.1197, w = 0.1159, h = 0.1770 },
+        PADPADDLE1 = { x = 0.7355, y = 0.6875, w = 0.0379, h = 0.1406 },
+        PADPADDLE3 = { x = 0.2635, y = 0.6875, w = 0.0379, h = 0.1406 },
+        PADRSHOULDER = { x = 0.7709, y = 0.2007, w = 0.1264, h = 0.1433 },
+        PADRTRIGGER = { x = 0.7657, y = 0.1168, w = 0.1159, h = 0.1711 },
+    },
+})
+
+Register({
     id = "switchpro",
     name = "Switch Pro",
     family = "nintendo",
     labelStyle = "Reverse",
     texture = "Interface\\AddOns\\GamepadGrimoire\\media\\controllers\\switchpro",
+    back = "switchpro_back",
     hidden = {},
     anchors = {
         PAD1 = { x = 0.6690, y = 0.4183, w = 0.0484, h = 0.0981 },
@@ -85,15 +130,32 @@ Register({
 })
 
 Register({
+    id = "switchpro_back",
+    name = "Switch Pro (back)",
+    family = "nintendo",
+    labelStyle = "Reverse",
+    texture = "Interface\\AddOns\\GamepadGrimoire\\media\\controllers\\switchpro_back",
+    view = "back",
+    front = "switchpro",
+    hidden = {},
+    labels = {},
+    anchors = {
+        PADLSHOULDER = { x = 0.3283, y = 0.1128, w = 0.1598, h = 0.1103 },
+        PADLTRIGGER = { x = 0.3241, y = 0.0758, w = 0.1178, h = 0.0891 },
+        PADRSHOULDER = { x = 0.6702, y = 0.1128, w = 0.1601, h = 0.1103 },
+        PADRTRIGGER = { x = 0.6741, y = 0.0754, w = 0.1175, h = 0.0884 },
+    },
+})
+
+Register({
     id = "steamdeck",
     name = "Steam Deck",
     family = "valve",
     labelStyle = "Letters",
     texture = "Interface\\AddOns\\GamepadGrimoire\\media\\controllers\\steamdeck",
-    hidden = { "L4", "L5", "R4", "R5", "LPAD", "RPAD", "QAM" },
+    back = "steamdeck_back",
+    hidden = { "LPAD", "RPAD", "QAM" },
     anchors = {
-        L4 = { x = 0.0450, y = 0.4465, w = 0.0500, h = 0.0600 },
-        L5 = { x = 0.0450, y = 0.6265, w = 0.0500, h = 0.0600 },
         LPAD = { x = 0.1575, y = 0.5065, w = 0.1037, h = 0.2081 },
         PAD1 = { x = 0.9256, y = 0.3184, w = 0.0305, h = 0.0600 },
         PAD2 = { x = 0.9534, y = 0.2623, w = 0.0300, h = 0.0600 },
@@ -110,9 +172,29 @@ Register({
         PADRTRIGGER = { x = 0.8933, y = 0.1263, w = 0.1037, h = 0.0416 },
         PADSYSTEM = { x = 0.1834, y = 0.6696, w = 0.0528, h = 0.0445 },
         QAM = { x = 0.8165, y = 0.6696, w = 0.0528, h = 0.0445 },
-        R4 = { x = 0.9550, y = 0.4465, w = 0.0500, h = 0.0600 },
-        R5 = { x = 0.9550, y = 0.6265, w = 0.0500, h = 0.0600 },
         RPAD = { x = 0.8420, y = 0.5065, w = 0.1037, h = 0.2081 },
         SCREEN = { x = 0.5000, y = 0.5177, w = 0.4902, h = 0.6135 },
+    },
+})
+
+Register({
+    id = "steamdeck_back",
+    name = "Steam Deck (back)",
+    family = "valve",
+    labelStyle = "Letters",
+    texture = "Interface\\AddOns\\GamepadGrimoire\\media\\controllers\\steamdeck_back",
+    view = "back",
+    front = "steamdeck",
+    hidden = {},
+    labels = { PADPADDLE1 = "R4", PADPADDLE2 = "R5", PADPADDLE3 = "L4", PADPADDLE4 = "L5" },
+    anchors = {
+        PADLSHOULDER = { x = 0.1096, y = 0.1413, w = 0.1211, h = 0.0309 },
+        PADLTRIGGER = { x = 0.1049, y = 0.1258, w = 0.1032, h = 0.0406 },
+        PADPADDLE1 = { x = 0.9117, y = 0.4211, w = 0.0291, h = 0.1341 },
+        PADPADDLE2 = { x = 0.9117, y = 0.5947, w = 0.0291, h = 0.1341 },
+        PADPADDLE3 = { x = 0.0883, y = 0.4211, w = 0.0291, h = 0.1341 },
+        PADPADDLE4 = { x = 0.0883, y = 0.5947, w = 0.0291, h = 0.1341 },
+        PADRSHOULDER = { x = 0.8885, y = 0.1413, w = 0.1211, h = 0.0290 },
+        PADRTRIGGER = { x = 0.8933, y = 0.1263, w = 0.1037, h = 0.0416 },
     },
 })

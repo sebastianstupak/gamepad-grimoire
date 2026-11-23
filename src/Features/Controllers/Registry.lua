@@ -24,13 +24,36 @@ function Registry.Get(id)
     return defs[id]
 end
 
----@return table[] definitions in registration order
-function Registry.All()
+---Controllers in registration order. Back views are extra definitions
+---(view = "back") that belong to a front one; they are left out unless asked for.
+---@param withViews? boolean include back views
+---@return table[]
+function Registry.All(withViews)
     local out = {}
-    for i, id in ipairs(order) do
-        out[i] = defs[id]
+    for _, id in ipairs(order) do
+        if withViews or defs[id].view ~= "back" then
+            out[#out + 1] = defs[id]
+        end
     end
     return out
+end
+
+---The back view of a controller (nil when it has none).
+---@return table|nil
+function Registry.BackOf(def)
+    return def and def.back and defs[def.back] or nil
+end
+
+---The definition showing `button`: the front, or the back view for back buttons.
+---@return table|nil def, string|nil view "front" | "back"
+function Registry.ViewFor(def, button)
+    if def.anchors[button] or (button:match("^PADD[UDLR]") and def.anchors.PADDPAD) then
+        return def, "front"
+    end
+    local back = Registry.BackOf(def)
+    if back and back.anchors[button] then
+        return back, "back"
+    end
 end
 
 ---Anchor of a button on a definition, in 0..1 image coordinates.

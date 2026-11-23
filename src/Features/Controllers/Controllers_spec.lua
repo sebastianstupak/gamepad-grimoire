@@ -38,10 +38,39 @@ describe("Controllers", function()
             end
         end)
 
-        it("marks the Steam Deck back grips as invisible to the game", function()
+        it("hides the trackpads and the quick access button", function()
             local deck = ns.Controllers.Registry.Get("steamdeck")
-            assert.is_true(ns.Controllers.Registry.IsHidden(deck, "L4"))
+            assert.is_true(ns.Controllers.Registry.IsHidden(deck, "LPAD"))
             assert.is_false(ns.Controllers.Registry.IsHidden(deck, "PAD1"))
+        end)
+
+        it("has a back view for every controller, left out of the controller list", function()
+            local R = ns.Controllers.Registry
+            assert.are.equal(4, #R.All())
+            assert.are.equal(8, #R.All(true))
+            for _, def in ipairs(R.All()) do
+                local back = R.BackOf(def)
+                assert.is_table(back, def.id)
+                assert.are.equal("back", back.view)
+                assert.are.equal(def.id, back.front)
+                assert.is_table(back.anchors.PADLTRIGGER, def.id .. " triggers on the back")
+                assert.truthy(back.texture:match("_back$"), def.id)
+            end
+        end)
+
+        it("puts the Steam Deck back grips on the back, named L4 L5 R4 R5", function()
+            local R = ns.Controllers.Registry
+            local deck = R.Get("steamdeck")
+            local back = R.BackOf(deck)
+            assert.are.equal("R4", back.labels.PADPADDLE1)
+            assert.are.equal("L5", back.labels.PADPADDLE4)
+            assert.is_true(back.anchors.PADPADDLE3.x < 0.5, "L4 on the left")
+            assert.are.equal("back", select(2, R.ViewFor(deck, "PADPADDLE1")))
+            assert.are.equal("front", select(2, R.ViewFor(deck, "PAD1")))
+            assert.are.equal("front", select(2, R.ViewFor(deck, "PADDUP")))
+            assert.is_nil(R.ViewFor(R.Get("switchpro"), "PADPADDLE1"))
+            assert.are.equal("R4", ns.CheatSheet.Glyphs.For(back, "PADPADDLE1"))
+            assert.are.equal("P1", ns.CheatSheet.Glyphs.For(R.Get("xbox"), "PADPADDLE1"))
         end)
     end)
 

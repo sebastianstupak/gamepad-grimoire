@@ -101,6 +101,15 @@ function Glyphs.Label(family, button)
     return f[button] or COMMON[button] or button
 end
 
+---Label of a button on one controller definition (its own labels win: the
+---Steam Deck's back buttons are L4/L5/R4/R5, not P1-P4).
+---@param def table
+---@param button string
+---@return string
+function Glyphs.For(def, button)
+    return def.labels and def.labels[button] or Glyphs.Label(def.family, button)
+end
+
 ---Name of the trigger that holds a layer ("LT" on Xbox, "L2" on PlayStation...).
 ---@param family string
 ---@param layer "LT"|"RT"

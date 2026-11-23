@@ -19,6 +19,7 @@ from PIL import Image
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, HERE)
+import back  # noqa: E402
 import restyle  # noqa: E402
 
 CANVAS = (1024, 512)
@@ -26,7 +27,7 @@ MARGIN = 16
 RENDER_W = 2000  # render large, then downscale for clean lines
 
 META = {
-    "steamdeck": dict(family="valve", labelStyle="Letters", hidden=["L4", "L5", "R4", "R5", "LPAD", "RPAD", "QAM"]),
+    "steamdeck": dict(family="valve", labelStyle="Letters", hidden=["LPAD", "RPAD", "QAM"]),
     "xbox": dict(family="xbox", labelStyle="Letters", hidden=[]),
     "dualsense": dict(family="playstation", labelStyle="Shapes", hidden=["MUTE"]),
     "switchpro": dict(family="nintendo", labelStyle="Reverse", hidden=[]),
@@ -58,17 +59,6 @@ def split_shoulders(anchors):
             anchors[f"PAD{side}SHOULDER"] = dict(x=trig["x"], y=band["y"], w=trig["w"] * 1.4, h=band["h"])
 
 
-def back_grips(anchors):
-    """Steam Deck L4/L5/R4/R5 sit on the back of the grips (outside the front
-    drawing): place them at the left/right edges, level with the trackpads."""
-    lp, rp = anchors.get("LPAD"), anchors.get("RPAD")
-    if not (lp and rp):
-        return
-    for name, pad, x in (("L4", lp, 0.045), ("L5", lp, 0.045), ("R4", rp, 0.955), ("R5", rp, 0.955)):
-        dy = -0.06 if name.endswith("4") else 0.12
-        anchors.setdefault(name, dict(x=x, y=pad["y"] + dy, w=0.05, h=0.06))
-
-
 def lua_str(s):
     return '"' + s.replace("\\", "\\\\").replace('"', '\\"') + '"'
 
@@ -83,10 +73,14 @@ def write_definitions(defs, path):
     ]
     for d in defs:
         out.append("Register({")
-        for k in ("id", "name", "family", "labelStyle", "texture"):
-            out.append(f"    {k} = {lua_str(d[k])},")
+        for k in ("id", "name", "family", "labelStyle", "texture", "view", "front", "back"):
+            if k in d:
+                out.append(f"    {k} = {lua_str(d[k])},")
         hidden = ", ".join(lua_str(h) for h in d["hidden"])
         out.append(f"    hidden = {{ {hidden} }}," if hidden else "    hidden = {},")  # StyLua's format
+        if "labels" in d:
+            pairs = ", ".join(f"{b} = {lua_str(t)}" for b, t in sorted(d["labels"].items()))
+            out.append(f"    labels = {{ {pairs} }}," if pairs else "    labels = {},")
         out.append("    anchors = {")
         for b in sorted(d["anchors"]):
             a = d["anchors"][b]
@@ -129,18 +123,47 @@ def main():
             for b, a in m["anchors"].items()
         }
         split_shoulders(anchors)
-        if cid == "steamdeck":
-            back_grips(anchors)
+        tex = "Interface\\AddOns\\GamepadGrimoire\\media\\controllers\\"
+        defs.append(dict(id=cid, name=m["name"], texture=tex + cid, back=cid + "_back", anchors=anchors, **META[cid]))
+        print(f"{cid:<10} {len(anchors):2d} anchors -> media/controllers/{cid}.tga")
+
+        # back view: same canvas placement, so it lines up with the front
+        drawing = {
+            b: dict(
+                cx=(a["x"] * CANVAS[0] - x) / w,
+                cy=(a["y"] * CANVAS[1] - y) / h,
+                w=a["w"] * CANVAS[0] / w,
+                h=a["h"] * CANVAS[1] / h,
+            )
+            for b, a in anchors.items()
+        }
+        bimg, banchors = back.draw(img, drawing, cid, stroke=max(2, round(RENDER_W / 1000 * 1.5 * 3)))
+        bcanvas, _ = fit(bimg)
+        bcanvas.save(os.path.join(media, cid + "_back.tga"))
+        bid = cid + "_back"
         defs.append(
             dict(
-                id=cid,
-                name=m["name"],
-                texture="Interface\\AddOns\\GamepadGrimoire\\media\\controllers\\" + cid,
-                anchors=anchors,
-                **META[cid],
+                id=bid,
+                name=back.SUBTITLE[cid],
+                family=META[cid]["family"],
+                labelStyle=META[cid]["labelStyle"],
+                texture=tex + bid,
+                view="back",
+                front=cid,
+                hidden=[],
+                labels=back.labels(cid),
+                anchors={
+                    b: dict(
+                        x=(x + a["cx"] * w) / CANVAS[0],
+                        y=(y + a["cy"] * h) / CANVAS[1],
+                        w=a["w"] * w / CANVAS[0],
+                        h=a["h"] * h / CANVAS[1],
+                    )
+                    for b, a in banchors.items()
+                },
             )
         )
-        print(f"{cid:<10} {len(anchors):2d} anchors -> media/controllers/{cid}.tga")
+        print(f"{bid:<15} {len(banchors):2d} anchors -> media/controllers/{bid}.tga")
     write_definitions(defs, os.path.join(ROOT, "src", "Features", "Controllers", "Definitions.lua"))
     gallery(os.path.join(ROOT, "docs", "images", "controllers.png"))
 

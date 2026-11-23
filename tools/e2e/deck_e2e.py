@@ -175,6 +175,49 @@ def restore_addons(deck):
     print("  restored", len(out.split()), "AddOns.txt")
 
 
+VPAD = "/home/deck/.local/share/gamepad-grimoire-e2e/vpad.py"
+VPAD_FIFO = "/tmp/gg-vpad.fifo"
+
+
+class VirtualPad:
+    """A virtual Xbox Elite pad on the Deck (tools/e2e/vpad.py), run as a user
+    service; steps are written to a FIFO so presses can overlap screenshots."""
+
+    def __init__(self, deck):
+        self.deck = deck
+        with open(os.path.join(ROOT, "tools", "e2e", "vpad.py"), "rb") as f:
+            deck.sh(f"mkdir -p {os.path.dirname(VPAD)}")
+            deck.put(f.read(), VPAD)
+        deck.sh(
+            f"systemctl --user stop gg-vpad 2>/dev/null; rm -f {VPAD_FIFO}; mkfifo {VPAD_FIFO};"
+            f" systemd-run --user --unit=gg-vpad python3 {VPAD} serve {VPAD_FIFO} >/dev/null 2>&1",
+            check=False,
+        )
+        time.sleep(3)  # the game picks up the new controller
+        if deck.sh("systemctl --user is-active gg-vpad", check=False).strip() != "active":
+            log = deck.sh("journalctl --user -u gg-vpad -n 20 --no-pager", check=False)
+            raise SystemExit("virtual gamepad did not start:\n" + log)
+
+    def send(self, *steps, wait=True):
+        """Queues steps; with wait, sleeps about as long as they take."""
+        body = "\n".join(steps)
+        self.deck.sh(f"printf '%s\\n' {shlex.quote(body)} > {VPAD_FIFO}", check=False)
+        if wait:
+            took = 0.0
+            for st in steps:
+                parts = st.split()
+                took += float(parts[1]) if parts[0] == "wait" else (float(parts[2]) if len(parts) > 2 else 0.15) + 0.25
+            time.sleep(took + 0.4)
+
+    def press(self, *buttons):
+        self.send(*("press " + b for b in buttons))
+
+    def close(self):
+        self.send("quit", wait=False)
+        time.sleep(1)
+        self.deck.sh("systemctl --user stop gg-vpad 2>/dev/null; rm -f " + VPAD_FIFO, check=False)
+
+
 def keep_awake(deck, on=True):
     """Blocks sleep / idle / lid suspend for the whole run. A user service, so it
     survives the SSH session that starts it (a nohup'ed child does not)."""
@@ -280,9 +323,55 @@ def scenario(deck):
     peek = deck.screenshot("20-peek-lt")
     deck.x(":1", "keyup shift")
     setup = setup_scenario(deck)
+    setup.update(gamepad_scenario(deck))
     deck.chat("/gg controller auto")
     deck.chat("/gg diag")
     return shots, peek, setup
+
+
+def gamepad_scenario(deck):
+    """Everything through a (virtual) controller: setup navigation, the back of the
+    controller, paddles, the on-screen keyboard and held-button highlighting."""
+    print("== gamepad")
+    deck.chat("/gg profile delete Padx")  # leftover of an earlier run
+    deck.chat("/gg profile use E2E Setup")
+    deck.chat("/gg controller xbox")  # the virtual pad is an Xbox Elite
+    pad = VirtualPad(deck)
+    shots = {}
+    try:
+        deck.chat("/gg setup")
+        pad.press("DOWN")  # first input makes the virtual pad the active controller
+        deck.chat("/gg diag")  # records the buttons the game sees (incl. paddles or not)
+        pad.press("VIEW")  # View / Select: back of the controller
+        shots["back"] = deck.screenshot("40-setup-back")
+        pad.press("PADDLE1")  # jumps to P1 if the game sees paddles
+        shots["paddle"] = deck.screenshot("41-setup-paddle")
+        pad.press("VIEW")  # front again
+        # menu from the bottom: Close, Capture, Card size, Controller, spec, Delete, Rename, Copy, New
+        pad.press("Y")
+        pad.press(*["DOWN"] * 25)
+        pad.press(*["UP"] * 8, "A")  # New empty profile...
+        # "Pad": P (row 2, col 6), a (row 1, col 1), d (row 1, col 4)
+        pad.press("DOWN", *["RIGHT"] * 5, "A", "UP", *["LEFT"] * 5, "A", *["RIGHT"] * 3, "A")
+        shots["keys"] = deck.screenshot("42-setup-keyboard")
+        pad.press("Y")  # done: profile "Pad" created and used
+        pad.press("Y", *["DOWN"] * 25, *["UP"] * 6, "A")  # Rename Pad...
+        pad.press("DOWN", "DOWN", *["RIGHT"] * 3, "A", "Y")  # append "x" -> "Padx"
+        pad.press("B")  # close setup
+        deck.chat("/gg show")  # pin the card (not in setup: presses reach the game)
+        pad.send("hold RB 2.5", wait=False)
+        time.sleep(1.2)
+        shots["held"] = deck.screenshot("43-held-rb")
+        time.sleep(1.8)
+        pad.send("hold PADDLE3 2.5", wait=False)
+        time.sleep(1.2)
+        shots["held-paddle"] = deck.screenshot("44-held-paddle")
+        time.sleep(1.8)
+        deck.chat("/gg show")
+    finally:
+        pad.close()
+    deck.chat("/gg profile use E2E")
+    return shots
 
 
 def setup_scenario(deck):
@@ -344,6 +433,12 @@ def check(sv):
     expect("share string round trip", re.search(r'\["share"\] = \{[^}]*\["ok"\] = true', sv, re.S))
     expect("E2E profile captured", '["E2E"]' in sv)
     expect("captured binds applied", re.search(r'\["applied"\] = [1-9]', sv))
+    diag_buttons = re.search(r'\["buttons"\] = \{([^}]*)\}', sv, re.S)
+    seen = re.findall(r'"(PAD\w+)"', diag_buttons.group(1)) if diag_buttons else []
+    expect("the game sees the virtual gamepad", "PAD1" in seen)
+    print("    buttons the game sees:", " ".join(seen) or "-")
+    print("    paddles reach the game:", "yes" if "PADPADDLE1" in seen else "no")
+    expect("profile named with the on-screen keyboard (gamepad only)", '["Padx"]' in sv)
     expect(
         "controller setup bound a spell to L1",
         re.search(r'\["E2E Setup"\] = \{.*?\["BASE"\] = \{.*?\["PADLSHOULDER"\] = \{[^}]*"spell"', sv, re.S),
@@ -365,7 +460,9 @@ def readme_images(shots, peek, sv, setup=None):
     out = os.path.join(ROOT, "docs", "images")
     os.makedirs(out, exist_ok=True)
     images = [("cheatsheet-" + c, c, p) for c, p in shots] + [("cheatsheet-peek-lt", "steamdeck", peek)]
-    images += [("setup-" + k, "steamdeck", v) for k, v in (setup or {}).items()]
+    # setup / gamepad shots: crop with the card that was on screen
+    card_of = {"back": "xbox_back", "paddle": "xbox_back", "keys": "xbox", "held": "xbox", "held-paddle": "xbox"}
+    images += [("setup-" + k, card_of.get(k, "steamdeck"), v) for k, v in (setup or {}).items() if k in SETUP_SHOTS]
     for name, cid, path in images:
         rect = card_rect(sv, cid)
         if not (path and rect):
@@ -378,7 +475,14 @@ def readme_images(shots, peek, sv, setup=None):
         print(f"  docs/images/{name}.png")
 
 
-SETUP_SHOTS = {"rows": "30-setup-rows", "picker": "31-setup-picker", "menu": "32-setup-menu"}
+SETUP_SHOTS = {
+    "rows": "30-setup-rows",
+    "picker": "31-setup-picker",
+    "menu": "32-setup-menu",
+    "back": "40-setup-back",
+    "keys": "42-setup-keyboard",
+    "held": "43-held-rb",
+}
 SHOT_NAMES = [(cid, "10-card-" + cid) for cid in ("steamdeck", "xbox", "dualsense", "switchpro")]
 
 

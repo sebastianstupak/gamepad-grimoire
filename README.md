@@ -22,8 +22,13 @@ share setups with friends.
   the addon; disable it and your normal keybinds are back. Changes made in combat
   wait until combat ends.
 - **Set up with the controller only.** Press LT+R3: move over the buttons with the
-  D-pad, A picks a spell, macro, item or game action for that button, X clears it,
-  LB / RB switch layers, Y opens profiles and options, B closes. No keyboard needed.
+  D-pad (or just press the button you want), A picks a spell, macro, item or game
+  action for it, X clears it, LB / RB switch layers, View shows the back of the
+  controller, Y opens profiles and options, B closes. Profiles are named with an
+  on-screen keyboard. No keyboard or chat needed.
+- **Front and back.** Back views show the Steam Deck's L4 / L5 / R4 / R5, Xbox Elite
+  paddles and DualSense Edge back buttons; the card turns around when you press one.
+- **Live highlight.** Held buttons light up on the card, so you can check what is where.
 - **Cheat sheet.** Hold LT or RT to peek at a layer; the card sizes itself to the screen.
 - **Mouse editing too.** On the open card, drag a spell, item or macro onto a row;
   right-click clears.
@@ -96,14 +101,14 @@ Controller support (front view, then back view where the device has buttons ther
 
 | Device | Front picture | Back / extra buttons |
 | --- | --- | --- |
-| Steam Deck (LCD, OLED) | Done | Planned: back view with L4, L5, R4, R5 |
-| Xbox Series X/S, Xbox One | Done | |
-| Xbox Elite Series 2 | Planned | Planned: back view with paddles P1 to P4 |
+| Steam Deck (LCD, OLED) | Done | Done: L4, L5, R4, R5 |
+| Xbox Series X/S, Xbox One | Done | Done (triggers and bumpers) |
+| Xbox Elite Series 2 | Uses the Xbox picture | Done: paddles P1 to P4 |
 | Xbox 360 | Planned | |
 | PlayStation DualSense | Done | |
-| PlayStation DualSense Edge | Planned | Planned: back view with the two back buttons |
+| PlayStation DualSense Edge | Uses the DualSense picture | Done: the two back buttons |
 | PlayStation DualShock 4 | Planned (detected already) | |
-| Nintendo Switch Pro | Done | |
+| Nintendo Switch Pro | Done | Done (triggers and bumpers) |
 | Nintendo Switch 2 Pro | Planned | Planned: GL / GR back buttons |
 | 8BitDo Pro 2, Ultimate | Planned | Planned: back buttons |
 | Steam Controller | Planned | Planned: back grips |
@@ -114,7 +119,6 @@ Features:
 
 - Controller-only text entry for naming profiles and pasting share strings (the
   on-screen keyboard of Steam / the OS works meanwhile).
-- Back-side view on the card for devices with back buttons, toggled with a button.
 - Blizzard's own button glyphs on the card (confirmed available on WoW: Forever).
 - Settings in the game's Settings panel.
 - Localization.

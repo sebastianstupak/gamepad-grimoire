@@ -15,9 +15,15 @@ GamepadGrimoireDB = {
 ["length"] = 120,
 },
 ["applied"] = 42,
+["buttons"] = {
+"PAD1",
+"PAD2",
+},
 },
 ["profiles"] = {
 ["E2E"] = {
+},
+["Padx"] = {
 },
 ["E2E Setup"] = {
 ["layers"] = {

@@ -19,7 +19,7 @@ docs(repo): explain the Wow adapter rule
 ```
 
 Allowed scopes: `core controllers bindings profiles share commands cheatsheet diagnostics editor
-art deps ci repo release`.
+setup options art deps ci repo release`.
 
 ## Controller art
 

@@ -23,6 +23,7 @@ src/
     Editor/                  drag & drop / right-click editing on the pinned card
     Setup/                   controller-only setup: Navigator (pure state machine), Catalog, Panel
     Options/                 page in the game's Settings > AddOns
+    Options/                 page in the game's Settings > AddOns
     Diagnostics/             /gg diag client checks, kept for the e2e test
     Commands/                /gg, /grimoire
   Bootstrap.lua              loaded last: saved data, then module start
@@ -57,5 +58,4 @@ with `spec/helpers/wow_fake.lua` as `ns.Wow`. `Addon.start(saved)` also fires
 
 ## Planned slices
 
-- **Settings** – options in the game's Settings panel (scale, pin key, controller).
 - **Gamepad navigation** for the editor (pick a row with the D-pad, assign from a list).

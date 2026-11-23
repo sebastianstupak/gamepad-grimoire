@@ -160,6 +160,20 @@ function Profiles.ActiveProfile()
     return db().profiles[Profiles.ActiveName()]
 end
 
+---Profile chosen for one specialization of this character (nil = none).
+---@param spec number
+---@return string|nil
+function Profiles.SpecProfile(spec)
+    return character().specProfiles[spec]
+end
+
+---Stops using a separate profile for `spec` (falls back to the character's).
+---@param spec number
+function Profiles.ClearSpec(spec)
+    character().specProfiles[spec] = nil
+    ns.Events.Emit("PROFILE_CHANGED")
+end
+
 ---Sets the character's profile; with `spec`, only for that specialization.
 ---@return boolean ok, string? err
 function Profiles.Use(name, spec)

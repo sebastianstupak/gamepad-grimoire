@@ -6,6 +6,8 @@
 --   rows    pick a button on the card    D-pad move, LB/RB layer, A pick, X clear, Y menu, B close
 --   picker  pick what to bind            D-pad move, LB/RB category, A assign, B back
 --   menu    profiles and options         D-pad move, A choose, left/right adjust, B back
+--   keys    on-screen keyboard           D-pad move, A type, X delete, LB/RB case, Y / Done ok, B cancel
+-- View (Select) flips the card between the front and back of the controller.
 local _, ns = ...
 
 local Navigator = {}
@@ -26,7 +28,39 @@ function Navigator.New(columns)
         index = 1,
         picker = { category = 1, index = 1, top = 1 },
         menu = { index = 1, top = 1 },
+        keys = nil, -- { text, row, col, upper, purpose } while the keyboard is open
     }
+end
+
+-- On-screen keyboard (profile names). Rows of keys; the last row is commands.
+Navigator.KEYS = {
+    { "a", "b", "c", "d", "e", "f", "g", "h", "i", "j" },
+    { "k", "l", "m", "n", "o", "p", "q", "r", "s", "t" },
+    { "u", "v", "w", "x", "y", "z", "-", "_", "'", "." },
+    { "1", "2", "3", "4", "5", "6", "7", "8", "9", "0" },
+    { "Aa", "Space", "Del", "Done" },
+}
+Navigator.MAX_NAME = 24
+
+---Opens the keyboard with `text` to edit; ACCEPT on Done returns
+---{ kind = purpose, text = ... }.
+function Navigator.OpenKeys(state, text, purpose)
+    state.keys = { text = text or "", row = 1, col = 1, upper = true, purpose = purpose }
+    state.screen = "keys"
+end
+
+---Moves the row cursor to `button` if it is on the current card.
+---@return boolean found
+function Navigator.Select(state, button)
+    for _, side in ipairs({ "left", "right" }) do
+        for i, b in ipairs(state.columns[side] or {}) do
+            if b == button then
+                state.col, state.index = side, i
+                return true
+            end
+        end
+    end
+    return false
 end
 
 ---@return string|nil button under the cursor on the rows screen
@@ -89,6 +123,8 @@ local function rows(state, input)
     elseif input == "MENU" then
         state.screen = "menu"
         state.menu.index, state.menu.top = 1, 1
+    elseif input == "FLIP" then
+        return { kind = "flip" }
     elseif input == "BACK" then
         return { kind = "close" }
     end
@@ -132,7 +168,7 @@ local function menu(state, input, ctx)
     elseif (input == "LEFT" or input == "RIGHT") and item and item.adjust then
         return { kind = item.adjust, delta = input == "LEFT" and -1 or 1 }
     elseif input == "ACCEPT" and item then
-        if item.effect and item.effect.kind ~= "close" then
+        if item.effect and item.effect.kind ~= "close" and not item.stay then
             state.screen = "rows"
         end
         return item.effect
@@ -141,10 +177,50 @@ local function menu(state, input, ctx)
     end
 end
 
+local function keyAt(k)
+    local row = Navigator.KEYS[k.row]
+    return row[math.min(k.col, #row)]
+end
+
+local function keys(state, input)
+    local k = state.keys
+    if input == "UP" or input == "DOWN" then
+        k.row = clamp(k.row + (input == "UP" and -1 or 1), #Navigator.KEYS)
+        k.col = clamp(k.col, #Navigator.KEYS[k.row])
+    elseif input == "LEFT" or input == "RIGHT" then
+        k.col = cycle(k.col, #Navigator.KEYS[k.row], input == "LEFT" and -1 or 1)
+    elseif input == "PREV" or input == "NEXT" then
+        k.upper = not k.upper
+    elseif input == "CLEAR" then
+        k.text = k.text:sub(1, -2)
+    elseif input == "BACK" then
+        state.keys, state.screen = nil, "menu"
+    elseif input == "MENU" or (input == "ACCEPT" and keyAt(k) == "Done") then
+        local text = k.text:gsub("^%s+", ""):gsub("%s+$", "")
+        state.keys, state.screen = nil, "rows"
+        if text ~= "" then
+            return { kind = k.purpose, text = text }
+        end
+    elseif input == "ACCEPT" then
+        local key = keyAt(k)
+        if key == "Aa" then
+            k.upper = not k.upper
+        elseif key == "Del" then
+            k.text = k.text:sub(1, -2)
+        elseif #k.text < Navigator.MAX_NAME then
+            local ch = key == "Space" and " " or (k.upper and key:upper() or key)
+            k.text = k.text .. ch
+            if k.upper and ch:match("%a") then
+                k.upper = false -- capital first letter, then lower case
+            end
+        end
+    end
+end
+
 ---Handles one input. ctx = { categories = { {name, items = { {name, action} }} },
 ---menu = { {name, effect?, adjust?} } }.
 ---@param state table
----@param input string UP DOWN LEFT RIGHT PREV NEXT ACCEPT BACK CLEAR MENU
+---@param input string UP DOWN LEFT RIGHT PREV NEXT ACCEPT BACK CLEAR MENU FLIP
 ---@param ctx table
 ---@return table|nil effect
 function Navigator.Handle(state, input, ctx)
@@ -154,6 +230,8 @@ function Navigator.Handle(state, input, ctx)
         return picker(state, input, ctx)
     elseif state.screen == "menu" then
         return menu(state, input, ctx)
+    elseif state.screen == "keys" then
+        return keys(state, input)
     end
 end
 
@@ -169,6 +247,8 @@ Navigator.INPUT = {
     PAD2 = "BACK",
     PAD3 = "CLEAR",
     PAD4 = "MENU",
+    PADFORWARD = "MENU",
+    PADBACK = "FLIP",
     UP = "UP",
     DOWN = "DOWN",
     LEFT = "LEFT",
@@ -185,4 +265,5 @@ Navigator.INPUT = {
     X = "CLEAR",
     TAB = "MENU",
     M = "MENU",
+    V = "FLIP",
 }

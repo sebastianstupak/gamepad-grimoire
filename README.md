@@ -18,6 +18,11 @@ share setups as text.
 - **Share strings** – export a profile as `!GG1!…` text, import one safely (nothing
   is ever executed; everything is validated).
 
+![Supported controllers](docs/images/controllers.png)
+
+*Controller pictures, generated from vector sources by `npm run art`. In-game
+screenshots of the cheat sheet are produced by `npm run e2e -- --readme`.*
+
 ## Commands
 
 ```

@@ -141,6 +141,21 @@ def main():
         )
         print(f"{cid:<10} {len(anchors):2d} anchors -> media/controllers/{cid}.tga")
     write_definitions(defs, os.path.join(ROOT, "src", "Features", "Controllers", "Definitions.lua"))
+    gallery(os.path.join(ROOT, "docs", "images", "controllers.png"))
+
+
+def gallery(path, bg=(43, 44, 51)):
+    """2x2 sheet of every controller texture on the line-art background (README image)."""
+    media = os.path.join(ROOT, "media", "controllers")
+    tiles = [Image.open(os.path.join(media, cid + ".tga")).convert("RGBA") for cid in ORDER]
+    w, h = CANVAS[0] // 2, CANVAS[1] // 2
+    sheet = Image.new("RGB", (2 * w, 2 * h), bg)
+    for i, t in enumerate(tiles):
+        cell = Image.new("RGBA", CANVAS, (*bg, 255))
+        cell.alpha_composite(t)
+        sheet.paste(cell.resize((w, h), Image.LANCZOS).convert("RGB"), ((i % 2) * w, (i // 2) * h))
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    sheet.save(path, optimize=True)
 
 
 if __name__ == "__main__":

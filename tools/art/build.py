@@ -21,6 +21,7 @@ ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, HERE)
 import back  # noqa: E402
 import restyle  # noqa: E402
+import schematic  # noqa: E402
 
 CANVAS = (1024, 512)
 MARGIN = 16
@@ -34,8 +35,29 @@ META = {
     "dualshock4": dict(family="playstation", labelStyle="Shapes", hidden=[]),
     "xbox360": dict(family="xbox", labelStyle="Letters", hidden=[], labels={"PADBACK": "Back", "PADFORWARD": "Start"}),
     "steamcontroller": dict(family="valve", labelStyle="Letters", hidden=[], labels={"PADDPAD": "LPad"}),
+    # drawn from a layout description (tools/art/schematic.py): no vector source exists
+    "rogally": dict(family="xbox", labelStyle="Letters", hidden=[], labels={"PADSOCIAL": "CC", "PADSYSTEM": "Armoury"}),
+    "legiongo": dict(
+        family="xbox", labelStyle="Letters", hidden=[], labels={"PADSOCIAL": "Legion L", "PADSYSTEM": "Legion R"}
+    ),
+    "msiclaw": dict(family="xbox", labelStyle="Letters", hidden=[], labels={"PADSOCIAL": "Quick", "PADSYSTEM": "MSI"}),
+    "8bitdo": dict(family="nintendo", labelStyle="Reverse", hidden=[], labels={"PADSOCIAL": "Star"}),
+    "generic": dict(family="xbox", labelStyle="Letters", hidden=[], labels={}),
 }
-ORDER = ["xbox", "dualsense", "switchpro", "steamdeck", "dualshock4", "xbox360", "steamcontroller"]
+ORDER = [
+    "xbox",
+    "dualsense",
+    "switchpro",
+    "steamdeck",
+    "dualshock4",
+    "xbox360",
+    "steamcontroller",
+    "rogally",
+    "legiongo",
+    "msiclaw",
+    "8bitdo",
+    "generic",
+]
 
 
 def fit(img):
@@ -111,9 +133,14 @@ def main():
     media = os.path.join(ROOT, "media", "controllers")
     os.makedirs(media, exist_ok=True)
     defs = []
+    stroke = max(2, round(RENDER_W / 1000 * 1.5 * 3))
     for cid in ORDER:
-        m = measured[cid]
-        img = Image.open(os.path.join(out_dir, cid + ".png")).convert("RGBA")
+        if cid in schematic.LAYOUTS:
+            img, drawn = schematic.draw(schematic.LAYOUTS[cid], stroke)
+            m = dict(name=schematic.LAYOUTS[cid]["name"], anchors=drawn)
+        else:
+            m = measured[cid]
+            img = Image.open(os.path.join(out_dir, cid + ".png")).convert("RGBA")
         canvas, (x, y, w, h) = fit(img)
         canvas.save(os.path.join(media, cid + ".tga"))
         anchors = {
@@ -140,7 +167,7 @@ def main():
             )
             for b, a in anchors.items()
         }
-        bimg, banchors = back.draw(img, drawing, cid, stroke=max(2, round(RENDER_W / 1000 * 1.5 * 3)))
+        bimg, banchors = back.draw(img, drawing, cid, stroke=stroke)
         bcanvas, _ = fit(bimg)
         bcanvas.save(os.path.join(media, cid + "_back.tga"))
         bid = cid + "_back"

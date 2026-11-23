@@ -35,6 +35,18 @@ def test_back_view_draws_shoulders_and_paddles_inside_the_outline():
     assert back.labels("switchpro") == {}
 
 
+def test_schematic_devices_draw_every_core_button():
+    import schematic
+
+    for cid, layout in schematic.LAYOUTS.items():
+        img, anchors = schematic.draw(layout, stroke=4)
+        assert schematic.silhouette_ok(img), cid
+        for b in ("PAD1", "PAD2", "PAD3", "PAD4", "PADLSTICK", "PADRSTICK", "PADDPAD", "PADLTRIGGER", "PADRSHOULDER"):
+            a = anchors[b]
+            assert 0 < a["cx"] < 1 and 0 < a["cy"] < 1, (cid, b)
+        assert anchors["PAD1"]["cy"] > anchors["PAD4"]["cy"], cid  # positional face buttons
+
+
 def test_fit_centres_the_drawing_on_the_texture_canvas():
     canvas, (x, y, w, h) = build.fit(Image.new("RGBA", (1000, 400), (255, 255, 255, 255)))
     assert canvas.size == build.CANVAS

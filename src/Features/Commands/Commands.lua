@@ -38,7 +38,7 @@ local HELP = {
     "/gg profile copy <name> - copy the active profile",
     "/gg profile rename <old> = <new> - rename a profile",
     "/gg profile delete <name> - delete an unused profile",
-    "/gg controller [auto|<id>] - which picture: xbox xbox360 dualsense dualshock4 switchpro steamdeck steamcontroller",
+    "/gg controller [auto|<id>] - picture: xbox xbox360 dualsense dualshock4 switchpro 8bitdo steamcontroller generic steamdeck rogally legiongo msiclaw",
     "/gg capture <name> - new profile from your current controller keybinds",
     "/gg export [profile] - share string of a profile (default: the active one)",
     "/gg import - paste a share string to add it as a new profile",

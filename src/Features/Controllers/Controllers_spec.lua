@@ -15,10 +15,20 @@ describe("Controllers", function()
                 ids[#ids + 1] = def.id
                 assert.truthy(def.texture:match("^Interface\\AddOns\\GamepadGrimoire\\"), def.id)
             end
-            assert.same(
-                { "xbox", "dualsense", "switchpro", "steamdeck", "dualshock4", "xbox360", "steamcontroller" },
-                ids
-            )
+            assert.same({
+                "xbox",
+                "dualsense",
+                "switchpro",
+                "steamdeck",
+                "dualshock4",
+                "xbox360",
+                "steamcontroller",
+                "rogally",
+                "legiongo",
+                "msiclaw",
+                "8bitdo",
+                "generic",
+            }, ids)
         end)
 
         it("has an anchor inside the picture for the core buttons of every controller", function()
@@ -49,8 +59,8 @@ describe("Controllers", function()
 
         it("has a back view for every controller, left out of the controller list", function()
             local R = ns.Controllers.Registry
-            assert.are.equal(7, #R.All())
-            assert.are.equal(14, #R.All(true))
+            assert.are.equal(12, #R.All())
+            assert.are.equal(24, #R.All(true))
             for _, def in ipairs(R.All()) do
                 local back = R.BackOf(def)
                 assert.is_table(back, def.id)
@@ -90,6 +100,11 @@ describe("Controllers", function()
             assert.equal("xbox", (Detect.FromDevice({ vendorID = 0x045E, productID = 0x028E })))
             assert.equal("steamcontroller", (Detect.FromDevice({ vendorID = 0x28DE, productID = 0x1142 })))
             assert.equal("steamdeck", (Detect.FromDevice({ vendorID = 0x28DE, productID = 0x1205 })))
+            assert.equal("rogally", (Detect.FromDevice({ vendorID = 0x0B05, productID = 0x1ABE })))
+            assert.equal("legiongo", (Detect.FromDevice({ vendorID = 0x17EF, productID = 0x6182 })))
+            assert.equal("msiclaw", (Detect.FromDevice({ vendorID = 0x0DB0, productID = 0x1901 })))
+            assert.equal("8bitdo", (Detect.FromDevice({ vendorID = 0x2DC8, productID = 0x6006 })))
+            assert.equal("msiclaw", (Detect.FromDevice({ name = "MSI Claw Gamepad" })))
         end)
 
         it("falls back to the button label style, then the device name", function()

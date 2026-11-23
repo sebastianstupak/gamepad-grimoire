@@ -17,7 +17,8 @@ share setups with friends.
 > by an automated end-to-end test. Not yet released on CurseForge or Wago.
 
 - **Any controller.** Xbox Series, Xbox 360, DualSense, DualShock 4, Switch Pro,
-  Steam Deck and Steam Controller pictures in one consistent line-art style.
+  8BitDo Pro 2, Steam Controller, a generic gamepad, and the Steam Deck, ROG Ally,
+  Legion Go and MSI Claw handhelds, in one consistent line-art style.
 - **Never touches your keybinds.** Binds are applied as override bindings owned by
   the addon; disable it and your normal keybinds are back. Changes made in combat
   wait until combat ends.
@@ -87,7 +88,7 @@ the keyboard fallback.
 | `/gg profile copy <name>` | Copy the active profile |
 | `/gg profile rename <old> = <new>` | Rename a profile |
 | `/gg profile delete <name>` | Delete an unused profile |
-| `/gg controller <id\|auto>` | Picture to show: `xbox`, `xbox360`, `dualsense`, `dualshock4`, `switchpro`, `steamdeck`, `steamcontroller` |
+| `/gg controller <id\|auto>` | Picture to show: `xbox`, `xbox360`, `dualsense`, `dualshock4`, `switchpro`, `8bitdo`, `steamcontroller`, `generic`, `steamdeck`, `rogally`, `legiongo`, `msiclaw` |
 | `/gg capture <name>` | New profile from your current controller keybinds |
 | `/gg export [profile]` | Share string of a profile (copy box) |
 | `/gg import` | Paste a share string to add it as a new profile |
@@ -110,10 +111,14 @@ Controller support (front view, then back view where the device has buttons ther
 | PlayStation DualShock 4 | Done | Done (triggers and bumpers) |
 | Nintendo Switch Pro | Done | Done (triggers and bumpers) |
 | Nintendo Switch 2 Pro | Planned | Planned: GL / GR back buttons |
-| 8BitDo Pro 2, Ultimate | Planned | Planned: back buttons |
+| 8BitDo Pro 2 | Done | Done: back buttons P1, P2 |
+| 8BitDo Ultimate | Planned | |
 | Steam Controller | Done | Done: grip buttons LG, RG |
-| ROG Ally, Legion Go, MSI Claw | Planned | Planned: back buttons where present |
-| Generic gamepad | Planned | |
+| ROG Ally / Ally X | Done | Done: M1, M2 |
+| Lenovo Legion Go | Done | Done: M2, M3, Y1, Y2 |
+| MSI Claw | Done | Done: M1, M2 |
+| Generic gamepad | Done | Done (triggers and bumpers) |
+| Joy-Cons, Switch 2 Pro, arcade sticks | Planned | |
 
 Features:
 

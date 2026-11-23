@@ -37,6 +37,25 @@ PADDLES = {
     "switchpro": {},
     "dualshock4": {},
     "xbox360": {},
+    "rogally": {
+        "PADPADDLE3": ("M1", 0.09, 0.55, 0.03, 0.2),
+        "PADPADDLE1": ("M2", 0.91, 0.55, 0.03, 0.2),
+    },
+    "legiongo": {
+        "PADPADDLE3": ("M2", 0.06, 0.45, 0.03, 0.14),
+        "PADPADDLE4": ("M3", 0.06, 0.66, 0.03, 0.14),
+        "PADPADDLE1": ("Y1", 0.94, 0.45, 0.03, 0.14),
+        "PADPADDLE2": ("Y2", 0.94, 0.66, 0.03, 0.14),
+    },
+    "msiclaw": {
+        "PADPADDLE3": ("M1", 0.09, 0.58, 0.03, 0.2),
+        "PADPADDLE1": ("M2", 0.91, 0.58, 0.03, 0.2),
+    },
+    "8bitdo": {
+        "PADPADDLE3": ("P1", 0.24, 0.66, 0.04, 0.16),
+        "PADPADDLE1": ("P2", 0.76, 0.66, 0.04, 0.16),
+    },
+    "generic": {},
     # Steam Controller grip buttons
     "steamcontroller": {
         "PADPADDLE3": ("LG", 0.17, 0.66, 0.05, 0.17),
@@ -52,6 +71,11 @@ SUBTITLE = {
     "dualshock4": "DualShock 4 (back)",
     "xbox360": "Xbox 360 (back)",
     "steamcontroller": "Steam Controller (back)",
+    "rogally": "ROG Ally (back)",
+    "legiongo": "Legion Go (back)",
+    "msiclaw": "MSI Claw (back)",
+    "8bitdo": "8BitDo Pro 2 (back)",
+    "generic": "Generic gamepad (back)",
 }
 
 SHOULDERS = ("PADLTRIGGER", "PADRTRIGGER", "PADLSHOULDER", "PADRSHOULDER")

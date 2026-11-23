@@ -14,6 +14,13 @@ Detect.FALLBACK = "xbox"
 local SONY, NINTENDO, MICROSOFT, VALVE = 0x054C, 0x057E, 0x045E, 0x28DE
 local DUALSENSE = { [0x0CE6] = true, [0x0DF2] = true }
 local STEAM_CONTROLLER = { [0x1102] = true, [0x1142] = true }
+-- handhelds and others: vendor -> controller (any product of that vendor)
+local BY_VENDOR = {
+    [0x0B05] = "rogally", -- ASUS (ROG Ally / Ally X)
+    [0x17EF] = "legiongo", -- Lenovo (Legion Go)
+    [0x0DB0] = "msiclaw", -- MSI (Claw)
+    [0x2DC8] = "8bitdo", -- 8BitDo
+}
 
 local LABEL_STYLE = { Shapes = "dualsense", Reverse = "switchpro", Letters = "xbox" }
 
@@ -32,6 +39,8 @@ function Detect.FromDevice(device)
         return STEAM_CONTROLLER[p] and "steamcontroller" or "steamdeck", "Valve controller"
     elseif v == MICROSOFT then
         return "xbox", "Xbox-compatible controller"
+    elseif BY_VENDOR[v] then
+        return BY_VENDOR[v], "USB vendor"
     end
     local byStyle = device.labelStyle and LABEL_STYLE[device.labelStyle]
     if byStyle then
@@ -44,6 +53,14 @@ function Detect.FromDevice(device)
         return "dualsense", "device name"
     elseif name:find("steam controller") then
         return "steamcontroller", "device name"
+    elseif name:find("ally") then
+        return "rogally", "device name"
+    elseif name:find("legion") then
+        return "legiongo", "device name"
+    elseif name:find("claw") then
+        return "msiclaw", "device name"
+    elseif name:find("8bitdo") then
+        return "8bitdo", "device name"
     elseif name:find("pro controller") then
         return "switchpro", "device name"
     end

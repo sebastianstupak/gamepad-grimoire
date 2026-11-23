@@ -326,9 +326,10 @@ def card_rect(sv, cid):
 
 
 def readme_images(shots, peek, sv):
+    """README images: the whole screen width from the top down to a bit below the card,
+    so the card is shown as the overlay it is, over the game."""
     out = os.path.join(ROOT, "docs", "images")
     os.makedirs(out, exist_ok=True)
-    pad = 0.012
     for name, cid, path in [("cheatsheet-" + c, c, p) for c, p in shots] + [("cheatsheet-peek-lt", "steamdeck", peek)]:
         rect = card_rect(sv, cid)
         if not (path and rect):
@@ -336,14 +337,20 @@ def readme_images(shots, peek, sv):
             continue
         im = Image.open(path).convert("RGB")
         W, H = im.size
-        box = (
-            max(0, int((rect["left"] - pad) * W)),
-            max(0, int((rect["top"] - pad) * H)),
-            min(W, int((rect["right"] + pad) * W)),
-            min(H, int((rect["bottom"] + pad) * H)),
-        )
-        im.crop(box).save(os.path.join(out, name + ".png"), optimize=True)
+        bottom = min(H, int((rect["bottom"] + 0.2) * H))
+        im.crop((0, 0, W, bottom)).save(os.path.join(out, name + ".png"), optimize=True)
         print(f"  docs/images/{name}.png")
+
+
+SHOT_NAMES = [(cid, "10-card-" + cid) for cid in ("steamdeck", "xbox", "dualsense", "switchpro")]
+
+
+def readme_from_last_run():
+    """Re-crops docs/images from tools/e2e/out (no Deck needed)."""
+    with open(os.path.join(OUT, "SavedVariables.lua"), encoding="utf-8") as f:
+        sv = f.read()
+    shots = [(cid, os.path.join(OUT, n + ".png")) for cid, n in SHOT_NAMES]
+    readme_images(shots, os.path.join(OUT, "20-peek-lt.png"), sv)
 
 
 def main():
@@ -353,7 +360,11 @@ def main():
     ap.add_argument("--no-launch", action="store_true", help="WoW is already in the world")
     ap.add_argument("--keep-running", action="store_true", help="do not log out at the end")
     ap.add_argument("--readme", action="store_true", help="update docs/images from the screenshots")
+    ap.add_argument("--readme-only", action="store_true", help="only re-crop docs/images from the last run")
     a = ap.parse_args()
+    if a.readme_only:
+        readme_from_last_run()
+        return
     deck = Deck(a.host, a.key)
     keep_awake(deck)
     if not deck.wow_running():

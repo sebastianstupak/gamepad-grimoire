@@ -4,8 +4,8 @@ A World of Warcraft addon for playing with a controller: bind spells, items and
 macros to every button, see your binds on a picture of *your* controller, and
 share setups as text.
 
-> Status: early development - everything below works in unit and integration
-> tests; the first in-game end-to-end run on a Steam Deck is next.
+> Status: early development. Verified in game on WoW: Forever 1.60.1 (Steam Deck)
+> by an automated end-to-end test; not yet released on CurseForge / Wago.
 
 - **Any controller** – Xbox, PlayStation (DualSense), Switch Pro and Steam Deck
   pictures in one consistent line-art style; detected automatically, or chosen.
@@ -21,10 +21,37 @@ share setups as text.
 - **Share strings** – export a profile as `!GG1!…` text, import one safely (nothing
   is ever executed; everything is validated).
 
-![Supported controllers](docs/images/controllers.png)
+## Screenshots
 
-*Controller pictures, generated from vector sources by `npm run art`. In-game
-screenshots of the cheat sheet are produced by `npm run e2e -- --readme`.*
+In-game screenshots from WoW: Forever on a Steam Deck, taken by the end-to-end test
+(`npm run e2e -- --readme`). The profile is a real Affliction warlock setup captured
+with `/gg capture`; the same binds are shown on every supported controller.
+
+### Steam Deck - holding LT (L2) to peek at the second layer
+
+![Gamepad Grimoire on a Steam Deck while holding L2](docs/images/cheatsheet-peek-lt.png)
+
+### Steam Deck - pinned
+
+![Gamepad Grimoire, Steam Deck](docs/images/cheatsheet-steamdeck.png)
+
+### Xbox Series
+
+![Gamepad Grimoire, Xbox Series controller](docs/images/cheatsheet-xbox.png)
+
+### PlayStation DualSense
+
+![Gamepad Grimoire, DualSense controller](docs/images/cheatsheet-dualsense.png)
+
+### Nintendo Switch Pro
+
+![Gamepad Grimoire, Switch Pro controller](docs/images/cheatsheet-switchpro.png)
+
+### All controller pictures
+
+One line-art style for every controller, generated from vector sources (`npm run art`):
+
+![Supported controllers](docs/images/controllers.png)
 
 ## Commands
 
@@ -68,7 +95,8 @@ Lua tools (busted, luacov, luacheck, LuaLS) run in a small Docker image (`tools/
 so they behave the same on every OS and in CI; set `GG_NATIVE_LUA=1` to use local installs.
 Python tools need `pip install -r tools/art/requirements.txt pytest ruff`.
 
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [CONTRIBUTING.md](CONTRIBUTING.md),
+[AGENTS.md](AGENTS.md) (guide for AI coding agents) and [SECURITY.md](SECURITY.md).
 
 ## License
 

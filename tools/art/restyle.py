@@ -37,6 +37,7 @@ def Q(tag):
 
 
 OUT_W = 1000  # every controller is normalised to this width, so strokes match
+STROKE_SCALE = 1.0  # >1 thickens every line (in-game textures are shown small)
 # The Deck drawing is 512 px wide; strokes there are 1.0-2.0 px -> x2 here.
 
 # ---- palette: taken from make_diagram.py ------------------------------------------
@@ -566,7 +567,7 @@ def main(assets, outdir):
         tree = ET.parse(os.path.join(assets, cfg["src"]))
         root = tree.getroot()
         vb = [float(x) for x in re.split(r"[ ,]+", root.get("viewBox").strip())]
-        k = vb[2] / OUT_W
+        k = vb[2] / OUT_W * STROKE_SCALE
         boxes = measure(root, cfg["parts"], vb)
         face_ids = {cfg["parts"][b]: r for b, r in FACE_ROLE.items() if b in cfg["parts"]}
         replaced = (

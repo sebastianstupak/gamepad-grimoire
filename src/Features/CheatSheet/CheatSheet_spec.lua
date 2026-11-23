@@ -170,6 +170,23 @@ describe("CheatSheet", function()
             assert.is_true(has(t, "Corruption"))
             assert.is_true(has(t, "Square"))
             assert.is_true(has(t, "held"))
+            assert.is_true(has(t, "Pin / unpin this card"))
+            local function textures(frame, out)
+                out = out or {}
+                for _, c in ipairs(rawget(frame, "children") or {}) do
+                    local call = rawget(c, "calls").SetTexture
+                    if call then
+                        out[#out + 1] = call[1]
+                    end
+                    textures(c, out)
+                end
+                return out
+            end
+            local found = false
+            for _, path in ipairs(textures(card())) do
+                found = found or path == "Interface\\Icons\\INV_Misc_Book_09"
+            end
+            assert.is_true(found, "pin row icon path")
             wow.shift = false
             wow.tick(0.1)
             assert.is_nil(select(2, ns.CheatSheet.State()))

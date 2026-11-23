@@ -181,6 +181,7 @@ function View.Build(def, buttons)
             t.label:SetTextColor(on and 0.08 or 0.75, on and 0.06 or 0.75, on and 0.02 or 0.78)
         end
         local layerButtons = state.layout.layers and state.layout.layers[state.layer] or {}
+        local prefix = state.layer == "BASE" and "" or ((state.modifiers[state.layer] or "?") .. "-")
         for _, row in ipairs(self.rows) do
             local holds = layerOf[row.button]
             local action = layerButtons[row.button]
@@ -192,6 +193,12 @@ function View.Build(def, buttons)
                     held and "|cffffd100held|r" or ("hold: " .. Glyphs.LayerTrigger(def.family, holds) .. " layer")
                 )
                 row.badge:SetColorTexture(unpack(held and C.held or C.badge))
+            elseif state.pinKey and prefix .. row.button == state.pinKey then
+                -- the pin key is a priority binding: it wins over whatever the profile has here
+                row.icon:SetTexture("Interface\\Icons\\INV_Misc_Book_09")
+                row.icon:Show()
+                row.label:SetText("|cffc8a2ffPin / unpin this card|r")
+                row.badge:SetColorTexture(unpack(C.badge))
             elseif action then
                 local icon, name = ns.Wow.DescribeAction(action)
                 if icon and icon ~= QUESTION_MARK then

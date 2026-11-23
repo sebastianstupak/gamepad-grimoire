@@ -106,6 +106,7 @@ def main():
     out_dir = os.path.join(HERE, "out")
     restyle.STYLE = "lineart"
     restyle.OUT_W = RENDER_W
+    restyle.STROKE_SCALE = 3.0  # shown at ~560 px wide in game: keep lines ~1.5 px
     restyle.main(os.path.join(HERE, "sources"), out_dir)
     with open(os.path.join(out_dir, "anchors.json"), encoding="utf-8") as f:
         measured = json.load(f)

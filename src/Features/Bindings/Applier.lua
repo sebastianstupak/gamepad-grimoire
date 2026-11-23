@@ -49,6 +49,7 @@ local function applyNow(bindings)
             skipped[#skipped + 1] = b.key
         end
     end
+    Applier.last = { applied = applied, skipped = skipped }
     ns.Events.Emit("BINDINGS_APPLIED", applied, skipped)
     return applied, skipped
 end

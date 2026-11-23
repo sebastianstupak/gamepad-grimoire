@@ -15,6 +15,9 @@ files["src/Core/Wow.lua"] = {
     "DEFAULT_CHAT_FRAME", "GetCVar", "GetRealmName", "GetSpecialization", "GetSpellInfo",
     "InCombatLockdown", "SetOverrideBinding", "SetOverrideBindingItem", "SetOverrideBindingMacro",
     "SetOverrideBindingSpell", "UnitName",
+    "C_Item", "C_Texture", "C_Timer", "GetActionInfo", "GetActionTexture", "GetBindingAction", "GetBuildInfo",
+    "GetCurrentKeyBoardFocus", "GetMacroInfo", "GetPetActionInfo", "HasAction", "IsControlKeyDown",
+    "IsShiftKeyDown", "UIParent",
   },
   globals = { "SlashCmdList" },
   -- slash command registration writes SLASH_<NAME><n> globals by design

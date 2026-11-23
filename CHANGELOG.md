@@ -13,3 +13,6 @@ versions: [SemVer](https://semver.org).
 - Profiles: account-wide, per character and per specialization.
 - Share strings (`!GG1!`) to export and safely import profiles.
 - Slash commands `/gg` and `/grimoire`.
+- Cheat sheet card: controller picture with leader lines to every button, peek
+  on held LT/RT, pin with LT+R3 or `/gg show`.
+- `/gg capture`, `/gg export` / `/gg import` (copy box), `/gg diag`.

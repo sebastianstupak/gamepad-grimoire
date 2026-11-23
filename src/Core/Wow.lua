@@ -91,6 +91,12 @@ function W.IsTyping()
     return GetCurrentKeyBoardFocus and GetCurrentKeyBoardFocus() ~= nil or false
 end
 
+---Lets Escape close a named frame (Blizzard's UISpecialFrames list).
+---@param frameName string
+function W.CloseOnEscape(frameName)
+    table.insert(UISpecialFrames, frameName)
+end
+
 ---@param seconds number
 ---@param fn function
 function W.After(seconds, fn)

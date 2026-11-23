@@ -139,6 +139,10 @@ function Fake.new()
     function W.IsTyping()
         return state.typing
     end
+    function W.CloseOnEscape(name)
+        state.escClose = state.escClose or {}
+        state.escClose[#state.escClose + 1] = name
+    end
     function W.After(_, fn)
         fn()
     end

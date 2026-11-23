@@ -148,3 +148,48 @@ describe("Share", function()
         end)
     end)
 end)
+
+describe("Share dialog", function()
+    local ns, wow, D
+    before_each(function()
+        ns, wow = Addon.start(nil)
+        D = ns.Share.Dialog
+    end)
+
+    it("picks the first free profile name", function()
+        local taken = { A = true, ["A (2)"] = true }
+        local exists = function(n)
+            return taken[n] == true
+        end
+        assert.equal("B", D.UniqueName("B", exists))
+        assert.equal("A (3)", D.UniqueName("A", exists))
+    end)
+
+    it("exports the active profile into a selected text box", function()
+        wow.slash.handler("export")
+        local f = D.Frame()
+        assert.is_true(f:IsShown())
+        assert.truthy(f.box:GetText():match("^!GG1!"))
+        assert.is_table(rawget(f.box, "calls").HighlightText)
+        assert.same({ "GamepadGrimoireShareDialog" }, wow.escClose)
+    end)
+
+    it("imports a pasted string as a new profile without overwriting", function()
+        local text = ns.Share.Codec.Export("Default", ns.Profiles.Get("Default"))
+        wow.slash.handler("import")
+        local f = D.Frame()
+        f.box:SetText(text)
+        rawget(f.import, "scripts").OnClick(f.import)
+        assert.is_table(ns.Profiles.Get("Default (2)"))
+        assert.truthy(rawget(f.status, "text"):find("imported profile Default %(2%)"))
+    end)
+
+    it("explains why a string cannot be imported", function()
+        wow.slash.handler("import")
+        local f = D.Frame()
+        f.box:SetText("hello")
+        rawget(f.import, "scripts").OnClick(f.import)
+        assert.truthy(rawget(f.status, "text"):find("not a Gamepad Grimoire string"))
+        assert.same({ "Default" }, ns.Profiles.List())
+    end)
+end)

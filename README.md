@@ -31,6 +31,11 @@ screenshots of the cheat sheet are produced by `npm run e2e -- --readme`.*
 /gg profile new <name>       new empty profile
 /gg profile copy <name>      copy the active profile
 /gg controller <id|auto>     xbox, dualsense, switchpro, steamdeck
+/gg show [lt|rt]             pin / unpin the cheat sheet (or hold LT/RT to peek)
+/gg capture <name>           profile from your current controller keybinds
+/gg export [profile]         share string (copy box)
+/gg import                   paste a share string -> new profile
+/gg diag                     check this client (for bug reports)
 /gg reload                   re-apply bindings
 ```
 

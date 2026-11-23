@@ -17,7 +17,7 @@ files["src/Core/Wow.lua"] = {
     "SetOverrideBindingSpell", "UnitName",
     "C_Item", "C_Texture", "C_Timer", "GetActionInfo", "GetActionTexture", "GetBindingAction", "GetBuildInfo",
     "GetCurrentKeyBoardFocus", "GetMacroInfo", "GetPetActionInfo", "HasAction", "IsControlKeyDown",
-    "IsShiftKeyDown", "UIParent",
+    "IsShiftKeyDown", "UIParent", "UISpecialFrames",
   },
   globals = { "SlashCmdList" },
   -- slash command registration writes SLASH_<NAME><n> globals by design

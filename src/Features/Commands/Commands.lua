@@ -37,6 +37,8 @@ local HELP = {
     "/gg profile copy <name> - copy the active profile",
     "/gg controller [auto|xbox|dualsense|switchpro|steamdeck] - which picture to show",
     "/gg capture <name> - new profile from your current controller keybinds",
+    "/gg export [profile] - share string of a profile (default: the active one)",
+    "/gg import - paste a share string to add it as a new profile",
     "/gg show [lt|rt] - pin / unpin the cheat sheet (or hold a trigger to peek)",
     "/gg scale <0.5-2.5> - cheat sheet size",
     "/gg reload - re-apply bindings",
@@ -98,6 +100,18 @@ function handlers.capture(_, _, rest)
     local profile = ns.Profiles.Get(name)
     profile.layers = layout.layers
     say(("captured %d controller binds into profile %s - /gg profile use %s"):format(count, name, name))
+end
+
+function handlers.export(_, _, rest)
+    local name = rest ~= "" and rest or ns.Profiles.ActiveName()
+    if not ns.Profiles.Get(name) then
+        return say("no profile named " .. name)
+    end
+    ns.Share.Dialog.Export(name)
+end
+
+function handlers.import()
+    ns.Share.Dialog.Import()
 end
 
 function handlers.show(layer)

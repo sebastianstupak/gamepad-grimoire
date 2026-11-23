@@ -49,9 +49,11 @@ local function dispatch(_, event, ...)
     end
 end
 
----Subscribes to a WoW game event.
+---Subscribes to a WoW game event. Returns false (and subscribes nothing) when this
+---client does not know the event - versions differ in which events exist.
 ---@param event string
 ---@param fn fun(event: string, ...)
+---@return boolean registered
 function Events.OnGame(event, fn)
     if not frame then
         frame = ns.Wow.CreateFrame("Frame")
@@ -59,9 +61,12 @@ function Events.OnGame(event, fn)
     end
     local list = gameListeners[event]
     if not list then
+        if not pcall(frame.RegisterEvent, frame, event) then
+            return false
+        end
         list = {}
         gameListeners[event] = list
-        frame:RegisterEvent(event)
     end
     list[#list + 1] = fn
+    return true
 end

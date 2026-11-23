@@ -118,6 +118,11 @@ function Fake.new()
     function W.GetGamePadDevice()
         return state.device
     end
+    W.SPEC_CHANGED_EVENT = "PLAYER_SPECIALIZATION_CHANGED"
+    function W.ReportError(err)
+        state.errors = state.errors or {}
+        state.errors[#state.errors + 1] = err
+    end
     function W.GetSpecialization()
         return state.spec
     end

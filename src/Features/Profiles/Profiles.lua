@@ -181,8 +181,9 @@ function M:OnEnable()
     ns.Events.On("PROFILE_CHANGED", function()
         last = Profiles.ActiveName()
     end)
-    ns.Events.OnGame("PLAYER_SPECIALIZATION_CHANGED", function(_, unit)
-        if unit ~= nil and unit ~= "player" then
+    ns.Events.OnGame(ns.Wow.SPEC_CHANGED_EVENT or "PLAYER_SPECIALIZATION_CHANGED", function(_, unit)
+        -- PLAYER_SPECIALIZATION_CHANGED passes a unit; ACTIVE_TALENT_GROUP_CHANGED numbers
+        if type(unit) == "string" and unit ~= "player" then
             return
         end
         local now = Profiles.ActiveName()

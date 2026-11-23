@@ -21,6 +21,20 @@ describe("Core", function()
             assert.same({ "A:init", "B:init", "A:enable", "B:enable" }, calls)
         end)
 
+        it("keeps starting the other modules when one fails, and reports it", function()
+            local ns, wow = Addon.load({ upTo = "Core/Store.lua" })
+            local started = {}
+            ns.NewModule("Broken").OnEnable = function()
+                error("boom")
+            end
+            ns.NewModule("Fine").OnEnable = function()
+                started[#started + 1] = "Fine"
+            end
+            assert.same({ "Broken" }, ns.CallModules("OnEnable"))
+            assert.same({ "Fine" }, started)
+            assert.truthy(tostring(wow.errors[1]):find("boom"))
+        end)
+
         it("rejects duplicate module names", function()
             local ns = Addon.load({ upTo = "Core/Namespace.lua" })
             ns.NewModule("X")
@@ -41,6 +55,17 @@ describe("Core", function()
             off()
             ns.Events.Emit("PING", 2)
             assert.same({ 1 }, got)
+        end)
+
+        it("ignores game events this client does not know", function()
+            local ns, wow = Addon.load({ upTo = "Core/Events.lua" })
+            local f = wow.frames[1] or ns.Wow.CreateFrame("Frame")
+            assert.is_true(ns.Events.OnGame("PLAYER_LOGIN", function() end))
+            rawset(wow.frames[#wow.frames], "RegisterEvent", function()
+                error("unknown event")
+            end)
+            assert.is_false(ns.Events.OnGame("NOT_AN_EVENT", function() end))
+            assert.is_table(f)
         end)
 
         it("routes game events to subscribers", function()

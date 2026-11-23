@@ -16,7 +16,34 @@ W.SetOverrideBindingSpell = SetOverrideBindingSpell
 W.SetOverrideBindingItem = SetOverrideBindingItem
 W.SetOverrideBindingMacro = SetOverrideBindingMacro
 W.ClearOverrideBindings = ClearOverrideBindings
-W.GetSpecialization = GetSpecialization
+
+---Current specialization (retail) or talent group (classic-style clients such as
+---WoW: Forever, which have no GetSpecialization), or nil when neither exists.
+---@return number?
+function W.GetSpecialization()
+    if GetSpecialization then
+        return GetSpecialization()
+    elseif C_SpecializationInfo and C_SpecializationInfo.GetSpecialization then
+        return C_SpecializationInfo.GetSpecialization()
+    elseif GetActiveTalentGroup then
+        return GetActiveTalentGroup()
+    end
+    return nil
+end
+
+---Game event fired when the value of GetSpecialization() changes on this client.
+W.SPEC_CHANGED_EVENT = GetSpecialization and "PLAYER_SPECIALIZATION_CHANGED" or "ACTIVE_TALENT_GROUP_CHANGED"
+
+---Reports an error through the game's error handler without stopping the caller.
+---@param err any
+function W.ReportError(err)
+    local handler = geterrorhandler and geterrorhandler()
+    if handler then
+        handler(err)
+    else
+        print(err)
+    end
+end
 
 ---@param name string
 ---@return string?
@@ -58,7 +85,17 @@ end
 
 ---@return string key "Name-Realm"
 function W.CharacterKey()
-    return (UnitName("player") or "?") .. "-" .. (GetRealmName() or "?")
+    -- GetRealmName() can be "" early on (and on WoW: Forever), so fall back through
+    -- UnitFullName / GetNormalizedRealmName before giving up on the realm.
+    local name, realm = UnitFullName("player")
+    name = name or UnitName("player") or "?"
+    if not realm or realm == "" then
+        realm = (GetNormalizedRealmName and GetNormalizedRealmName()) or GetRealmName()
+    end
+    if not realm or realm == "" then
+        return name
+    end
+    return name .. "-" .. realm
 end
 
 ---Blizzard's built-in compression (nil on clients without C_EncodingUtil).
@@ -128,11 +165,12 @@ end
 
 -- Keybinds and what is behind them --------------------------------------------
 
----Command bound to a key in the player's own keybinds ("" / nil when unbound).
+---Command bound to a key in the player's own (saved) keybinds, ignoring override
+---bindings - including this addon's own. nil when unbound.
 ---@param key string
 ---@return string?
 function W.GetBindingAction(key)
-    local a = GetBindingAction(key, true)
+    local a = GetBindingAction(key, false)
     return a ~= "" and a or nil
 end
 
@@ -201,6 +239,9 @@ function W.DescribeCommand(command)
         return icon, arg
     elseif kind == "ITEM" then
         return nil, arg
+    end
+    if command:find("^CLICK GamepadGrimoireToggle") then
+        return "Interface\\Icons\\INV_Misc_Book_09", "Pin / unpin this card"
     end
     return nil, _G["BINDING_NAME_" .. command] or command
 end

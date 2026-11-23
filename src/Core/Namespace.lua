@@ -30,12 +30,21 @@ function ns.GetModule(name)
     return assert(modules[name], "unknown module: " .. tostring(name))
 end
 
----Calls `method` on every module that defines it, in registration order.
+---Calls `method` on every module that defines it, in registration order. A module
+---that fails is reported (through ns.Wow.ReportError) and the others still start.
 ---@param method "OnInitialize"|"OnEnable"
+---@return string[] failed names of modules whose method raised an error
 function ns.CallModules(method)
+    local failed = {}
     for _, m in ipairs(order) do
         if m[method] then
-            m[method](m)
+            local ok, err = pcall(m[method], m)
+            if not ok then
+                failed[#failed + 1] = m.name
+                local report = ns.Wow and ns.Wow.ReportError or print
+                report(("%s %s: %s"):format(m.name, method, tostring(err)))
+            end
         end
     end
+    return failed
 end

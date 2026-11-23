@@ -141,6 +141,35 @@ def install(deck):
     print("  installed", ADDON)
 
 
+CONFLICTING = ("DeckSetup",)  # addons that also answer LT+R3 / draw a card
+
+
+def disable_conflicting(deck):
+    """Disables CONFLICTING addons in every character's AddOns.txt (WoW closed),
+    keeping a backup that restore_addons() puts back."""
+    per_addon = "".join(
+        rf"""grep -q '^{a}:' "$f" || echo '{a}: disabled' >> "$f"; sed -i 's/^{a}: enabled/{a}: disabled/' "$f"; """
+        for a in CONFLICTING
+    )
+    out = deck.sh(
+        f"cd {shlex.quote(ACCOUNT)} && "
+        r'for f in */*/AddOns.txt; do [ -f "$f" ] || continue; cp "$f" "$f.gg-e2e-bak"; '
+        + per_addon
+        + r'echo "$f"; done',
+        check=False,
+    )
+    print("  disabled", ", ".join(CONFLICTING), "in", len(out.split()), "AddOns.txt")
+
+
+def restore_addons(deck):
+    out = deck.sh(
+        f'cd {shlex.quote(ACCOUNT)} && for b in */*/AddOns.txt.gg-e2e-bak; do [ -f "$b" ] || continue;'
+        f' mv -f "$b" "${{b%.gg-e2e-bak}}"; echo "$b"; done',
+        check=False,
+    )
+    print("  restored", len(out.split()), "AddOns.txt")
+
+
 def launch(deck):
     print("== launch")
     deck.sh(
@@ -271,11 +300,14 @@ def main():
     deck = Deck(a.host, a.key)
     if not a.no_launch:
         install(deck)
+        disable_conflicting(deck)
         launch(deck)
     shots, peek = scenario(deck)
     if a.keep_running:
         return
     logout(deck)
+    if not deck.wow_running():
+        restore_addons(deck)
     sv = saved_variables(deck)
     os.makedirs(OUT, exist_ok=True)
     with open(os.path.join(OUT, "SavedVariables.lua"), "w", encoding="utf-8") as f:

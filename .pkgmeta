@@ -1,0 +1,24 @@
+package-as: GamepadGrimoire
+
+enable-nolib-creation: no
+
+ignore:
+  - "*_spec.lua"
+  - spec
+  - tools
+  - docs
+  - node_modules
+  - package.json
+  - package-lock.json
+  - lefthook.yml
+  - commitlint.config.mjs
+  - stylua.toml
+  - .busted
+  - .luacheckrc
+  - .luarc.json
+  - .editorconfig
+  - CONTRIBUTING.md
+
+manual-changelog:
+  filename: CHANGELOG.md
+  markup-type: markdown

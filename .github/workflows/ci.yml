@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  lua:
+    name: Lint & test (Lua 5.1)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Format (StyLua)
+        run: npm run format:check
+
+      - uses: leafo/gh-actions-lua@v11
+        with:
+          luaVersion: "5.1.5"
+      - uses: leafo/gh-actions-luarocks@v5
+      - name: Install busted + luacheck
+        run: |
+          luarocks install busted 2.2.0-1
+          luarocks install luacheck 1.2.0-1
+      - name: Lint (luacheck)
+        run: luacheck .
+      - name: Test (busted)
+        run: busted -o gtest
+
+  commits:
+    name: Conventional commits
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
+
+  art:
+    name: Generated art is up to date
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install -r tools/art/requirements.txt
+      - run: python tools/art/build.py
+      - name: Definitions.lua matches the sources
+        run: git diff --exit-code -- src/Features/Controllers/Definitions.lua

@@ -1,0 +1,25 @@
+{
+  "name": "gamepad-grimoire",
+  "private": true,
+  "description": "Dev tooling for the Gamepad Grimoire World of Warcraft addon (the addon itself is Lua).",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "prepare": "lefthook install",
+    "format": "stylua src spec",
+    "format:check": "stylua --check src spec",
+    "lint": "node tools/lua.mjs luacheck .",
+    "test": "node tools/lua.mjs busted",
+    "check": "npm run format:check && npm run lint && npm run test",
+    "lua:image": "node tools/lua.mjs --build"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
+    "@johnnymorganz/stylua-bin": "^2.1.0",
+    "lefthook": "^1.13.6"
+  }
+}

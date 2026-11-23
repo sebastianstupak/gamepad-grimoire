@@ -1,0 +1,25 @@
+name: Release
+
+# Push a tag like v0.1.0 to package the addon and publish it.
+# CurseForge / Wago uploads start once CF_API_KEY / WAGO_API_TOKEN secrets and the
+# X-Curse-Project-ID / X-Wago-ID toc fields are set; until then only a GitHub
+# release with the zip is created.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
+      CF_API_KEY: ${{ secrets.CF_API_KEY }}
+      WAGO_API_TOKEN: ${{ secrets.WAGO_API_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: BigWigsMods/packager@v2

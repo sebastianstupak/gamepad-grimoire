@@ -1,0 +1,11 @@
+return {
+  _all = {
+    lpath = "./?.lua",
+  },
+  default = {
+    ROOT = { "src" },
+    pattern = "_spec",
+    helper = "spec/helpers/setup.lua",
+    verbose = true,
+  },
+}

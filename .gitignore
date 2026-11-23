@@ -1,0 +1,10 @@
+node_modules/
+.release/
+.luarocks/
+luacov.*.out
+__pycache__/
+*.pyc
+.venv/
+tools/art/out/
+.DS_Store
+Thumbs.db

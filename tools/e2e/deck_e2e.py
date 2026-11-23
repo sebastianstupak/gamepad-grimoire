@@ -310,7 +310,7 @@ def scenario(deck):
     time.sleep(1)
     deck.screenshot("01-chat-diag")
     shots = []
-    for cid in ("steamdeck", "xbox", "dualsense", "switchpro"):
+    for cid in controller_ids():
         deck.chat("/gg controller " + cid)
         deck.chat("/gg show")
         time.sleep(1)
@@ -483,7 +483,16 @@ SETUP_SHOTS = {
     "keys": "42-setup-keyboard",
     "held": "43-held-rb",
 }
-SHOT_NAMES = [(cid, "10-card-" + cid) for cid in ("steamdeck", "xbox", "dualsense", "switchpro")]
+
+
+def controller_ids():
+    """Front-view controller ids, in registration order, from the generated definitions."""
+    with open(os.path.join(ROOT, "src", "Features", "Controllers", "Definitions.lua"), encoding="utf-8") as f:
+        ids = re.findall(r'id = "(\w+)"', f.read())
+    return [i for i in ids if not i.endswith("_back")]
+
+
+SHOT_NAMES = [(cid, "10-card-" + cid) for cid in controller_ids()]
 
 
 def readme_from_last_run():

@@ -109,4 +109,24 @@ describe("Bindings", function()
             assert.is_nil(set)
         end)
     end)
+
+    it("applies the active profile on login and when it changes", function()
+        local ns, wow = Addon.start({
+            schema = 1,
+            profiles = {
+                Default = { controller = "auto", layers = { BASE = { PAD1 = { type = "command", command = "JUMP" } } } },
+                Raid = { controller = "auto", layers = { BASE = { PAD2 = { type = "command", command = "TARGET" } } } },
+            },
+            characters = {},
+            settings = {},
+        })
+        local function current()
+            local _, set = next(wow.bindings)
+            return set
+        end
+        assert.is_table(current().PAD1)
+        ns.Profiles.Use("Raid")
+        assert.is_nil(current().PAD1)
+        assert.is_table(current().PAD2)
+    end)
 end)

@@ -139,6 +139,12 @@ function Fake.new()
     function W.IsTyping()
         return state.typing
     end
+    function W.GetCursorAction()
+        return state.cursor
+    end
+    function W.ClearCursor()
+        state.cursor = nil
+    end
     function W.CloseOnEscape(name)
         state.escClose = state.escClose or {}
         state.escClose[#state.escClose + 1] = name

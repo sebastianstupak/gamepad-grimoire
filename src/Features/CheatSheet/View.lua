@@ -72,8 +72,13 @@ function View.Build(def, buttons)
     card.tabs = {}
     local tabW = 118
     for i, layer in ipairs({ "BASE", "LT", "RT" }) do
-        local t = ns.Wow.CreateFrame("Frame", nil, frame)
+        local t = ns.Wow.CreateFrame("Button", nil, frame)
         t:SetSize(tabW, 22)
+        t:SetScript("OnClick", function()
+            if card.onTab then
+                card.onTab(layer)
+            end
+        end)
         t:SetPoint("TOP", frame, "TOP", (i - 2) * (tabW + 6), -10)
         t.bg = tex(t, "ARTWORK", C.row)
         t.bg:SetAllPoints()
@@ -90,8 +95,20 @@ function View.Build(def, buttons)
     img:SetPoint("TOPLEFT", g.image.x, -g.image.y)
 
     for _, r in ipairs(g.rows) do
-        local row = ns.Wow.CreateFrame("Frame", nil, frame)
+        local row = ns.Wow.CreateFrame("Button", nil, frame)
         row:SetSize(r.w, r.h)
+        row:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+        local function act(kind)
+            if card.onRow then
+                card.onRow(r.button, kind)
+            end
+        end
+        row:SetScript("OnReceiveDrag", function()
+            act("drop")
+        end)
+        row:SetScript("OnClick", function(_, mouse)
+            act(mouse == "RightButton" and "clear" or "drop")
+        end)
         row:SetPoint("TOPLEFT", r.x, -r.y)
         row.bg = tex(row, "BACKGROUND", C.row)
         row.bg:SetAllPoints()
@@ -139,6 +156,17 @@ function View.Build(def, buttons)
     card.footer = text(frame, "GameFontDisableSmall", "CENTER")
     card.footer:SetPoint("BOTTOM", 0, 10)
 
+    ---Rows and tabs take the mouse only while the card is pinned (editing).
+    ---@param editable boolean
+    function card:SetEditable(editable)
+        for _, row in ipairs(self.rows) do
+            row:EnableMouse(editable)
+        end
+        for _, t in ipairs(self.tabs) do
+            t:EnableMouse(editable)
+        end
+    end
+
     ---@param state { layer: string, layout: table, modifiers: table, profile: string, pinned: boolean, pinKey: string? }
     function card:Fill(state)
         local layerOf = {} -- trigger button -> the layer it holds
@@ -182,6 +210,11 @@ function View.Build(def, buttons)
                 l:SetAlpha(on and 1 or C.dim)
             end
             row.dot:SetAlpha(on and 1 or C.dim)
+        end
+        if state.pinned then
+            return self.footer:SetText(
+                "drag a spell, item or macro onto a row to bind it  -  right-click clears  -  click a tab to edit that layer"
+            )
         end
         self.footer:SetText(
             "hold "

@@ -31,6 +31,8 @@ src\Features\CheatSheet\Glyphs.lua
 src\Features\CheatSheet\View.lua
 src\Features\CheatSheet\CheatSheet.lua
 
+src\Features\Editor\Editor.lua
+
 src\Features\Diagnostics\Diagnostics.lua
 
 src\Features\Commands\Commands.lua

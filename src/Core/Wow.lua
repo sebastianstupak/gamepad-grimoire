@@ -91,6 +91,23 @@ function W.IsTyping()
     return GetCurrentKeyBoardFocus and GetCurrentKeyBoardFocus() ~= nil or false
 end
 
+---What the mouse cursor is holding (dragged from the spellbook, bags, macros...).
+---@return { kind: string, id?: number, name?: string }|nil
+function W.GetCursorAction()
+    local kind, a, _, c = GetCursorInfo()
+    if kind == "spell" then
+        return { kind = "spell", id = c }
+    elseif kind == "item" then
+        return { kind = "item", id = a }
+    elseif kind == "macro" then
+        return { kind = "macro", name = (GetMacroInfo(a)) }
+    elseif kind then
+        return { kind = kind }
+    end
+end
+
+W.ClearCursor = ClearCursor
+
 ---Lets Escape close a named frame (Blizzard's UISpecialFrames list).
 ---@param frameName string
 function W.CloseOnEscape(frameName)

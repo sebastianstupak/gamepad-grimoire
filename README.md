@@ -4,14 +4,17 @@ A World of Warcraft addon for playing with a controller: bind spells, items and
 macros to every button, see your binds on a picture of *your* controller, and
 share setups as text.
 
-> Status: early development. Core, controllers, bindings, profiles, sharing and
-> slash commands work; the on-screen cheat sheet and the in-game editor are next.
+> Status: early development - everything below works in unit and integration
+> tests; the first in-game end-to-end run on a Steam Deck is next.
 
 - **Any controller** – Xbox, PlayStation (DualSense), Switch Pro and Steam Deck
   pictures in one consistent line-art style; detected automatically, or chosen.
 - **Never touches your keybinds** – binds are applied as override bindings owned by
   the addon; disable it and your normal keybinds are back. Changes made in combat
   wait until combat ends.
+- **Cheat sheet** – hold LT/RT to peek at a layer, or pin the card (LT+R3, `/gg show`).
+- **Edit in game** – on the pinned card, drag a spell, item or macro onto a button's row;
+  right-click clears; click a tab to edit that layer.
 - **Layers** – hold LT or RT for a second and third set of binds.
 - **Profiles** – account-wide, per character and per specialization (switches
   automatically).

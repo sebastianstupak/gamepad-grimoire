@@ -19,6 +19,9 @@ src/
       Model.lua  Applier.lua  Bindings.lua  Bindings_spec.lua
     Profiles/                account / character / spec profiles
     Share/                   export / import strings
+    CheatSheet/              the card: Layout (pure geometry), Glyphs, View, peek/pin
+    Editor/                  drag & drop / right-click editing on the pinned card
+    Diagnostics/             /gg diag client checks, kept for the e2e test
     Commands/                /gg, /grimoire
   Bootstrap.lua              loaded last: saved data, then module start
 spec/helpers/                fake WoW API + loader used by every slice's tests
@@ -52,7 +55,5 @@ with `spec/helpers/wow_fake.lua` as `ns.Wow`. `Addon.start(saved)` also fires
 
 ## Planned slices
 
-- **CheatSheet** – the on-screen card: controller picture, leader lines to labels,
-  peek on held trigger, pin/unpin (port of the DeckSetup card).
-- **Editor** – click or press a button on the picture, drop a spell/item/macro on it.
-- **Settings** – options in the game's Settings panel.
+- **Settings** – options in the game's Settings panel (scale, pin key, controller).
+- **Gamepad navigation** for the editor (pick a row with the D-pad, assign from a list).

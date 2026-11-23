@@ -16,3 +16,5 @@ versions: [SemVer](https://semver.org).
 - Cheat sheet card: controller picture with leader lines to every button, peek
   on held LT/RT, pin with LT+R3 or `/gg show`.
 - `/gg capture`, `/gg export` / `/gg import` (copy box), `/gg diag`.
+- In-game editing on the pinned card: drag a spell, item or macro onto a row,
+  right-click to clear, click a tab to switch layer.

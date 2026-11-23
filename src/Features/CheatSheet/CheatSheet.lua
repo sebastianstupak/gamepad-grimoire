@@ -72,7 +72,16 @@ local function currentCard()
     local profile = ns.Profiles.ActiveProfile()
     local id = ns.Controllers.Detect.Resolve(profile.controller)
     if not cards[id] then
-        cards[id] = ns.CheatSheet.View.Build(ns.Controllers.Registry.Get(id), ns.Bindings.Model.BUTTONS)
+        local built = ns.CheatSheet.View.Build(ns.Controllers.Registry.Get(id), ns.Bindings.Model.BUTTONS)
+        built.onRow = function(button, kind)
+            if pinned and shownLayer then
+                ns.Editor.OnRow(shownLayer, button, kind)
+            end
+        end
+        built.onTab = function(layer)
+            CheatSheet.Toggle(layer)
+        end
+        cards[id] = built
     end
     if card and card ~= cards[id] then
         card.frame:Hide()
@@ -99,6 +108,7 @@ local function render(layer)
         pinned = pinned,
         pinKey = settings().pinKey or CheatSheet.DEFAULT_PIN_KEY,
     })
+    c:SetEditable(pinned)
     c.frame:Show()
     shownLayer = layer
     CheatSheet.RecordScreenRect(c)

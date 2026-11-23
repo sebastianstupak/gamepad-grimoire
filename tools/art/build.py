@@ -84,7 +84,8 @@ def write_definitions(defs, path):
         out.append("Register({")
         for k in ("id", "name", "family", "labelStyle", "texture"):
             out.append("    %s = %s," % (k, lua_str(d[k])))
-        out.append("    hidden = { %s }," % ", ".join(lua_str(h) for h in d["hidden"]))
+        hidden = ", ".join(lua_str(h) for h in d["hidden"])
+        out.append("    hidden = { %s }," % hidden if hidden else "    hidden = {},")  # StyLua's format
         out.append("    anchors = {")
         for b in sorted(d["anchors"]):
             a = d["anchors"][b]

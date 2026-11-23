@@ -6,7 +6,8 @@ export default {
     "scope-enum": [
       2,
       "always",
-      ["core", "controllers", "bindings", "profiles", "share", "commands", "cheatsheet", "diagnostics", "editor", "art", "deps", "ci", "repo", "release"],
+      ["core", "controllers", "bindings", "profiles", "share", "commands", "cheatsheet", "diagnostics", "editor",
+        "setup", "art", "deps", "ci", "repo", "release"],
     ],
     "body-max-line-length": [1, "always", 100],
   },

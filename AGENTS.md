@@ -37,7 +37,7 @@ running, or set `GG_NATIVE_LUA=1` with Lua 5.1 + busted/luacheck/luacov/LuaLS in
 ## Conventions
 
 - Conventional Commits, scope = slice or area:
-  `core controllers bindings profiles share commands cheatsheet diagnostics editor art deps ci repo release`.
+  `core controllers bindings profiles share commands cheatsheet diagnostics editor setup art deps ci repo release`.
   commitlint rejects anything else (commit-msg hook + CI).
 - LuaLS annotations (`---@param`, `---@return`) on public functions; `npm run typecheck`
   must report no problems.

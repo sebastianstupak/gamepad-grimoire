@@ -16,4 +16,7 @@ src\Features\Controllers\Registry.lua
 src\Features\Controllers\Detect.lua
 src\Features\Controllers\Definitions.lua
 
+src\Features\Bindings\Model.lua
+src\Features\Bindings\Applier.lua
+
 src\Bootstrap.lua

@@ -8,7 +8,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "prepare": "lefthook install",
+    "prepare": "node tools/install-hooks.mjs",
     "format": "stylua src spec && python -m ruff format tools",
     "format:check": "stylua --check src spec && python -m ruff format --check tools",
     "lint": "node tools/lua.mjs luacheck . && python -m ruff check tools",

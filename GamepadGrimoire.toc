@@ -25,4 +25,6 @@ src\Features\Share\Serializer.lua
 src\Features\Share\Base64.lua
 src\Features\Share\Codec.lua
 
+src\Features\Commands\Commands.lua
+
 src\Bootstrap.lua

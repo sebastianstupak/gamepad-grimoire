@@ -56,12 +56,6 @@ with `/gg capture`; the same binds are shown on every supported controller.
 
 ![Gamepad Grimoire, Switch Pro controller](docs/images/cheatsheet-switchpro.png)
 
-### All controller pictures
-
-One line-art style for every controller, generated from vector sources (`npm run art`):
-
-![Supported controllers](docs/images/controllers.png)
-
 ## Slash commands
 
 Everything can be done with the controller on the pinned card; these are the
@@ -83,6 +77,37 @@ keyboard fallback.
 | `/gg scale <0.5-2.5>` | Cheat sheet size |
 | `/gg diag` | Check this client (for bug reports) |
 | `/gg reload` | Re-apply bindings |
+
+## Roadmap
+
+Controller support (front view, then back view where the device has buttons there):
+
+| Device | Front picture | Back / extra buttons |
+| --- | --- | --- |
+| Steam Deck (LCD, OLED) | Done | Planned: back view with L4, L5, R4, R5 |
+| Xbox Series X/S, Xbox One | Done | |
+| Xbox Elite Series 2 | Planned | Planned: back view with paddles P1 to P4 |
+| Xbox 360 | Planned | |
+| PlayStation DualSense | Done | |
+| PlayStation DualSense Edge | Planned | Planned: back view with the two back buttons |
+| PlayStation DualShock 4 | Planned (detected already) | |
+| Nintendo Switch Pro | Done | |
+| Nintendo Switch 2 Pro | Planned | Planned: GL / GR back buttons |
+| 8BitDo Pro 2, Ultimate | Planned | Planned: back buttons |
+| Steam Controller | Planned | Planned: back grips |
+| ROG Ally, Legion Go, MSI Claw | Planned | Planned: back buttons where present |
+| Generic gamepad | Planned | |
+
+Features:
+
+- Controller-only setup: pick buttons and actions, switch profiles and options with
+  the D-pad and face buttons, no keyboard needed (in progress).
+- Back-side view on the card for devices with back buttons, toggled with a button.
+- Blizzard's own button glyphs on the card (confirmed available on WoW: Forever).
+- Settings in the game's Settings panel.
+- Localization.
+- Retail and Classic clients in addition to WoW: Forever.
+- First release on CurseForge and Wago.
 
 ## Development
 

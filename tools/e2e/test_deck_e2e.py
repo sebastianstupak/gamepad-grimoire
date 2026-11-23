@@ -19,6 +19,16 @@ GamepadGrimoireDB = {
 ["profiles"] = {
 ["E2E"] = {
 },
+["E2E Setup"] = {
+["layers"] = {
+["BASE"] = {
+["PADLSHOULDER"] = {
+["id"] = 348,
+["type"] = "spell",
+},
+},
+},
+},
 },
 ["debug"] = {
 ["cards"] = {

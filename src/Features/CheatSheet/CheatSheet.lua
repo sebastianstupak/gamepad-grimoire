@@ -63,6 +63,15 @@ local card -- visible card
 local pinned = false
 local peek = { heldFor = 0 }
 local shownLayer
+local focus, setupMode -- set by the Setup slice while the controller setup is open
+
+---Card size: the player's choice, else fit ~90% of the screen width (big on a
+---Steam Deck, sensible on a monitor).
+---@param cardWidth number
+---@return number
+function CheatSheet.AutoScale(cardWidth, screenWidth)
+    return math.max(0.8, math.min(1.6, screenWidth * 0.9 / cardWidth))
+end
 
 local function settings()
     return ns.db.settings
@@ -87,7 +96,7 @@ local function currentCard()
         card.frame:Hide()
     end
     card = cards[id]
-    card.frame:SetScale(settings().scale or 1)
+    card.frame:SetScale(CheatSheet.Scale())
     return card, profile
 end
 
@@ -107,6 +116,8 @@ local function render(layer)
         profile = ns.Profiles.ActiveName(),
         pinned = pinned,
         pinKey = settings().pinKey or CheatSheet.DEFAULT_PIN_KEY,
+        focus = focus,
+        setup = setupMode,
     })
     c:SetEditable(pinned)
     c.frame:Show()
@@ -152,11 +163,45 @@ function CheatSheet.State()
     return pinned, shownLayer
 end
 
----@param scale number 0.5 .. 2.5
+---Current card scale (the player's setting, else automatic).
+---@return number
+function CheatSheet.Scale()
+    if settings().scale then
+        return settings().scale
+    end
+    local w = ns.Wow.ScreenSize()
+    return CheatSheet.AutoScale(card and card.width or 1100, w or 1280)
+end
+
+---@param scale number|nil 0.5 .. 2.5, nil = automatic
 function CheatSheet.SetScale(scale)
     settings().scale = scale
     if card then
-        card.frame:SetScale(scale)
+        card.frame:SetScale(CheatSheet.Scale())
+    end
+end
+
+---The card for the active profile's controller (built on demand).
+function CheatSheet.Card()
+    return (currentCard())
+end
+
+---Shows the card pinned on `layer` with `button` outlined (controller setup).
+---@param layer string
+---@param button string|nil
+---@param active boolean setup mode on/off
+function CheatSheet.SetSetup(layer, button, active)
+    focus, setupMode = active and button or nil, active or nil
+    if active then
+        pinned, peek.pinnedLayer = true, layer
+        render(layer)
+    end
+end
+
+---Re-renders the card if it is showing.
+function CheatSheet.Refresh()
+    if shownLayer then
+        render(shownLayer)
     end
 end
 
@@ -169,7 +214,12 @@ end
 function M:OnEnable()
     local toggle = ns.Wow.CreateFrame("Button", CheatSheet.TOGGLE_BUTTON, ns.Wow.UIParent)
     toggle:SetScript("OnClick", function()
-        CheatSheet.Toggle()
+        -- the Setup slice turns the pin key into "open controller setup"
+        if CheatSheet.pinAction then
+            CheatSheet.pinAction()
+        else
+            CheatSheet.Toggle()
+        end
     end)
     local pinKey = settings().pinKey or CheatSheet.DEFAULT_PIN_KEY
     if pinKey ~= "NONE" and not ns.Wow.InCombatLockdown() then

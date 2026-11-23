@@ -21,9 +21,12 @@ share setups with friends.
 - **Never touches your keybinds.** Binds are applied as override bindings owned by
   the addon; disable it and your normal keybinds are back. Changes made in combat
   wait until combat ends.
-- **Cheat sheet.** Hold LT or RT to peek at a layer, press LT+R3 to pin the card.
-- **Edit in game.** On the pinned card, drag a spell, item or macro onto a button's
-  row; right-click clears; click a tab to edit that layer.
+- **Set up with the controller only.** Press LT+R3: move over the buttons with the
+  D-pad, A picks a spell, macro, item or game action for that button, X clears it,
+  LB / RB switch layers, Y opens profiles and options, B closes. No keyboard needed.
+- **Cheat sheet.** Hold LT or RT to peek at a layer; the card sizes itself to the screen.
+- **Mouse editing too.** On the open card, drag a spell, item or macro onto a row;
+  right-click clears.
 - **Layers.** Hold LT or RT for a second and third set of binds.
 - **Profiles.** Account-wide, per character and per specialization (switches
   automatically).
@@ -39,6 +42,14 @@ with `/gg capture`; the same binds are shown on every supported controller.
 ### Steam Deck: holding LT (L2) to peek at the second layer
 
 ![Gamepad Grimoire on a Steam Deck while holding L2](docs/images/cheatsheet-peek-lt.png)
+
+### Controller setup: pick a button, then what it does
+
+![Controller setup, choosing a button with the D-pad](docs/images/setup-rows.png)
+
+![Controller setup, choosing a spell for L1](docs/images/setup-picker.png)
+
+![Controller setup menu: profiles, controller picture, card size](docs/images/setup-menu.png)
 
 ### Steam Deck: pinned
 
@@ -58,11 +69,12 @@ with `/gg capture`; the same binds are shown on every supported controller.
 
 ## Slash commands
 
-Everything can be done with the controller on the pinned card; these are the
-keyboard fallback.
+Everything can be done with the controller (LT+R3 opens the setup); these are
+the keyboard fallback.
 
 | Command | What it does |
 | --- | --- |
+| `/gg setup` | Controller setup (same as LT+R3) |
 | `/gg show [lt\|rt]` | Pin or unpin the cheat sheet (or hold LT/RT to peek) |
 | `/gg profile` | List profiles (`*` marks the active one) |
 | `/gg profile use <name>` | Switch this character to a profile |
@@ -74,7 +86,7 @@ keyboard fallback.
 | `/gg capture <name>` | New profile from your current controller keybinds |
 | `/gg export [profile]` | Share string of a profile (copy box) |
 | `/gg import` | Paste a share string to add it as a new profile |
-| `/gg scale <0.5-2.5>` | Cheat sheet size |
+| `/gg scale <0.5-2.5\|auto>` | Cheat sheet size (automatic by default) |
 | `/gg diag` | Check this client (for bug reports) |
 | `/gg reload` | Re-apply bindings |
 
@@ -100,8 +112,8 @@ Controller support (front view, then back view where the device has buttons ther
 
 Features:
 
-- Controller-only setup: pick buttons and actions, switch profiles and options with
-  the D-pad and face buttons, no keyboard needed (in progress).
+- Controller-only text entry for naming profiles and pasting share strings (the
+  on-screen keyboard of Steam / the OS works meanwhile).
 - Back-side view on the card for devices with back buttons, toggled with a button.
 - Blizzard's own button glyphs on the card (confirmed available on WoW: Forever).
 - Settings in the game's Settings panel.

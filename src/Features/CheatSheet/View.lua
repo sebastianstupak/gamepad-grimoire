@@ -62,7 +62,15 @@ function View.Build(def, buttons)
         e:SetPoint(side[2])
     end
 
-    local card = { frame = frame, rows = {}, def = def }
+    local card = {
+        frame = frame,
+        rows = {},
+        def = def,
+        width = g.width,
+        height = g.height,
+        image = g.image,
+        columns = { left = {}, right = {} }, -- buttons in on-screen order, for D-pad navigation
+    }
 
     card.title = text(frame, "GameFontNormal")
     card.title:SetPoint("TOPLEFT", 14, -12)
@@ -115,11 +123,11 @@ function View.Build(def, buttons)
 
         row.badge = tex(row, "ARTWORK", C.badge)
         row.badge:SetSize(56, r.h - 4)
-        row.glyph = text(row, "GameFontHighlightSmall", "CENTER")
+        row.glyph = text(row, "GameFontNormal", "CENTER")
         row.icon = tex(row, "ARTWORK")
         row.icon:SetSize(r.h - 4, r.h - 4)
         row.icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
-        row.label = text(row, "GameFontHighlightSmall", r.side == "left" and "RIGHT" or "LEFT")
+        row.label = text(row, "GameFontHighlight", r.side == "left" and "RIGHT" or "LEFT")
         row.label:SetWordWrap(false)
         row.label:SetWidth(r.w - 56 - (r.h - 4) - 16)
 
@@ -149,8 +157,27 @@ function View.Build(def, buttons)
         row.dot:SetSize(5, 5)
         row.dot:SetPoint("CENTER", frame, "TOPLEFT", r.anchor.x, -r.anchor.y)
 
+        -- gold outline marks the row selected with the D-pad during setup
+        row.focus = {}
+        for i, edge in ipairs({ { "TOPLEFT", "TOPRIGHT" }, { "BOTTOMLEFT", "BOTTOMRIGHT" } }) do
+            local e = tex(row, "OVERLAY", C.held)
+            e:SetHeight(2)
+            e:SetPoint(edge[1])
+            e:SetPoint(edge[2])
+            row.focus[i] = e
+        end
+        for i, edge in ipairs({ { "TOPLEFT", "BOTTOMLEFT" }, { "TOPRIGHT", "BOTTOMRIGHT" } }) do
+            local e = tex(row, "OVERLAY", C.held)
+            e:SetWidth(2)
+            e:SetPoint(edge[1])
+            e:SetPoint(edge[2])
+            row.focus[i + 2] = e
+        end
+
         row.button = r.button
+        row.side = r.side
         card.rows[#card.rows + 1] = row
+        card.columns[r.side][#card.columns[r.side] + 1] = r.button
     end
 
     card.footer = text(frame, "GameFontDisableSmall", "CENTER")
@@ -167,7 +194,7 @@ function View.Build(def, buttons)
         end
     end
 
-    ---@param state { layer: string, layout: table, modifiers: table, profile: string, pinned: boolean, pinKey: string? }
+    ---@param state { layer: string, layout: table, modifiers: table, profile: string, pinned: boolean, pinKey: string?, focus: string?, setup: boolean? }
     function card:Fill(state)
         local layerOf = {} -- trigger button -> the layer it holds
         for layer in pairs(state.modifiers) do
@@ -197,7 +224,7 @@ function View.Build(def, buttons)
                 -- the pin key is a priority binding: it wins over whatever the profile has here
                 row.icon:SetTexture("Interface\\Icons\\INV_Misc_Book_09")
                 row.icon:Show()
-                row.label:SetText("|cffc8a2ffPin / unpin this card|r")
+                row.label:SetText("|cffc8a2ffController setup|r")
                 row.badge:SetColorTexture(unpack(C.badge))
             elseif action then
                 local icon, name = ns.Wow.DescribeAction(action)
@@ -212,23 +239,31 @@ function View.Build(def, buttons)
                 row.badge:SetColorTexture(unpack(C.badge))
                 on = false
             end
+            local focused = state.focus == row.button
+            for _, e in ipairs(row.focus) do
+                e:SetShown(focused)
+            end
+            if focused then
+                on = true
+            end
             row:SetAlpha(on and 1 or C.dim)
             for _, l in ipairs(row.lines) do
                 l:SetAlpha(on and 1 or C.dim)
             end
             row.dot:SetAlpha(on and 1 or C.dim)
         end
-        if state.pinned then
-            return self.footer:SetText(
-                "drag a spell, item or macro onto a row to bind it  -  right-click clears  -  click a tab to edit that layer"
-            )
+        if state.setup then
+            return self.footer:SetText("D-pad move   A choose   X clear   Y menu   LB / RB layer   B close")
+        elseif state.pinned then
+            return self.footer:SetText("drag a spell, item or macro onto a row  -  right-click clears")
         end
         self.footer:SetText(
             "hold "
                 .. Glyphs.LayerTrigger(def.family, "LT")
                 .. " / "
                 .. Glyphs.LayerTrigger(def.family, "RT")
-                .. " to peek at a layer  -  /gg help"
+                .. " to peek at a layer  -  "
+                .. (state.pinKey and (state.pinKey .. " opens setup") or "/gg setup")
         )
     end
 

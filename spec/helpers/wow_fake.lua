@@ -174,6 +174,28 @@ function Fake.new()
         end
         return nil, action.name or tostring(action.id)
     end
+    function W.ListSpells()
+        local out = {}
+        for id, name in pairs(state.spells) do
+            out[#out + 1] = { id = id, name = name, icon = 136118 }
+        end
+        table.sort(out, function(a, b)
+            return a.name < b.name
+        end)
+        return out
+    end
+    function W.ListMacros()
+        return state.macros or {}
+    end
+    function W.ListBagItems()
+        return state.bagItems or {}
+    end
+    function W.BindingName(command)
+        return command
+    end
+    function W.ScreenSize()
+        return state.screenWidth or 1280, 800
+    end
     function W.Capabilities()
         return { encoding = false, gamepadApi = true, gamepadEnabled = "1", build = 16001, version = "1.60.1" }
     end

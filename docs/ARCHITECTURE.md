@@ -21,6 +21,7 @@ src/
     Share/                   export / import strings
     CheatSheet/              the card: Layout (pure geometry), Glyphs, View, peek/pin
     Editor/                  drag & drop / right-click editing on the pinned card
+    Setup/                   controller-only setup: Navigator (pure state machine), Catalog, Panel
     Diagnostics/             /gg diag client checks, kept for the e2e test
     Commands/                /gg, /grimoire
   Bootstrap.lua              loaded last: saved data, then module start

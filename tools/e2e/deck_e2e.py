@@ -261,6 +261,7 @@ def scenario(deck):
     deck.chat("/gg diag")
     deck.chat("/gg profile use Default")
     deck.chat("/gg profile delete E2E")  # leftovers of an earlier run
+    deck.chat("/gg profile delete E2E Setup")
     deck.chat("/gg capture E2E")
     deck.chat("/gg profile use E2E")
     time.sleep(1)
@@ -278,9 +279,38 @@ def scenario(deck):
     time.sleep(1.2)
     peek = deck.screenshot("20-peek-lt")
     deck.x(":1", "keyup shift")
+    setup = setup_scenario(deck)
     deck.chat("/gg controller auto")
     deck.chat("/gg diag")
-    return shots, peek
+    return shots, peek, setup
+
+
+def setup_scenario(deck):
+    """Controller setup, driven with arrow keys / Enter / Tab / Escape - the same
+    navigator inputs as D-pad / A / Y / B on a controller."""
+    deck.chat("/gg profile copy E2E Setup")
+    deck.chat("/gg profile use E2E Setup")
+    deck.chat("/gg setup")
+    time.sleep(0.8)
+
+    def key(name):
+        deck.x(":1", "key " + name)
+        time.sleep(0.5)
+
+    key("Down")  # L1 row
+    rows = deck.screenshot("30-setup-rows")
+    key("Return")  # spell picker
+    key("Down")
+    time.sleep(0.5)
+    picker = deck.screenshot("31-setup-picker")
+    key("Return")  # bind the second spell to L1
+    key("Tab")  # menu: profiles, controller, size...
+    time.sleep(0.5)
+    menu = deck.screenshot("32-setup-menu")
+    key("Escape")  # back to the rows
+    key("Escape")  # close setup
+    deck.chat("/gg profile use E2E")
+    return {"rows": rows, "picker": picker, "menu": menu}
 
 
 def logout(deck):
@@ -314,6 +344,10 @@ def check(sv):
     expect("share string round trip", re.search(r'\["share"\] = \{[^}]*\["ok"\] = true', sv, re.S))
     expect("E2E profile captured", '["E2E"]' in sv)
     expect("captured binds applied", re.search(r'\["applied"\] = [1-9]', sv))
+    expect(
+        "controller setup bound a spell to L1",
+        re.search(r'\["E2E Setup"\] = \{.*?\["BASE"\] = \{.*?\["PADLSHOULDER"\] = \{[^}]*"spell"', sv, re.S),
+    )
     return all(ok for _, ok in results)
 
 
@@ -325,12 +359,14 @@ def card_rect(sv, cid):
     return {k: float(v) for k, v in vals.items()} if len(vals) == 4 else None
 
 
-def readme_images(shots, peek, sv):
+def readme_images(shots, peek, sv, setup=None):
     """README images: the whole screen width from the top down to a bit below the card,
     so the card is shown as the overlay it is, over the game."""
     out = os.path.join(ROOT, "docs", "images")
     os.makedirs(out, exist_ok=True)
-    for name, cid, path in [("cheatsheet-" + c, c, p) for c, p in shots] + [("cheatsheet-peek-lt", "steamdeck", peek)]:
+    images = [("cheatsheet-" + c, c, p) for c, p in shots] + [("cheatsheet-peek-lt", "steamdeck", peek)]
+    images += [("setup-" + k, "steamdeck", v) for k, v in (setup or {}).items()]
+    for name, cid, path in images:
         rect = card_rect(sv, cid)
         if not (path and rect):
             print("  ! no screenshot or card position for", name)
@@ -342,6 +378,7 @@ def readme_images(shots, peek, sv):
         print(f"  docs/images/{name}.png")
 
 
+SETUP_SHOTS = {"rows": "30-setup-rows", "picker": "31-setup-picker", "menu": "32-setup-menu"}
 SHOT_NAMES = [(cid, "10-card-" + cid) for cid in ("steamdeck", "xbox", "dualsense", "switchpro")]
 
 
@@ -350,7 +387,8 @@ def readme_from_last_run():
     with open(os.path.join(OUT, "SavedVariables.lua"), encoding="utf-8") as f:
         sv = f.read()
     shots = [(cid, os.path.join(OUT, n + ".png")) for cid, n in SHOT_NAMES]
-    readme_images(shots, os.path.join(OUT, "20-peek-lt.png"), sv)
+    setup = {k: os.path.join(OUT, n + ".png") for k, n in SETUP_SHOTS.items()}
+    readme_images(shots, os.path.join(OUT, "20-peek-lt.png"), sv, setup)
 
 
 def main():
@@ -373,7 +411,7 @@ def main():
         install(deck)
         disable_conflicting(deck)
         launch(deck)
-    shots, peek = scenario(deck)
+    shots, peek, setup = scenario(deck)
     if a.keep_running:
         return
     logout(deck)
@@ -386,7 +424,7 @@ def main():
         f.write(sv)
     ok = check(sv)
     if a.readme:
-        readme_images(shots, peek, sv)
+        readme_images(shots, peek, sv, setup)
     sys.exit(0 if ok else 1)
 
 

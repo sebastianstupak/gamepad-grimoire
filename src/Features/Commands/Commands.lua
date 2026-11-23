@@ -31,6 +31,7 @@ function Commands.Parse(msg, maxParts)
 end
 
 local HELP = {
+    "/gg setup - controller setup (same as the pin chord, LT+R3)",
     "/gg profile - list profiles (* = active)",
     "/gg profile use <name> - switch this character to a profile",
     "/gg profile new <name> - new empty profile",
@@ -42,7 +43,7 @@ local HELP = {
     "/gg export [profile] - share string of a profile (default: the active one)",
     "/gg import - paste a share string to add it as a new profile",
     "/gg show [lt|rt] - pin / unpin the cheat sheet (or hold a trigger to peek)",
-    "/gg scale <0.5-2.5> - cheat sheet size",
+    "/gg scale <0.5-2.5|auto> - cheat sheet size",
     "/gg reload - re-apply bindings",
     "/gg diag - check this client and the addon (saved for bug reports)",
 }
@@ -133,10 +134,18 @@ function handlers.show(layer)
     say(pinned and "cheat sheet pinned" or "cheat sheet hidden")
 end
 
+function handlers.setup()
+    ns.Setup.Toggle()
+end
+
 function handlers.scale(value)
+    if value == "auto" then
+        ns.CheatSheet.SetScale(nil)
+        return say("cheat sheet size: automatic")
+    end
     local n = tonumber(value)
     if not n or n < 0.5 or n > 2.5 then
-        return say("usage: /gg scale <0.5 - 2.5>")
+        return say("usage: /gg scale <0.5 - 2.5|auto>")
     end
     ns.CheatSheet.SetScale(n)
     say(("cheat sheet scale %.2f"):format(n))

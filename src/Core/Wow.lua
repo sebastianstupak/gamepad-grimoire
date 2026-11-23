@@ -241,7 +241,7 @@ function W.DescribeCommand(command)
         return nil, arg
     end
     if command:find("^CLICK GamepadGrimoireToggle") then
-        return "Interface\\Icons\\INV_Misc_Book_09", "Pin / unpin this card"
+        return "Interface\\Icons\\INV_Misc_Book_09", "Controller setup"
     end
     return nil, _G["BINDING_NAME_" .. command] or command
 end
@@ -259,6 +259,125 @@ function W.DescribeAction(action)
     elseif action.type == "command" then
         return W.DescribeCommand(action.command)
     end
+end
+
+-- What the player can bind (controller setup lists) ------------------------------
+
+local function isPassive(id)
+    if C_Spell and C_Spell.IsSpellPassive then
+        return C_Spell.IsSpellPassive(id)
+    end
+    return IsPassiveSpell and IsPassiveSpell(id) or false
+end
+
+local function byName(a, b)
+    return (a.name or "") < (b.name or "")
+end
+
+---Active spells in the player's spellbook (modern C_SpellBook or the classic API).
+---@return { id: number, name: string, icon: any }[]
+function W.ListSpells()
+    local out, seen = {}, {}
+    -- one entry per spell name: classic spellbooks list every rank, and later
+    -- entries are higher ranks, so the last one wins
+    local function add(id)
+        if id and not isPassive(id) then
+            local icon, name = spellInfo(id)
+            if name then
+                local entry = { id = id, name = name, icon = icon }
+                if seen[name] then
+                    out[seen[name]] = entry
+                else
+                    out[#out + 1] = entry
+                    seen[name] = #out
+                end
+            end
+        end
+    end
+    if C_SpellBook and C_SpellBook.GetNumSpellBookSkillLines then
+        local bank = Enum and Enum.SpellBookSpellBank and Enum.SpellBookSpellBank.Player or 0
+        local spellType = Enum and Enum.SpellBookItemType and Enum.SpellBookItemType.Spell
+        for line = 1, C_SpellBook.GetNumSpellBookSkillLines() do
+            local info = C_SpellBook.GetSpellBookSkillLineInfo(line)
+            if info and not info.shouldHide then
+                for i = info.itemIndexOffset + 1, info.itemIndexOffset + info.numSpellBookItems do
+                    local item = C_SpellBook.GetSpellBookItemInfo(i, bank)
+                    if item and (spellType == nil or item.itemType == spellType) and not item.isPassive then
+                        add(item.spellID)
+                    end
+                end
+            end
+        end
+    elseif GetNumSpellTabs then
+        for tab = 1, GetNumSpellTabs() do
+            local _, _, offset, count = GetSpellTabInfo(tab)
+            for i = offset + 1, offset + count do
+                local kind, id = GetSpellBookItemInfo(i, "spell")
+                if kind == "SPELL" then
+                    add(id)
+                end
+            end
+        end
+    end
+    table.sort(out, byName)
+    return out
+end
+
+---Account and character macros.
+---@return { name: string, icon: any }[]
+function W.ListMacros()
+    local out = {}
+    local account, character = GetNumMacros()
+    local function add(i)
+        local name, icon = GetMacroInfo(i)
+        if name then
+            out[#out + 1] = { name = name, icon = icon }
+        end
+    end
+    for i = 1, account or 0 do
+        add(i)
+    end
+    for i = 121, 120 + (character or 0) do
+        add(i)
+    end
+    return out
+end
+
+---Usable items (with an on-use effect) in the backpack and bags.
+---@return { id: number, name: string, icon: any }[]
+function W.ListBagItems()
+    local out, seen = {}, {}
+    local C = C_Container
+    if not (C and C.GetContainerNumSlots) then
+        return out
+    end
+    local itemSpell = (C_Item and C_Item.GetItemSpell) or GetItemSpell
+    for bag = 0, 4 do
+        for slot = 1, C.GetContainerNumSlots(bag) or 0 do
+            local info = C.GetContainerItemInfo(bag, slot)
+            local id = info and info.itemID
+            if id and not seen[id] and itemSpell and itemSpell(id) then
+                seen[id] = true
+                local icon, name = itemInfo(id)
+                out[#out + 1] =
+                    { id = id, name = name or info.itemName or ("item " .. id), icon = icon or info.iconFileID }
+            end
+        end
+    end
+    table.sort(out, byName)
+    return out
+end
+
+---Display name of a key-binding command ("JUMP" -> "Jump").
+---@param command string
+---@return string
+function W.BindingName(command)
+    return _G["BINDING_NAME_" .. command] or command
+end
+
+---@return number width, number height of the UI in UI units
+function W.ScreenSize()
+    return UIParent:GetWidth(), UIParent:GetHeight()
 end
 
 ---Facts about this client used by /gg diag (APIs that differ between versions).

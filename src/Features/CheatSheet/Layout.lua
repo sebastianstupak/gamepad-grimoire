@@ -10,7 +10,7 @@ local Layout = {}
 ns.CheatSheet = ns.CheatSheet or {}
 ns.CheatSheet.Layout = Layout
 
-Layout.ROW_W, Layout.ROW_H, Layout.ROW_GAP = 224, 22, 2
+Layout.ROW_W, Layout.ROW_H, Layout.ROW_GAP = 236, 26, 2
 Layout.IMG_W, Layout.IMG_H = 560, 280 -- textures are 2:1
 Layout.PAD, Layout.HEADER, Layout.FOOTER = 12, 44, 30
 Layout.ELBOW = 10 -- leader lines leave the row horizontally for this many px

@@ -170,7 +170,7 @@ describe("CheatSheet", function()
             assert.is_true(has(t, "Corruption"))
             assert.is_true(has(t, "Square"))
             assert.is_true(has(t, "held"))
-            assert.is_true(has(t, "Pin / unpin this card"))
+            assert.is_true(has(t, "Controller setup"))
             local function textures(frame, out)
                 out = out or {}
                 for _, c in ipairs(rawget(frame, "children") or {}) do

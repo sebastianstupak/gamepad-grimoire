@@ -18,7 +18,9 @@ files["src/Core/Wow.lua"] = {
     "C_Item", "C_Texture", "C_Timer", "GetActionInfo", "GetActionTexture", "GetBindingAction", "GetBuildInfo",
     "GetCurrentKeyBoardFocus", "GetMacroInfo", "GetPetActionInfo", "HasAction", "IsControlKeyDown",
     "IsShiftKeyDown", "UIParent", "UISpecialFrames", "UnitFullName", "GetNormalizedRealmName",
-    "C_SpecializationInfo", "GetActiveTalentGroup", "geterrorhandler", "GetCursorInfo", "ClearCursor",
+    "C_SpecializationInfo", "GetActiveTalentGroup", "geterrorhandler",
+    "C_SpellBook", "C_Container", "Enum", "GetNumSpellTabs", "GetSpellTabInfo", "GetSpellBookItemInfo",
+    "GetNumMacros", "GetItemSpell", "IsPassiveSpell", "GetCursorInfo", "ClearCursor",
   },
   globals = { "SlashCmdList" },
   -- slash command registration writes SLASH_<NAME><n> globals by design

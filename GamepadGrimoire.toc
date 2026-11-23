@@ -33,6 +33,11 @@ src\Features\CheatSheet\CheatSheet.lua
 
 src\Features\Editor\Editor.lua
 
+src\Features\Setup\Navigator.lua
+src\Features\Setup\Catalog.lua
+src\Features\Setup\Panel.lua
+src\Features\Setup\Setup.lua
+
 src\Features\Diagnostics\Diagnostics.lua
 
 src\Features\Commands\Commands.lua

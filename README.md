@@ -42,15 +42,17 @@ share setups with friends.
 
 ## See it in game
 
-In-game screenshots from WoW: Forever on a Steam Deck (1280x800), taken by the
-end-to-end test (`npm run e2e -- --readme`). The profile is a real Affliction
-warlock setup captured with `/gg capture`.
+In-game on WoW: Forever on a Steam Deck (1280x800), from a real Affliction warlock
+setup saved with `/gg capture`. The clip and the screenshots below are captured on
+the device by the end-to-end test (`npm run e2e`).
+
+![Gamepad Grimoire on a Steam Deck: the pinned cheat sheet, each button lighting up as it is held, a peek at a layer, then a flip to the back](docs/images/demo.webp)
 
 ### Steam Deck: front and back
 
 <table>
 <tr><td width="50%"><b>Front</b><br><img src="docs/images/cheatsheet-steamdeck.png" alt="Gamepad Grimoire card for the Steam Deck, front"></td>
-<td width="50%"><b>Back: R4 bound in the controller setup</b><br><img src="docs/images/setup-back-bound.png" alt="Back of the Steam Deck with a spell bound to R4"></td></tr>
+<td width="50%"><b>Back: L4 / L5 / R4 / R5 grips</b><br><img src="docs/images/cheatsheet-steamdeck-back.png" alt="Gamepad Grimoire card for the back of the Steam Deck"></td></tr>
 </table>
 
 View (or `/gg flip`) turns the card around.

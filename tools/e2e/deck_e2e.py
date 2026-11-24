@@ -43,11 +43,11 @@ OUT = os.path.join(ROOT, "tools", "e2e", "out")
 
 class Deck:
     def __init__(self, host, key):
-        self.host, self.key = host, os.path.expanduser(key)
+        self.host, self.keyfile = host, os.path.expanduser(key)
 
     def sh(self, cmd, check=True, timeout=300):
         r = subprocess.run(
-            ["ssh", "-i", self.key, "-o", "BatchMode=yes", "-o", "ConnectTimeout=10", self.host, cmd],
+            ["ssh", "-i", self.keyfile, "-o", "BatchMode=yes", "-o", "ConnectTimeout=10", self.host, cmd],
             capture_output=True,
             timeout=timeout,
         )
@@ -59,7 +59,7 @@ class Deck:
 
     def put(self, data, remote):
         r = subprocess.run(
-            ["ssh", "-i", self.key, "-o", "BatchMode=yes", self.host, f"cat > {shlex.quote(remote)}"],
+            ["ssh", "-i", self.keyfile, "-o", "BatchMode=yes", self.host, f"cat > {shlex.quote(remote)}"],
             input=data,
             capture_output=True,
         )
@@ -68,7 +68,7 @@ class Deck:
 
     def get(self, remote):
         r = subprocess.run(
-            ["ssh", "-i", self.key, "-o", "BatchMode=yes", self.host, f"cat {shlex.quote(remote)}"],
+            ["ssh", "-i", self.keyfile, "-o", "BatchMode=yes", self.host, f"cat {shlex.quote(remote)}"],
             capture_output=True,
         )
         return r.stdout if r.returncode == 0 else None
@@ -103,6 +103,17 @@ class Deck:
         """Presses a key in WoW (refuses when another window has focus)."""
         self.require_wow()
         self.x(":1", "key " + name)
+
+    def focus_wow(self):
+        """Raise the full-screen WoW window to the front. Battle.net grabs focus
+        when it is remapped after the virtual pad; this restores the right window
+        so require_wow passes legitimately (it still verifies before typing)."""
+        self.sh(
+            "export DISPLAY=:1; w=$(xdotool search --name '^World of Warcraft$' 2>/dev/null | head -1);"
+            ' [ -n "$w" ] && xdotool windowactivate --sync "$w"',
+            check=False,
+        )
+        time.sleep(0.5)
 
     def chat(self, line):
         """Types a chat line in WoW (only when no loading screen is up; refuses when
@@ -214,11 +225,7 @@ class VirtualPad:
         self.deck = deck
         # Battle.net reads controllers too and acts on them (opens friends chat, file
         # browsers...): hide its windows while the virtual pad exists
-        deck.sh(
-            f"export DISPLAY=:1; xdotool search --name '^Battle.net' > {BNET_HIDDEN} 2>/dev/null;"
-            f" for w in $(cat {BNET_HIDDEN}); do xdotool windowunmap $w; done",
-            check=False,
-        )
+        hide_battlenet(deck)
         with open(os.path.join(ROOT, "tools", "e2e", "vpad.py"), "rb") as f:
             deck.sh(f"mkdir -p {os.path.dirname(VPAD)}")
             deck.put(f.read(), VPAD)
@@ -250,11 +257,28 @@ class VirtualPad:
         self.send("quit", wait=False)
         time.sleep(1)
         self.deck.sh("systemctl --user stop gg-vpad 2>/dev/null; rm -f " + VPAD_FIFO, check=False)
-        self.deck.sh(
-            f"export DISPLAY=:1; for w in $(cat {BNET_HIDDEN} 2>/dev/null); do xdotool windowmap $w; done;"
-            f" rm -f {BNET_HIDDEN}",
-            check=False,
-        )
+        # Leave Battle.net hidden: remapping it mid-run lets it grab focus back from
+        # WoW (it behaves as always-on-top). restore_battlenet() shows it at the end.
+        self.deck.focus_wow()
+
+
+def hide_battlenet(deck):
+    """Unmap Battle.net windows so they cannot steal focus from WoW during a run
+    (Battle.net reads gamepads and acts on them, and behaves as always-on-top)."""
+    deck.sh(
+        f"export DISPLAY=:1; xdotool search --name '^Battle.net' > {BNET_HIDDEN} 2>/dev/null;"
+        f" for w in $(cat {BNET_HIDDEN}); do xdotool windowunmap $w; done",
+        check=False,
+    )
+
+
+def restore_battlenet(deck):
+    """Show the Battle.net windows the virtual pad hid (run once at the end)."""
+    deck.sh(
+        f"export DISPLAY=:1; for w in $(cat {BNET_HIDDEN} 2>/dev/null); do xdotool windowmap $w; done;"
+        f" rm -f {BNET_HIDDEN}",
+        check=False,
+    )
 
 
 def keep_awake(deck, on=True):
@@ -340,6 +364,8 @@ def launch(deck):
 
 def scenario(deck, pad=True):
     print("== scenario")
+    hide_battlenet(deck)  # keep Battle.net from stealing focus for the whole run
+    deck.focus_wow()
     deck.chat("/gg diag")
     deck.chat("/gg profile use Default")
     deck.chat("/gg profile delete E2E")  # leftovers of an earlier run
@@ -635,6 +661,88 @@ def card_rect(sv, cid):
     return {k: float(v) for k, v in vals.items()} if len(vals) == 4 else None
 
 
+# the showcase clip (docs/images/demo.webp): base card, each face/bumper button
+# held so the live highlight lights it, a peek at the second layer, the back
+VIDEO_FRAMES = (
+    [("steamdeck", "60-demo-00", 900)]
+    + [("steamdeck", f"60-demo-{i:02d}", 520) for i, _ in enumerate(("A", "B", "X", "Y", "LB", "RB"), 1)]
+    + [("steamdeck", "60-demo-07", 1100), ("steamdeck_back", "60-demo-08", 1500)]
+)
+
+
+def video_scenario(deck):
+    """Drive a short demo for docs/images/demo.webp: the pinned card with the live
+    highlight (each button lights up as the virtual pad holds it), a peek at the
+    second layer, then a flip to the back. Returns [(cid, path, ms)]."""
+    print("== video demo")
+    deck.focus_wow()
+    deck.chat("/reload")  # clean slate: closes any game menu a prior scenario left open
+    time.sleep(12)
+    deck.focus_wow()
+    deck.chat("/gg profile use E2E")
+    deck.chat("/gg controller steamdeck")
+    deck.chat("/gg scale auto")
+    frames = [("steamdeck", shot_with_card(deck, "60-demo-00"), 900)]
+    pad = VirtualPad(deck)
+    try:
+        pad.press("DOWN")  # make the virtual pad the active controller
+        for cid, name, ms in VIDEO_FRAMES[1:7]:
+            btn = ("A", "B", "X", "Y", "LB", "RB")[int(name[-2:]) - 1]
+            pad.send(f"hold {btn} 1.4", wait=False)
+            time.sleep(0.7)
+            deck.require_wow()  # the pad must not have driven another window
+            frames.append((cid, deck.screenshot(name), ms))
+            time.sleep(1.0)
+        pad.send("hold LT 2.2", wait=False)  # peek the second layer with the real trigger
+        time.sleep(1.1)
+        deck.require_wow()
+        frames.append(("steamdeck", deck.screenshot("60-demo-07"), 1100))
+        time.sleep(1.4)
+    finally:
+        pad.close()
+    deck.chat("/gg flip")  # turn the card to the back
+    time.sleep(0.8)
+    frames.append(("steamdeck_back", deck.screenshot("60-demo-08"), 1500))
+    deck.chat("/gg flip")
+    deck.chat("/gg hide")
+    return [(cid, p, ms) for cid, p, ms in frames if p]
+
+
+def write_video(frames, sv, cid="steamdeck"):
+    """Crop every frame to the card band (as readme_images does) and encode a
+    looping animated WebP. All frames share the front card's crop so they line up."""
+    rect = card_rect(sv, cid)
+    if not rect:
+        print("  ! no card position for the video")
+        return
+    out = os.path.join(ROOT, "docs", "images", "demo.webp")
+    target_w, imgs, durations, bottom = 960, [], [], None
+    for _cid, path, ms in frames:
+        if not path:
+            continue
+        im = Image.open(path).convert("RGB")
+        w, h = im.size
+        if bottom is None:
+            bottom = min(h, int((rect["bottom"] + 0.2) * h))
+        im = im.crop((0, 0, w, bottom))
+        imgs.append(im.resize((target_w, round(target_w * im.height / im.width)), Image.LANCZOS))
+        durations.append(ms)
+    if not imgs:
+        print("  ! no video frames")
+        return
+    imgs[0].save(
+        out, save_all=True, append_images=imgs[1:], duration=durations, loop=0, format="WEBP", method=6, quality=70
+    )
+    print(f"  docs/images/demo.webp ({len(imgs)} frames, {sum(durations)} ms)")
+
+
+def video_from_last_run():
+    """Re-encode docs/images/demo.webp from tools/e2e/out (no Deck needed)."""
+    with open(os.path.join(OUT, "SavedVariables.lua"), encoding="utf-8") as f:
+        sv = f.read()
+    write_video([(cid, os.path.join(OUT, n + ".png"), ms) for cid, n, ms in VIDEO_FRAMES], sv)
+
+
 def readme_images(shots, peek, sv, setup=None):
     """README images: the whole screen width from the top down to a bit below the card,
     so the card is shown as the overlay it is, over the game."""
@@ -696,9 +804,15 @@ def main():
     ap.add_argument("--readme", action="store_true", help="update docs/images from the screenshots")
     ap.add_argument("--no-pad", action="store_true", help="skip the virtual gamepad scenario")
     ap.add_argument("--readme-only", action="store_true", help="only re-crop docs/images from the last run")
+    ap.add_argument("--video", action="store_true", help="also record the showcase clip docs/images/demo.webp")
+    ap.add_argument("--video-only", action="store_true", help="only re-encode demo.webp from the last run")
+    ap.add_argument("--demo", action="store_true", help="only record demo.webp (launch, capture a profile, video)")
     a = ap.parse_args()
     if a.readme_only:
         readme_from_last_run()
+        return
+    if a.video_only:
+        video_from_last_run()
         return
     deck = Deck(a.host, a.key)
     keep_awake(deck)
@@ -708,10 +822,34 @@ def main():
         install(deck)
         disable_conflicting(deck)
         launch(deck)
+    if a.demo:  # fast path: just the showcase clip, no full scenario
+        hide_battlenet(deck)
+        deck.focus_wow()
+        deck.chat("/gg profile delete E2E")
+        deck.chat("/gg capture E2E")  # a populated card from the character's real binds
+        vframes = video_scenario(deck)
+        logout(deck)
+        restore_battlenet(deck)
+        if not deck.wow_running():
+            restore_addons(deck)
+        keep_awake(deck, False)
+        sv = saved_variables(deck)
+        os.makedirs(OUT, exist_ok=True)
+        with open(os.path.join(OUT, "SavedVariables.lua"), "w", encoding="utf-8") as f:
+            f.write(sv)
+        write_video(vframes, sv)
+        return
     shots, peek, setup = scenario(deck, pad=not a.no_pad)
+    vframes = None
+    if a.video:
+        try:
+            vframes = video_scenario(deck)
+        except Exception as e:  # a demo hiccup must not lose the screenshot refresh
+            print("  ! video demo failed:", e)
     if a.keep_running:
         return
     logout(deck)
+    restore_battlenet(deck)  # show Battle.net again (the pad hid it for the run)
     if not deck.wow_running():
         restore_addons(deck)
     keep_awake(deck, False)
@@ -722,6 +860,8 @@ def main():
     ok = check(sv, pad=not a.no_pad)
     if a.readme:
         readme_images(shots, peek, sv, setup)
+    if vframes:
+        write_video(vframes, sv)
     sys.exit(0 if ok else 1)
 
 

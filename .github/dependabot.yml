@@ -12,6 +12,10 @@ updates:
     schedule: { interval: monthly }
     cooldown: { default-days: 7 }
     commit-message: { prefix: "chore(ci)" }
+    # codeql-action v4 fails the analysis step in CI; stay on v3 until it is compatible.
+    ignore:
+      - dependency-name: "github/codeql-action*"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: pip
     directories: [/tools/art, /tools]
     schedule: { interval: monthly }

@@ -6,196 +6,96 @@
 [![Security](https://github.com/sebastianstupak/gamepad-grimoire/actions/workflows/security.yml/badge.svg)](https://github.com/sebastianstupak/gamepad-grimoire/actions/workflows/security.yml)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/sebastianstupak/gamepad-grimoire/badge)](https://scorecard.dev/viewer/?uri=github.com/sebastianstupak/gamepad-grimoire)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![Lua 5.1](https://img.shields.io/badge/Lua-5.1-2C2D72?logo=lua)
 ![WoW: Forever](https://img.shields.io/badge/WoW-Forever%201.60-c8a2ff)
 
 A World of Warcraft addon for playing with a controller: bind spells, items and
-macros to every button, see your binds on a picture of *your* controller, and
-share setups with friends.
+macros to every button, see your binds on a picture of *your* controller, and set
+it all up without touching the keyboard.
 
-> Status: early development. Verified in game on WoW: Forever 1.60.1 (Steam Deck)
-> by an automated end-to-end test. Not yet released on CurseForge or Wago.
-
-- **Any controller.** Xbox Series, Xbox 360, DualSense, DualShock 4, Switch Pro,
-  8BitDo Pro 2, Steam Controller, a generic gamepad, and the Steam Deck, ROG Ally,
-  Legion Go and MSI Claw handhelds, in one consistent line-art style.
-- **Never touches your keybinds.** Binds are applied as override bindings owned by
-  the addon; disable it and your normal keybinds are back. Changes made in combat
-  wait until combat ends.
-- **Set up with the controller only.** Press LT+R3: move over the buttons with the
-  D-pad (or just press the button you want), A picks a spell, macro, item or game
-  action for it, X clears it, LB / RB switch layers, View shows the back of the
-  controller, Y opens profiles and options, B closes. Profiles are named with an
-  on-screen keyboard. No keyboard or chat needed.
-- **Front and back.** Back views show the Steam Deck's L4 / L5 / R4 / R5 and the
-  DualSense Edge back buttons (View turns the card around). Whether their presses
-  reach the game depends on the controller and Steam Input; see the roadmap.
-- **Live highlight.** Held buttons light up on the card, so you can check what is where.
-- **Cheat sheet.** Hold LT or RT to peek at a layer; the card sizes itself to the screen.
-- **Mouse editing too.** On the open card, drag a spell, item or macro onto a row;
-  right-click clears.
-- **Layers.** Hold LT or RT for a second and third set of binds.
-- **Profiles.** Account-wide, per character and per specialization (switches
-  automatically).
-- **Share strings.** Export a profile as `!GG1!...` text, import one safely (nothing
-  is ever executed; everything is validated).
-
-## See it in game
-
-In-game on WoW: Forever on a Steam Deck (1280x800), from a real Affliction warlock
-setup saved with `/gg capture`. The clip and the screenshots below are captured on
-the device by the end-to-end test (`npm run e2e`).
+> **Status:** early development — verified in game on WoW: Forever 1.60.1 (Steam Deck)
+> by an automated end-to-end test. Not yet on CurseForge/Wago; see [Install](#install).
 
 ![Gamepad Grimoire on a Steam Deck: the pinned cheat sheet, each button lighting up as it is held, a peek at a layer, then a flip to the back](docs/images/demo.webp)
 
-### Steam Deck: front and back
+## Features
 
-<table>
-<tr><td width="50%"><b>Front</b><br><img src="docs/images/cheatsheet-steamdeck.png" alt="Gamepad Grimoire card for the Steam Deck, front"></td>
-<td width="50%"><b>Back: L4 / L5 / R4 / R5 grips</b><br><img src="docs/images/cheatsheet-steamdeck-back.png" alt="Gamepad Grimoire card for the back of the Steam Deck"></td></tr>
-</table>
+- **Any controller** — Xbox, DualSense/DualShock, Switch Pro, 8BitDo, Steam
+  Controller, a generic pad, and the Steam Deck / ROG Ally / Legion Go / MSI Claw
+  handhelds, each drawn in one line-art style, front and back.
+- **Controller-only setup** — press **LT + R3** and bind everything with the pad; no
+  keyboard or chat needed.
+- **Never touches your keybinds** — binds are override bindings the addon owns;
+  disable it and your normal keybinds are back. Combat changes wait for combat to end.
+- **Live cheat sheet** — held buttons light up on the card; hold LT/RT to peek at a
+  layer (up to three layers).
+- **Mouse editing too** — drag a spell, item or macro onto a row; right-click clears.
+- **Profiles** — account-wide, per character and per spec (switches automatically).
+- **Safe sharing** — export/import a profile as a `!GG1!…` string; nothing is ever
+  executed, everything is validated.
 
-View (or `/gg flip`) turns the card around.
+## Install
 
-> **Steam Deck back grips:** with Steam Input on (the default), SteamOS keeps
-> L4 / L5 / R4 / R5 and sends the game keys or Steam actions instead, so binds on
-> them do not fire yet. When the game reports no back buttons, the back view says
-> so. See the roadmap.
+Until the CurseForge/Wago release, install manually:
 
-### Holding L2 to peek at the second layer
+1. Download the repo (**Code → Download ZIP**, or clone it).
+2. Copy the addon into WoW's `Interface/AddOns/` as a folder named **`GamepadGrimoire`**
+   — it needs the `.toc`, `src/` and `media/` (the repo without `tools/`, `spec/`
+   and `docs/`).
+3. Enable **Gamepad Grimoire** on the character screen.
 
-![Gamepad Grimoire on a Steam Deck while holding L2](docs/images/cheatsheet-peek-lt.png)
+On a Steam Deck, [wow-steamdeck-setup](https://github.com/sebastianstupak/wow-steamdeck-setup)
+has an `install-addon.sh` that pushes an addon over SSH.
 
-### Controller setup: pick a button, then what it does
+## Usage
 
-![Controller setup, choosing a button with the D-pad](docs/images/setup-rows.png)
-
-![Controller setup, choosing a spell for L1](docs/images/setup-picker.png)
-
-![Controller setup menu: profiles, controller picture, card size](docs/images/setup-menu.png)
-
-### Held buttons light up
-
-![The card with R1 held on a Steam Deck](docs/images/setup-held.png)
-
-### Your controller, whichever it is
-
-The card draws a picture of the controller you are holding. A few, mid-game:
-
-<table>
-<tr>
-<td width="33%"><b>Xbox</b><br><img src="docs/images/cheatsheet-xbox.png" alt="Gamepad Grimoire card for an Xbox controller, in game"></td>
-<td width="33%"><b>DualSense</b><br><img src="docs/images/cheatsheet-dualsense.png" alt="Gamepad Grimoire card for a DualSense controller, in game"></td>
-<td width="33%"><b>Switch Pro</b><br><img src="docs/images/cheatsheet-switchpro.png" alt="Gamepad Grimoire card for a Switch Pro controller, in game"></td>
-</tr>
-</table>
-
-The end-to-end test captures the card for every supported controller; these shots
-are refreshed on each Steam Deck run.
-
-## Slash commands
-
-Everything can be done with the controller (LT+R3 opens the setup); these are
-the keyboard fallback.
+Press **LT + R3** in game to open the setup, or use `/gg` commands — the handy ones:
 
 | Command | What it does |
 | --- | --- |
-| `/gg setup` | Controller setup (same as LT+R3) |
-| `/gg show [base\|lt\|rt]` | Pin or unpin the cheat sheet; with a layer, pin it on that layer (or hold LT/RT to peek) |
-| `/gg hide` | Hide the pinned cheat sheet |
-| `/gg flip` | Turn the card around: front or back of the controller (View in the setup) |
-| `/gg profile` | List profiles (`*` marks the active one) |
+| `/gg setup` | Open the controller setup (same as LT+R3) |
+| `/gg show` · `/gg hide` | Pin or hide the cheat sheet |
+| `/gg controller <id\|auto>` | Which controller picture to show |
 | `/gg profile use <name>` | Switch this character to a profile |
-| `/gg profile new <name>` | New empty profile |
-| `/gg profile copy <name>` | Copy the active profile |
-| `/gg profile rename <old> = <new>` | Rename a profile |
-| `/gg profile delete <name>` | Delete an unused profile |
-| `/gg controller <id\|auto>` | Picture to show: `xbox`, `xbox360`, `dualsense`, `dualshock4`, `switchpro`, `8bitdo`, `steamcontroller`, `generic`, `steamdeck`, `rogally`, `legiongo`, `msiclaw` |
-| `/gg capture <name>` | New profile from your current controller keybinds |
-| `/gg export [profile]` | Share string of a profile (copy box) |
-| `/gg import` | Paste a share string to add it as a new profile |
-| `/gg scale <0.5-2.5\|auto>` | Cheat sheet size (automatic by default) |
-| `/gg diag` | Check this client (for bug reports) |
-| `/gg reload` | Re-apply bindings |
+| `/gg export` · `/gg import` | Share a profile as text |
+
+`/gg help` lists every command.
+
+## Screenshots
+
+<table>
+<tr><td width="50%"><b>Steam Deck, front</b><br><img src="docs/images/cheatsheet-steamdeck.png" alt="Gamepad Grimoire card for the Steam Deck, front"></td>
+<td width="50%"><b>Back: L4 / L5 / R4 / R5 grips</b><br><img src="docs/images/cheatsheet-steamdeck-back.png" alt="Gamepad Grimoire card for the back of the Steam Deck"></td></tr>
+</table>
+
+The card draws whichever controller you plug in:
+
+<table>
+<tr>
+<td width="33%"><b>Xbox</b><br><img src="docs/images/cheatsheet-xbox.png" alt="Gamepad Grimoire card for an Xbox controller"></td>
+<td width="33%"><b>DualSense</b><br><img src="docs/images/cheatsheet-dualsense.png" alt="Gamepad Grimoire card for a DualSense controller"></td>
+<td width="33%"><b>Switch Pro</b><br><img src="docs/images/cheatsheet-switchpro.png" alt="Gamepad Grimoire card for a Switch Pro controller"></td>
+</tr>
+</table>
 
 ## Roadmap
 
-Controller support (front view, then back view where the device has buttons there):
+Every controller above has a front and back picture. Still to come:
 
-| Device | Front picture | Back buttons drawn | Back buttons reach the game |
-| --- | --- | --- | --- |
-| Steam Deck (LCD, OLED) | Done | L4, L5, R4, R5 | No with Steam Input (they become keys); planned: bind them as keys |
-| Xbox Series X/S, Xbox One | Done | (triggers and bumpers) | |
-| Xbox Elite Series 2 | Uses the Xbox picture (no paddles drawn) | Planned | Unverified (a virtual Elite's paddles arrive as face buttons) |
-| Xbox 360 | Done | (triggers and bumpers) | |
-| PlayStation DualSense | Done | (triggers and bumpers) | |
-| PlayStation DualSense Edge | Uses the DualSense picture | The two back buttons | Unverified |
-| PlayStation DualShock 4 | Done | (triggers and bumpers) | |
-| Nintendo Switch Pro | Done | (triggers and bumpers) | |
-| Nintendo Switch 2 Pro | Planned | Planned: GL / GR | |
-| 8BitDo Pro 2 | Done | P1, P2 | Unverified |
-| 8BitDo Ultimate | Planned | | |
-| Steam Controller (2026) | Done (Valve CAD) | Four back buttons | Unverified |
-| ROG Ally / Ally X | Done | M1, M2 | Unverified |
-| Lenovo Legion Go | Done | M2, M3, Y1, Y2 | Unverified |
-| MSI Claw | Done | M1, M2 | Unverified |
-| Generic gamepad | Done | (triggers and bumpers) | |
-| Joy-Cons, arcade sticks | Planned | | |
+- Steam Deck / handheld **back grips** that Steam Input turns into keys — bind those
+  keys too (today the game can't see them as controller buttons).
+- Pasting share strings with the controller; Blizzard's own button glyphs on the card.
+- Localization; Retail and Classic clients; first CurseForge/Wago release.
 
-Features:
+## Contributing
 
-- Back grips that Steam Input turns into keys (Steam Deck): bind those keys too.
-- Pasting share strings with the controller (profiles are already named with the
-  on-screen keyboard).
-- Blizzard's own button glyphs on the card (confirmed available on WoW: Forever).
-- Localization.
-- Retail and Classic clients in addition to WoW: Forever.
-- First release on CurseForge and Wago.
-
-## Development
-
-The addon is Lua 5.1, the dialect the game client runs.
-
-| Area | Tooling |
-| --- | --- |
-| Format | [StyLua](https://github.com/JohnnyMorganz/StyLua), [ruff](https://docs.astral.sh/ruff/) (`npm run format`) |
-| Lint | [luacheck](https://github.com/lunarmodules/luacheck), ruff (`npm run lint`) |
-| Types | [lua-language-server](https://luals.github.io) `--check` with LuaLS annotations (`npm run typecheck`) |
-| Tests | [busted](https://lunarmodules.github.io/busted/) unit, integration and end-to-end specs (every chat command, controller-only and mouse journeys against a simulated client), seeded fuzzing of share strings, pytest for tools (`npm test`) |
-| Coverage | [luacov](https://lunarmodules.github.io/luacov/); CI fails under 90 % (`npm run coverage`) |
-| End to end | Real Steam Deck over SSH: install, play, screenshot, verify saved data (`npm run e2e`) |
-| Commits | [Conventional Commits](https://www.conventionalcommits.org), checked by commitlint |
-| Hooks | [lefthook](https://github.com/evilmartians/lefthook): format and lint on commit, message check, full check on push |
-| Security | zizmor, gitleaks, CodeQL, dependency review, OpenSSF Scorecard; actions pinned to SHAs |
-| Art | `npm run art` (Pillow and resvg) |
-| Release | Tag `vX.Y.Z`, packaged by the [BigWigs packager](https://github.com/BigWigsMods/packager) |
-
-```sh
-npm install          # dev tools and git hooks
-npm run check        # format, lint, types, tests and coverage (also the pre-push hook)
-```
-
-Lua tools (busted, luacov, luacheck, LuaLS) run in a small Docker image (`tools/docker/`)
-so they behave the same on every OS and in CI; set `GG_NATIVE_LUA=1` to use local installs.
-Python tools: `pip install --require-hashes -r tools/requirements-ci.txt` (hash-locked).
-
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [CONTRIBUTING.md](CONTRIBUTING.md),
-[AGENTS.md](AGENTS.md) (guide for AI coding agents) and [SECURITY.md](SECURITY.md).
+Pull requests welcome. See **[CONTRIBUTING.md](CONTRIBUTING.md)** for the dev setup,
+tooling and commit conventions, and **[SECURITY.md](SECURITY.md)** to report a
+vulnerability.
 
 ## License
 
-The code is MIT. Controller pictures are licensed per file, see
-[media/controllers/CREDITS.md](media/controllers/CREDITS.md):
-
-- The Steam Deck and Steam Controller pictures are rendered from Valve's official
-  CAD ([Deck](https://gitlab.steamos.cloud/SteamDeck/hardware),
-  [Controller](https://gitlab.steamos.cloud/SteamHardware/SteamController)) and are
-  licensed [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
-  like those models. Gamepad Grimoire is not made, endorsed or supported by Valve.
-- The DualSense picture is rendered from a community 3D model on Sketchfab,
-  [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), credited to
-  AHarmlessPotato in [media/controllers/CREDITS.md](media/controllers/CREDITS.md).
-- The Xbox, Xbox 360, DualShock 4, ROG Ally, Legion Go, MSI Claw, 8BitDo Pro 2 and
-  generic pad are 3D models built for this project (`tools/art/model.py`) and are MIT;
-  simplified line-art impressions, not exact replicas.
-- The Switch Pro picture is derived from AL2009man's Gamepad-Asset-Pack (MIT).
+Code is **MIT** ([LICENSE](LICENSE)). Controller pictures are licensed per file —
+Valve official CAD (Steam Deck / Controller, CC BY-NC-SA), a community DualSense model
+(CC BY 4.0), models built for this project (MIT), and a traced Switch Pro (MIT); full
+credits in [media/controllers/CREDITS.md](media/controllers/CREDITS.md). Not made,
+endorsed or supported by Blizzard or Valve.

@@ -233,7 +233,7 @@ function View.Build(def, buttons)
         end
     end
 
-    ---@param state { layer: string, layout: table, modifiers: table, profile: string, pinned: boolean, pinKey: string?, focus: string?, setup: boolean? }
+    ---@param state { layer: string, layout: table, modifiers: table, profile: string, pinned: boolean, pinKey: string?, focus: string?, setup: string?, backUnreachable: boolean? }
     function card:Fill(state)
         local layerOf = {} -- trigger button -> the layer it holds
         for layer in pairs(state.modifiers) do
@@ -296,8 +296,15 @@ function View.Build(def, buttons)
             end
             row.dot:SetAlpha(on and 1 or C.dim)
         end
-        if state.setup then
+        if state.backUnreachable then
+            return self.footer:SetText(
+                "|cffff9a3cThe game does not see back buttons from this controller"
+                    .. " (a Steam Deck's L4 L5 R4 R5 go to Steam Input)|r"
+            )
+        elseif state.setup == "rows" then
             return self.footer:SetText("D-pad move   A choose   X clear   Y menu   LB / RB layer   B close")
+        elseif state.setup then
+            return self.footer:SetText("") -- the open list / keyboard shows its own buttons
         elseif state.pinned then
             return self.footer:SetText("drag a spell, item or macro onto a row  -  right-click clears")
         end

@@ -42,7 +42,9 @@ local HELP = {
     "/gg capture <name> - new profile from your current controller keybinds",
     "/gg export [profile] - share string of a profile (default: the active one)",
     "/gg import - paste a share string to add it as a new profile",
-    "/gg show [lt|rt] - pin / unpin the cheat sheet (or hold a trigger to peek)",
+    "/gg show - pin / unpin the cheat sheet (or hold a trigger to peek)",
+    "/gg show base|lt|rt - pin it on that layer",
+    "/gg hide - hide the pinned cheat sheet",
     "/gg scale <0.5-2.5|auto> - cheat sheet size",
     "/gg reload - re-apply bindings",
     "/gg diag - check this client and the addon (saved for bug reports)",
@@ -128,10 +130,17 @@ end
 function handlers.show(layer)
     local L = { lt = "LT", rt = "RT", base = "BASE" }
     if layer and not L[layer] then
-        return say("usage: /gg show [lt|rt]")
+        return say("usage: /gg show [base|lt|rt]")
     end
     local pinned = ns.CheatSheet.Toggle(layer and L[layer])
     say(pinned and "cheat sheet pinned" or "cheat sheet hidden")
+end
+
+function handlers.hide()
+    if ns.CheatSheet.State() then
+        ns.CheatSheet.Toggle()
+    end
+    say("cheat sheet hidden")
 end
 
 function handlers.setup()

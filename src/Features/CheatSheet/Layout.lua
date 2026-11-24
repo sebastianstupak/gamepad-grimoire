@@ -36,8 +36,12 @@ end
 ---@return table[] left, table[] right rows { button, side, point }, sorted top to bottom
 function Layout.Assign(def, buttons)
     local left, right, middle = {}, {}, {}
+    local hidden = {} -- drawn on the picture but never reaching the game (e.g. the Deck's Steam button)
+    for _, h in ipairs(def.hidden or {}) do
+        hidden[h] = true
+    end
     for _, b in ipairs(buttons) do
-        local p = Layout.ButtonPoint(def, b)
+        local p = not hidden[b] and Layout.ButtonPoint(def, b)
         if p then
             local item = { button = b, point = p }
             if math.abs(p.x - 0.5) < 0.04 then

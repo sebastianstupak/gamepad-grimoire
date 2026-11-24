@@ -130,7 +130,7 @@ local function render()
     if not state then
         return
     end
-    ns.CheatSheet.SetSetup(state.layer, N().Button(state), true)
+    ns.CheatSheet.SetSetup(state.layer, N().Button(state), true, state.screen)
     local card = ns.CheatSheet.Card()
     local p = ensurePanel(card)
     if state.screen == "picker" then

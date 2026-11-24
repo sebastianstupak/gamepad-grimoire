@@ -139,6 +139,26 @@ describe("e2e: controller only", function()
         assert.same({ "spell Corruption" }, me:actions())
     end)
 
+    it("says so on the back view when the game cannot see the back buttons", function()
+        -- a Steam Deck through Steam Input looks like an Xbox 360 pad: no paddles
+        me.wow.knownButtons = { "PAD1", "PAD2", "PAD3", "PAD4", "PADLSHOULDER", "PADRSHOULDER", "PADBACK" }
+        chord()
+        assert.is_false(me:sees("does not see back buttons"))
+        me:tap("PADBACK")
+        assert.is_true(me:sees("does not see back buttons"))
+        me.wow.knownButtons = { "PAD1", "PADPADDLE1", "PADPADDLE2" } -- an Elite / DualSense Edge
+        me:tap("PADBACK", "PADBACK")
+        assert.is_false(me:sees("does not see back buttons"))
+    end)
+
+    it("does not show the Steam button SteamOS keeps for itself", function()
+        chord()
+        assert.is_false(me:sees("^Steam$"))
+        for _, r in ipairs(me.ns.CheatSheet.Card().rows) do
+            assert.are_not.equal("PADSYSTEM", r.button)
+        end
+    end)
+
     it("flips the card with View and back again", function()
         chord()
         me:tap("PADBACK")

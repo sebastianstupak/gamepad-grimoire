@@ -154,7 +154,7 @@ Register({
     labelStyle = "Letters",
     texture = "Interface\\AddOns\\GamepadGrimoire\\media\\controllers\\steamdeck",
     back = "steamdeck_back",
-    hidden = { "LPAD", "RPAD", "QAM" },
+    hidden = { "LPAD", "RPAD", "QAM", "PADSYSTEM" },
     anchors = {
         LPAD = { x = 0.1575, y = 0.5065, w = 0.1037, h = 0.2081 },
         PAD1 = { x = 0.9256, y = 0.3184, w = 0.0305, h = 0.0600 },

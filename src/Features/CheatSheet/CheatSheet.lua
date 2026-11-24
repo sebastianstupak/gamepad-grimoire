@@ -63,7 +63,22 @@ local card -- visible card
 local pinned = false
 local peek = { heldFor = 0 }
 local shownLayer
-local focus, setupMode -- set by the Setup slice while the controller setup is open
+local focus, setupMode -- set by the Setup slice while the controller setup is open (its screen)
+
+-- false when the active controller is known and has no back buttons the game can
+-- see (e.g. a Steam Deck through Steam Input), else true
+local function backButtonsReachGame()
+    local known = ns.Wow.KnownButtons()
+    if #known == 0 then
+        return true -- no controller info: do not warn
+    end
+    for _, b in ipairs(known) do
+        if b:match("^PADPADDLE") then
+            return true
+        end
+    end
+    return false
+end
 local view = "front" -- "front" | "back"
 local lastPressed = {}
 
@@ -137,6 +152,7 @@ local function render(layer)
         pinKey = settings().pinKey or CheatSheet.DEFAULT_PIN_KEY,
         focus = focus,
         setup = setupMode,
+        backUnreachable = c.def.view == "back" and not backButtonsReachGame(),
     })
     c:SetEditable(pinned)
     c.frame:Show()
@@ -209,8 +225,10 @@ end
 ---@param layer string
 ---@param button string|nil
 ---@param active boolean setup mode on/off
-function CheatSheet.SetSetup(layer, button, active)
-    focus, setupMode = active and button or nil, active or nil
+---@param screen? string the setup screen ("rows" when omitted): the card's hint
+---line is only shown on the rows; lists and the keyboard bring their own
+function CheatSheet.SetSetup(layer, button, active, screen)
+    focus, setupMode = active and button or nil, active and (screen or "rows") or nil
     if active then
         pinned, peek.pinnedLayer = true, layer
         render(layer)

@@ -37,6 +37,7 @@ describe("e2e: chat commands", function()
             "export",
             "import",
             "show",
+            "hide",
             "scale",
             "reload",
             "diag",
@@ -155,6 +156,19 @@ describe("e2e: chat commands", function()
         assert.is_true(any(me:chat("/gg show lt"), "cheat sheet pinned"))
         assert.are.equal("LT", select(2, me.ns.CheatSheet.State()))
         assert.is_true(any(me:chat("/gg show back"), "usage: /gg show"))
+    end)
+
+    it("/gg show base and /gg hide pin and hide whatever the state was", function()
+        for _ = 1, 2 do -- the same result when repeated: a lost command cannot invert them
+            assert.is_true(any(me:chat("/gg show base"), "cheat sheet pinned"))
+            assert.is_true(me:sees("PINNED"))
+            assert.are.equal("BASE", select(2, me.ns.CheatSheet.State()))
+        end
+        for _ = 1, 2 do
+            assert.is_true(any(me:chat("/gg hide"), "cheat sheet hidden"))
+            assert.is_false((me.ns.CheatSheet.State()))
+            assert.is_false(me:sees("PINNED"))
+        end
     end)
 
     it("/gg scale sets the card size, back to automatic, and refuses nonsense", function()

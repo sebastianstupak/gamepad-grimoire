@@ -28,7 +28,7 @@ MARGIN = 16
 RENDER_W = 2000  # render large, then downscale for clean lines
 
 META = {
-    "steamdeck": dict(family="valve", labelStyle="Letters", hidden=["LPAD", "RPAD", "QAM"]),
+    "steamdeck": dict(family="valve", labelStyle="Letters", hidden=["LPAD", "RPAD", "QAM", "PADSYSTEM"]),
     "xbox": dict(family="xbox", labelStyle="Letters", hidden=[]),
     "dualsense": dict(family="playstation", labelStyle="Shapes", hidden=["MUTE"]),
     "switchpro": dict(family="nintendo", labelStyle="Reverse", hidden=[]),

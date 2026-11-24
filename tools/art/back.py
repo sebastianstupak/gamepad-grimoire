@@ -21,13 +21,7 @@ PADDLES = {
         "PADPADDLE1": ("R4", 0.925, 0.40, 0.030, 0.17),
         "PADPADDLE2": ("R5", 0.925, 0.62, 0.030, 0.17),
     },
-    # Xbox Elite Series 2 paddles (the Series X|S pad has none)
-    "xbox": {
-        "PADPADDLE3": ("P3", 0.30, 0.60, 0.045, 0.16),
-        "PADPADDLE4": ("P4", 0.34, 0.80, 0.045, 0.16),
-        "PADPADDLE1": ("P1", 0.70, 0.60, 0.045, 0.16),
-        "PADPADDLE2": ("P2", 0.66, 0.80, 0.045, 0.16),
-    },
+    "xbox": {},  # standard Xbox controller: no back buttons
     # DualSense Edge back buttons
     "dualsense": {
         "PADPADDLE3": ("LB", 0.22, 0.70, 0.045, 0.15),
@@ -67,7 +61,7 @@ PADDLES = {
 
 SUBTITLE = {
     "steamdeck": "Steam Deck (back)",
-    "xbox": "Xbox Elite (back)",
+    "xbox": "Xbox (back)",
     "dualsense": "DualSense Edge (back)",
     "switchpro": "Switch Pro (back)",
     "dualshock4": "DualShock 4 (back)",

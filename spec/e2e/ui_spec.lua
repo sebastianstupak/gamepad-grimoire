@@ -118,7 +118,7 @@ describe("e2e: windows and mouse", function()
         me:chat("/gg setup")
         assert.is_true(me:sees("D%-pad move   A choose   X clear   Y menu   LB / RB layer   B close"))
         me:tap("PAD1")
-        assert.is_true(me:sees("^Bind LT:"))
+        assert.is_true(me:sees("^Bind ")) -- "Bind <button>:  < Spells >", whichever button is first
         assert.is_true(me:sees("A bind   LB / RB category   B back"))
         assert.is_false(me:sees("B close")) -- the card's own hint would contradict the list's
         for _, spell in ipairs({ "Corruption", "Immolate", "Shadow Bolt" }) do

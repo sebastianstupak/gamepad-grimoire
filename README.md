@@ -27,10 +27,9 @@ share setups with friends.
   action for it, X clears it, LB / RB switch layers, View shows the back of the
   controller, Y opens profiles and options, B closes. Profiles are named with an
   on-screen keyboard. No keyboard or chat needed.
-- **Front and back.** Back views show the Steam Deck's L4 / L5 / R4 / R5, Xbox Elite
-  paddles and DualSense Edge back buttons (View turns the card around). Whether
-  their presses reach the game depends on the controller and Steam Input; see the
-  roadmap.
+- **Front and back.** Back views show the Steam Deck's L4 / L5 / R4 / R5 and the
+  DualSense Edge back buttons (View turns the card around). Whether their presses
+  reach the game depends on the controller and Steam Input; see the roadmap.
 - **Live highlight.** Held buttons light up on the card, so you can check what is where.
 - **Cheat sheet.** Hold LT or RT to peek at a layer; the card sizes itself to the screen.
 - **Mouse editing too.** On the open card, drag a spell, item or macro onto a row;
@@ -60,7 +59,7 @@ Licensed CC BY-NC-SA 4.0 like the model; credited to Valve. Not endorsed by Valv
 Each CC BY 4.0, credited to its author in [media/controllers/CREDITS.md](media/controllers/CREDITS.md).
 
 <table>
-<tr><td><b>Xbox (Elite model)</b>: front and back<br><img src="docs/images/art/xbox.png" alt="Xbox (Elite model) controller picture, front and back"></td></tr>
+<tr><td><b>Xbox</b>: front and back<br><img src="docs/images/art/xbox.png" alt="Xbox controller picture, front and back"></td></tr>
 <tr><td><b>DualSense</b>: front and back<br><img src="docs/images/art/dualsense.png" alt="DualSense controller picture, front and back"></td></tr>
 <tr><td><b>DualShock 4</b>: front and back<br><img src="docs/images/art/dualshock4.png" alt="DualShock 4 controller picture, front and back"></td></tr>
 <tr><td><b>Xbox 360</b>: front and back<br><img src="docs/images/art/xbox360.png" alt="Xbox 360 controller picture, front and back"></td></tr>
@@ -85,6 +84,7 @@ From AL2009man's Gamepad-Asset-Pack (MIT).
 <table>
 <tr><td><b>Switch Pro</b>: front and back<br><img src="docs/images/art/switchpro.png" alt="Switch Pro controller picture, front and back"></td></tr>
 </table>
+
 ## Screenshots
 
 In-game screenshots from WoW: Forever on a Steam Deck (1280x800), taken by the
@@ -159,7 +159,7 @@ Controller support (front view, then back view where the device has buttons ther
 | --- | --- | --- | --- |
 | Steam Deck (LCD, OLED) | Done | L4, L5, R4, R5 | No with Steam Input (they become keys); planned: bind them as keys |
 | Xbox Series X/S, Xbox One | Done | (triggers and bumpers) | |
-| Xbox Elite Series 2 | Uses the Xbox picture | P1 to P4 | Unverified (a virtual Elite's paddles arrive as face buttons) |
+| Xbox Elite Series 2 | Uses the Xbox picture (no paddles drawn) | Planned | Unverified (a virtual Elite's paddles arrive as face buttons) |
 | Xbox 360 | Done | (triggers and bumpers) | |
 | PlayStation DualSense | Done | (triggers and bumpers) | |
 | PlayStation DualSense Edge | Uses the DualSense picture | The two back buttons | Unverified |
@@ -228,7 +228,7 @@ The code is MIT. Controller pictures are licensed per file, see
 - The Xbox, DualSense, DualShock 4 and Xbox 360 pictures are rendered from
   community 3D models on Sketchfab, each [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
   and credited to its author in [media/controllers/CREDITS.md](media/controllers/CREDITS.md):
-  Xbox Elite by Rusfort, DualSense by AHarmlessPotato, DualShock 4 by shaielwolf,
+  Xbox by gosevg, DualSense by AHarmlessPotato, DualShock 4 by shaielwolf,
   Xbox 360 by Harpiart.
 - The ROG Ally, Legion Go, MSI Claw, 8BitDo Pro 2 and generic pad are 3D models
   built for this project (`tools/art/model.py`) and are MIT; simplified line-art

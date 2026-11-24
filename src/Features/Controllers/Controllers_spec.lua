@@ -84,7 +84,7 @@ describe("Controllers", function()
         end)
 
         it("shows every bindable button on the front or the back of a controller with paddles", function()
-            for _, id in ipairs({ "steamdeck", "xbox", "legiongo" }) do
+            for _, id in ipairs({ "steamdeck", "steamcontroller", "legiongo" }) do
                 local def = ns.Controllers.Registry.Get(id)
                 for _, b in ipairs({ "PADPADDLE1", "PADPADDLE2", "PADPADDLE3", "PADPADDLE4" }) do
                     local shown, side = ns.Controllers.Registry.ViewFor(def, b)

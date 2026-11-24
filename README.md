@@ -139,7 +139,7 @@ The addon is Lua 5.1, the dialect the game client runs.
 | Format | [StyLua](https://github.com/JohnnyMorganz/StyLua), [ruff](https://docs.astral.sh/ruff/) (`npm run format`) |
 | Lint | [luacheck](https://github.com/lunarmodules/luacheck), ruff (`npm run lint`) |
 | Types | [lua-language-server](https://luals.github.io) `--check` with LuaLS annotations (`npm run typecheck`) |
-| Tests | [busted](https://lunarmodules.github.io/busted/) unit and integration tests, pytest for tools (`npm test`) |
+| Tests | [busted](https://lunarmodules.github.io/busted/) unit, integration and end-to-end specs (every chat command, controller-only and mouse journeys against a simulated client), seeded fuzzing of share strings, pytest for tools (`npm test`) |
 | Coverage | [luacov](https://lunarmodules.github.io/luacov/); CI fails under 90 % (`npm run coverage`) |
 | End to end | Real Steam Deck over SSH: install, play, screenshot, verify saved data (`npm run e2e`) |
 | Commits | [Conventional Commits](https://www.conventionalcommits.org), checked by commitlint |

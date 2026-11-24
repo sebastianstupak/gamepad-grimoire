@@ -63,11 +63,25 @@ running, or set `GG_NATIVE_LUA=1` with Lua 5.1 + busted/luacheck/luacov/LuaLS in
 - Slash command errors leave the text in the chat box and Forever hides Lua errors;
   use `/console scriptErrors 1` when testing in game.
 
+## End-to-end specs (in CI)
+
+`spec/e2e/` plays the whole addon against the fake client the way a player would,
+through `spec/helpers/player.lua`: `me:chat("/gg ...")`, `me:tap("PAD1")`,
+`me:holding({ "PADLTRIGGER" }, fn)`, `me:key("ESCAPE")`, `me:click("Import")`,
+`me:drag(cursor, "^A$")`, then `me:sees(pattern)`, `me:chatLines()` and
+`me:actions()` (what the game ran from the bindings, e.g. `"spell Corruption"`).
+Input goes where the client sends it: the frame that captures it, else the override
+bindings (priority first), else the player's own keybinds. One suite each for chat
+commands, controller-only use, and windows / mouse. A new command, setup screen or
+button belongs in these suites as well as in a unit spec.
+
 ## End-to-end test (Steam Deck rig)
 
 `tools/e2e/deck_e2e.py` drives a real Steam Deck over SSH: installs the packaged addon,
 keeps the Deck awake, switches to Gaming Mode, starts WoW via Battle.net, runs `/gg`
-commands, screenshots every controller card, logs out and checks the saved data.
+commands, screenshots every controller card, drives the setup with a virtual gamepad
+(uinput), runs every slash command once (`chat_scenario`), logs out and checks the
+saved data.
 It disables DeckSetup during the run and restores `AddOns.txt` afterwards (only while
 WoW is closed - WoW rewrites that file on exit). Use `--readme` to refresh
 `docs/images/cheatsheet-*.png`. Always leave the game logged out.

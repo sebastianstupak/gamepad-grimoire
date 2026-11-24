@@ -324,6 +324,7 @@ def scenario(deck):
     deck.x(":1", "keyup shift")
     setup = setup_scenario(deck)
     setup.update(gamepad_scenario(deck))
+    setup.update(chat_scenario(deck))
     deck.chat("/gg controller auto")
     deck.chat("/gg diag")
     return shots, peek, setup
@@ -372,6 +373,68 @@ def gamepad_scenario(deck):
         pad.close()
     deck.chat("/gg profile use E2E")
     return shots
+
+
+# profiles the chat scenario makes; check() looks for what is left of them
+CHAT_PROFILES = ("Chat A", "Chat B", "Chat C", "Chat Gone", "Chat Keys")
+
+
+def chat_scenario(deck):
+    """Every slash command once, typed in chat. What they change is checked in the
+    saved data after logout (check()); what they show is screenshotted."""
+    print("== chat commands")
+    deck.chat("/gg profile use E2E")
+    for name in CHAT_PROFILES:  # leftovers of an earlier run
+        deck.chat("/gg profile delete " + name)
+    shots = {}
+    deck.chat("/gg help")
+    deck.chat("/gg profile")
+    time.sleep(0.5)
+    shots["chat-help"] = deck.screenshot("50-chat-help")
+    deck.chat("/gg profile new Chat A")
+    deck.chat("/gg profile use Chat A")
+    deck.chat("/gg profile copy Chat B")
+    deck.chat("/gg profile rename Chat B = Chat C")
+    deck.chat("/gg profile new Chat Gone")
+    deck.chat("/gg profile delete Chat Gone")
+    deck.chat("/gg capture Chat Keys")
+    deck.chat("/gg profile use Chat C")
+    deck.chat("/gg controller dualsense")  # stored in Chat C
+    deck.chat("/gg scale 1.3")
+    deck.chat("/gg show lt")
+    time.sleep(0.8)
+    shots["chat-show-lt"] = deck.screenshot("51-chat-show-lt")
+    deck.chat("/gg show")
+    deck.chat("/gg scale auto")
+    deck.chat("/gg export")
+    time.sleep(0.8)
+    shots["chat-export"] = deck.screenshot("52-chat-export")
+    deck.x(":1", "key Escape")
+    deck.chat("/gg import")
+    time.sleep(0.8)
+    shots["chat-import"] = deck.screenshot("53-chat-import")
+    deck.x(":1", "key Escape")
+    deck.chat("/gg setup")
+    time.sleep(0.8)
+    shots["chat-setup"] = deck.screenshot("54-chat-setup")
+    deck.chat("/gg setup")
+    deck.chat("/gg reload")
+    deck.chat("/grimoire profile use E2E")  # the long alias
+    return shots
+
+
+def _block(sv, key):
+    """Text of the table saved under ["key"] = { ... } (balanced braces), or None."""
+    start = sv.find(f'["{key}"] = {{')
+    if start < 0:
+        return None
+    i = sv.index("{", start)
+    depth = 0
+    for j in range(i, len(sv)):
+        depth += {"{": 1, "}": -1}.get(sv[j], 0)
+        if depth == 0:
+            return sv[i : j + 1]
+    return None
 
 
 def setup_scenario(deck):
@@ -439,6 +502,12 @@ def check(sv):
     print("    buttons the game sees:", " ".join(seen) or "-")
     print("    paddles reach the game:", "yes" if "PADPADDLE1" in seen else "no")
     expect("profile named with the on-screen keyboard (gamepad only)", '["Padx"]' in sv)
+    chat_c = _block(sv, "Chat C") or ""
+    expect("chat: profile new / copy / rename kept Chat A and Chat C", '["Chat A"]' in sv and chat_c)
+    expect("chat: renamed and deleted profiles are gone", '["Chat B"]' not in sv and '["Chat Gone"]' not in sv)
+    expect("chat: controller choice saved in the profile", '"dualsense"' in chat_c)
+    expect("chat: capture made a profile", '["Chat Keys"]' in sv)
+    expect("chat: scale back to automatic", '["scale"]' not in (_block(sv, "settings") or ""))
     expect(
         "controller setup bound a spell to L1",
         re.search(r'\["E2E Setup"\] = \{.*?\["BASE"\] = \{.*?\["PADLSHOULDER"\] = \{[^}]*"spell"', sv, re.S),

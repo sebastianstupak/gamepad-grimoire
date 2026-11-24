@@ -25,6 +25,15 @@ GamepadGrimoireDB = {
 },
 ["Padx"] = {
 },
+["Chat A"] = {
+},
+["Chat C"] = {
+["controller"] = "dualsense",
+["layers"] = {
+},
+},
+["Chat Keys"] = {
+},
 ["E2E Setup"] = {
 ["layers"] = {
 ["BASE"] = {
@@ -89,3 +98,12 @@ def test_conflicting_addons_are_disabled_with_a_backup_and_restored():
     assert "s/^DeckSetup: enabled/DeckSetup: disabled/" in disable
     assert "\n" not in disable
     assert 'mv -f "$b" "${b%.gg-e2e-bak}"' in restore
+
+
+def test_chat_checks_follow_the_saved_profiles(capsys):
+    assert '"dualsense"' in deck_e2e._block(SV, "Chat C")
+    assert '"dualsense"' not in deck_e2e._block(SV, "Chat A")
+    assert deck_e2e._block(SV, "Nope") is None
+    renamed_back = SV.replace('["Chat C"]', '["Chat B"]')
+    assert deck_e2e.check(renamed_back) is False
+    assert "FAIL chat: renamed and deleted profiles are gone" in capsys.readouterr().out

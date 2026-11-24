@@ -89,12 +89,12 @@ function Fake.new()
         return f
     end
 
-    local function bind(owner, key, kind, value)
+    local function bind(owner, key, kind, value, priority)
         state.bindings[owner] = state.bindings[owner] or {}
-        state.bindings[owner][key] = { kind = kind, value = value }
+        state.bindings[owner][key] = { kind = kind, value = value, priority = priority or nil }
     end
-    function W.SetOverrideBinding(owner, _, key, command)
-        bind(owner, key, "command", command)
+    function W.SetOverrideBinding(owner, priority, key, command)
+        bind(owner, key, "command", command, priority)
     end
     function W.SetOverrideBindingSpell(owner, _, key, spell)
         bind(owner, key, "spell", spell)
@@ -175,15 +175,22 @@ function Fake.new()
         return nil, action.name or tostring(action.id)
     end
     state.settingsPages, state.settingsClosed = {}, 0
-    function W.RegisterSettingsPage(name)
+    function W.RegisterSettingsPage(name, frame)
         state.settingsPages[#state.settingsPages + 1] = name
+        state.settingsFrames = state.settingsFrames or {}
+        state.settingsFrames[name] = frame
         return true
     end
     function W.CloseSettings()
         state.settingsClosed = state.settingsClosed + 1
     end
     function W.PressedButtons()
-        return state.pressed or {}
+        -- a new table every call, like the client's mapped state
+        local copy = {}
+        for b, down in pairs(state.pressed or {}) do
+            copy[b] = down
+        end
+        return copy
     end
     function W.KnownButtons()
         return state.knownButtons or {}

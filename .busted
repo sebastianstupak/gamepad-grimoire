@@ -3,7 +3,7 @@ return {
     lpath = "./?.lua",
   },
   default = {
-    ROOT = { "src" },
+    ROOT = { "src", "spec/e2e" },
     pattern = "_spec",
     helper = "spec/helpers/setup.lua",
     verbose = true,

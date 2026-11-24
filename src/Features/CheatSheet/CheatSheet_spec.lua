@@ -155,9 +155,9 @@ describe("CheatSheet", function()
             return false
         end
 
-        it("binds the pin key to the toggle button", function()
+        it("binds the pin key to the toggle button, ahead of profile binds", function()
             assert.same(
-                { kind = "command", value = "CLICK GamepadGrimoireToggle:LeftButton" },
+                { kind = "command", value = "CLICK GamepadGrimoireToggle:LeftButton", priority = true },
                 wow.bindingsOf("GamepadGrimoireToggle")["SHIFT-PADRSTICK"]
             )
         end)

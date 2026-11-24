@@ -101,11 +101,14 @@ def lineset(name, thickness, **sel):
 
 
 lineset("outer", job.get("outer_px", 3.4) * scale, select_external_contour=True)
-# crease lines show panel seams and button edges, but on rough/scanned meshes they
-# turn into noise; a model can switch them off and keep only silhouette + borders
+# Inner lines carry the buttons: a raised button reads as a silhouette/border, a
+# moulded one (scanned models) as a crease around its dimple. Draw them boldly -
+# thin rings vanish once the picture is scaled down into the cheat sheet. On rough
+# meshes crease turns into noise, so a model can switch it off (min_line_px culls
+# the short speckle either way).
 lineset(
     "inner",
-    job.get("inner_px", 1.2) * scale,
+    job.get("inner_px", 2.3) * scale,
     select_silhouette=True,
     select_border=True,
     select_crease=job.get("crease", True),

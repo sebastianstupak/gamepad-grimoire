@@ -374,7 +374,7 @@ def ensure_battlenet(deck, tries=4):
             time.sleep(2)
             if deck.bnet_running():
                 print("  Battle.net signed in")
-                time.sleep(5)  # let the WoW tab settle
+                time.sleep(45)  # let the UI render the WoW tab + Play button before clicking
                 return
         print("  ! launcher did not sign in; tearing it down and retrying")
         kill_battlenet(deck)

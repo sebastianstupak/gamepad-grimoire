@@ -42,6 +42,39 @@ describe("Bindings", function()
             assert.equal(3, #errors)
         end)
 
+        it("names malformed actions and layers", function()
+            local cases = {
+                { nil, "layout.layers missing" },
+                { { layers = "x" }, "layout.layers missing" },
+                { { layers = { BASE = 5 } }, "BASE is not a table" },
+                { { layers = { BASE = { PAD1 = "JUMP" } } }, "BASE.PAD1: action must be a table" },
+                {
+                    { layers = { BASE = { PAD1 = { type = "macro", name = "" } } } },
+                    "BASE.PAD1: macro needs a non-empty name",
+                },
+                {
+                    { layers = { BASE = { PAD1 = { type = "macro", name = string.rep("m", 256) } } } },
+                    "BASE.PAD1: macro needs a non-empty name",
+                },
+                {
+                    { layers = { BASE = { PAD1 = { type = "item", id = "5512" } } } },
+                    "BASE.PAD1: item needs a positive integer id",
+                },
+            }
+            for _, c in ipairs(cases) do
+                local ok, errors = Model.Validate(c[1])
+                assert.is_false(ok)
+                assert.are.equal(c[2], errors[1])
+            end
+        end)
+
+        it("accepts every action type it knows", function()
+            for kind, field in pairs(Model.ACTION_TYPES) do
+                local action = { type = kind, [field] = field == "id" and 1 or "x" }
+                assert.is_true((Model.ValidateAction(action)), kind)
+            end
+        end)
+
         it("maps held-trigger layers to the modifiers the client emulates", function()
             local cvars = { GamePadEmulateShift = "PADLTRIGGER", GamePadEmulateCtrl = "PADRTRIGGER" }
             local mods = Model.LayerModifiers(function(k)
@@ -129,5 +162,18 @@ describe("Bindings", function()
         ns.Profiles.Use("Raid")
         assert.is_nil(current().PAD1)
         assert.is_table(current().PAD2)
+    end)
+
+    it("warns about layers no trigger can reach and still applies the rest", function()
+        local ns, wow = Addon.start(nil)
+        wow.cvars.GamePadEmulateCtrl = nil
+        local p = ns.Profiles.ActiveProfile()
+        ns.Bindings.Model.Set(p, "BASE", "PAD1", { type = "command", command = "JUMP" })
+        ns.Bindings.Model.Set(p, "RT", "PAD2", { type = "command", command = "TARGET" })
+        ns.Events.Emit("PROFILE_CHANGED")
+        assert.matches("RT need GamePadEmulateShift/Ctrl", wow.printed[#wow.printed])
+        local set = wow.bindingsOf("GamepadGrimoireBindingOwner")
+        assert.is_table(set.PAD1)
+        assert.is_nil(set["CTRL-PAD2"])
     end)
 end)

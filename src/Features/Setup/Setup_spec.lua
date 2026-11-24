@@ -210,6 +210,77 @@ describe("Setup (controller-only configuration)", function()
         assert.is_false(ns.Setup.Open())
     end)
 
+    it("deleting the profile of this specialization also stops using it for the spec", function()
+        ns.Profiles.Create("Shadow")
+        ns.Profiles.Use("Shadow", state.spec)
+        ns.Setup.Open()
+        menuTo("Delete Shadow")
+        press("PAD1", "PAD1")
+        assert.is_nil(ns.Profiles.Get("Shadow"))
+        assert.is_nil(ns.Profiles.SpecProfile(state.spec))
+    end)
+
+    it("says why a rename is refused and keeps the old name", function()
+        ns.Profiles.Create("Taken")
+        ns.Profiles.Create("Mine")
+        ns.Profiles.Use("Mine")
+        ns.Setup.Open()
+        menuTo("Rename Mine")
+        press("PAD1")
+        for _ = 1, 4 do
+            press("PAD3") -- X deletes "Mine"
+        end
+        type("Taken")
+        press("PAD4") -- Y = done
+        assert.are.equal("Mine", ns.Profiles.ActiveName())
+        assert.matches("already exists", state.printed[#state.printed])
+    end)
+
+    it("reads gamepad buttons and keys from its input frame", function()
+        ns.Setup.Open()
+        local input
+        for _, f in ipairs(state.frames) do
+            if rawget(f, "name") == "GamepadGrimoireSetupInput" then
+                input = f
+            end
+        end
+        local scripts = rawget(input, "scripts")
+        local before = button()
+        scripts.OnGamePadButtonDown(input, "PADDDOWN")
+        assert.are_not.equal(before, button())
+        scripts.OnKeyDown(input, "F5") -- not ours: passes through to the game
+        assert.same({ true }, rawget(input, "calls").SetPropagateKeyboardInput)
+        scripts.OnKeyDown(input, "ESCAPE") -- ours: kept
+        assert.same({ false }, rawget(input, "calls").SetPropagateKeyboardInput)
+        assert.is_false(ns.Setup.IsOpen())
+    end)
+
+    it("opening twice is harmless and closing a closed setup does nothing", function()
+        assert.is_true(ns.Setup.Open())
+        local s = ns.Setup.State()
+        assert.is_true(ns.Setup.Open())
+        assert.are.equal(s, ns.Setup.State())
+        ns.Setup.Close()
+        ns.Setup.Close()
+        assert.is_false(ns.Setup.IsOpen())
+    end)
+
+    it("leaves a card that was already pinned on screen", function()
+        ns.CheatSheet.Toggle()
+        ns.Setup.Open()
+        ns.Setup.Close()
+        assert.is_true((ns.CheatSheet.State()))
+    end)
+
+    it("follows the card when a back button is held while setting up", function()
+        ns.Profiles.ActiveProfile().controller = "steamdeck"
+        ns.Setup.Open()
+        assert.are.equal("front", ns.CheatSheet.ViewName())
+        ns.CheatSheet.ShowPressed({ PADPADDLE3 = true })
+        assert.are.equal("back", ns.CheatSheet.ViewName())
+        assert.are.equal("PADPADDLE3", button())
+    end)
+
     it("is available as /gg setup", function()
         ns.Commands.Run("setup")
         assert.is_true(ns.Setup.IsOpen())

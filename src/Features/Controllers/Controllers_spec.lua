@@ -43,6 +43,84 @@ describe("Controllers", function()
             end
         end)
 
+        it("keeps every drawn part inside the picture and every name meaningful", function()
+            -- SCREEN is decoration; PADDPAD is the whole D-pad, standing in for its four directions
+            local known = { SCREEN = true, PADDPAD = true }
+            for _, b in ipairs(ns.Bindings.Model.BUTTONS) do
+                known[b] = true
+            end
+            for _, def in ipairs(ns.Controllers.Registry.All(true)) do
+                local hidden = {}
+                for _, h in ipairs(def.hidden or {}) do
+                    hidden[h] = true
+                end
+                for name, a in pairs(def.anchors) do
+                    local where = def.id .. " " .. name
+                    assert(known[name] or hidden[name], where .. ": not a button and not hidden")
+                    assert(a.w > 0 and a.h > 0, where .. ": empty box")
+                    assert(a.x - a.w / 2 >= 0 and a.x + a.w / 2 <= 1, where .. ": sticks out sideways")
+                    assert(a.y - a.h / 2 >= 0 and a.y + a.h / 2 <= 1, where .. ": sticks out vertically")
+                end
+                for b, text in pairs(def.labels or {}) do
+                    assert(known[b], def.id .. " labels unknown button " .. b)
+                    assert(type(text) == "string" and text ~= "", def.id .. " " .. b)
+                end
+            end
+        end)
+
+        it("links every front to its back and back again, each with its own picture", function()
+            for _, def in ipairs(ns.Controllers.Registry.All()) do
+                local back = ns.Controllers.Registry.BackOf(def)
+                assert.is_table(back, def.id)
+                assert.are.equal("back", back.view)
+                assert.are.equal(def.id, back.front)
+                for _, d in ipairs({ def, back }) do
+                    local file = d.texture:gsub("^Interface\\AddOns\\GamepadGrimoire\\", ""):gsub("\\", "/")
+                    local f = io.open(file .. ".tga", "rb")
+                    assert(f, "missing picture " .. file .. ".tga")
+                    f:close()
+                end
+            end
+        end)
+
+        it("shows every bindable button on the front or the back of a controller with paddles", function()
+            for _, id in ipairs({ "steamdeck", "xbox", "legiongo" }) do
+                local def = ns.Controllers.Registry.Get(id)
+                for _, b in ipairs({ "PADPADDLE1", "PADPADDLE2", "PADPADDLE3", "PADPADDLE4" }) do
+                    local shown, side = ns.Controllers.Registry.ViewFor(def, b)
+                    assert.is_table(shown, id .. " " .. b)
+                    assert.are.equal("back", side, id .. " " .. b)
+                    assert.is_table(shown.anchors[b], id .. " " .. b)
+                end
+            end
+        end)
+
+        it("only detects controllers that exist", function()
+            local Detect = ns.Controllers.Detect
+            local samples = {
+                { vendorID = 0x045E, productID = 0x0B13 },
+                { vendorID = 0x054C, productID = 0x0CE6 },
+                { vendorID = 0x057E, productID = 0x2009 },
+                { vendorID = 0x28DE, productID = 0x1205 },
+                { vendorID = 0x28DE, productID = 0x1142 },
+                { vendorID = 0x0B05, productID = 0x1ABE },
+                { vendorID = 0x17EF, productID = 0x6182 },
+                { vendorID = 0x0DB0, productID = 0x1901 },
+                { vendorID = 0x2DC8, productID = 0x6006 },
+                { vendorID = 0x1234, productID = 0x5678 },
+                { name = "ROG Ally X" },
+                { name = "Legion Go S" },
+                { name = "8BitDo Ultimate" },
+                {},
+            }
+            for _, dev in ipairs(samples) do
+                local id = Detect.FromDevice(dev)
+                if id then
+                    assert.is_table(ns.Controllers.Registry.Get(id), id)
+                end
+            end
+        end)
+
         it("uses positional face buttons: PAD1 is the bottom one, PAD4 the top", function()
             for _, def in ipairs(ns.Controllers.Registry.All()) do
                 local A = def.anchors

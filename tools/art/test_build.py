@@ -99,3 +99,41 @@ def test_generated_definitions_cover_every_controller():
     assert ids == [v for cid in build.ORDER for v in (cid, cid + "_back")]  # every front has a back view
     for cid in ids:
         assert os.path.exists(os.path.join(root, "media", "controllers", cid + ".tga"))
+
+
+def test_back_buttons_are_paddles_inside_the_picture_and_named():
+    import back
+
+    for cid in build.ORDER:
+        assert cid in back.PADDLES, cid
+        assert cid in back.SUBTITLE, cid
+        names = set()
+        for button, (label, x, y, w, h) in back.PADDLES[cid].items():
+            assert re.fullmatch(r"PADPADDLE[1-4]", button), (cid, button)
+            assert label and label not in names, (cid, label)
+            names.add(label)
+            assert x - w / 2 >= 0 and x + w / 2 <= 1, (cid, button)
+            assert y - h / 2 >= 0 and y + h / 2 <= 1, (cid, button)
+        # numbering follows SDL: P1/P2 on the right, P3/P4 on the left
+        for button, (_, x, *_rest) in back.PADDLES[cid].items():
+            right = button in ("PADPADDLE1", "PADPADDLE2")
+            assert (x > 0.5) == right, (cid, button)
+        assert back.labels(cid) == {b: v[0] for b, v in back.PADDLES[cid].items()}
+
+
+def test_schematic_buttons_do_not_overlap_and_drawing_is_repeatable():
+    import schematic
+
+    for cid, layout in schematic.LAYOUTS.items():
+        img, anchors = schematic.draw(layout, stroke=4)
+        again, _ = schematic.draw(layout, stroke=4)
+        assert img.tobytes() == again.tobytes(), cid
+        face = [anchors[b] for b in ("PAD1", "PAD2", "PAD3", "PAD4")]
+        for i, a in enumerate(face):
+            for b in face[i + 1 :]:
+                apart = (
+                    abs(a["cx"] - b["cx"]) >= (a["w"] + b["w"]) / 2 * 0.9
+                    or abs(a["cy"] - b["cy"]) >= (a["h"] + b["h"]) / 2 * 0.9
+                )
+                assert apart, cid
+        assert anchors["PADLSTICK"]["cx"] < 0.5 < anchors["PADRSTICK"]["cx"], cid

@@ -193,4 +193,52 @@ describe("Setup.Navigator", function()
         assert.are.equal(N.INPUT.PADDUP, N.INPUT.UP)
         assert.are.equal(N.INPUT.PADLSHOULDER, N.INPUT.Q)
     end)
+
+    it("keeps every cursor valid through long random input sequences", function()
+        local x = 7
+        local function r(k) -- seeded LCG: reproducible on every platform
+            x = (x * 1103515245 + 12345) % 2147483648
+            return x % k + 1
+        end
+        local inputs = { "UP", "DOWN", "LEFT", "RIGHT", "PREV", "NEXT", "ACCEPT", "BACK", "CLEAR", "MENU", "FLIP" }
+        local columnSets = {
+            COLUMNS,
+            { left = {}, right = { "PAD1", "PAD2" } },
+            { left = { "PADPADDLE3" }, right = {} },
+        }
+        local valid = { rows = true, picker = true, menu = true, keys = true }
+        for walk = 1, 50 do
+            local s = N.New(columnSets[r(#columnSets)])
+            for step = 1, 400 do
+                local where = ("walk %d step %d"):format(walk, step)
+                -- the menu grows and shrinks as profiles are made and deleted
+                local c = ctx(r(30) - 1)
+                for _ = 1, r(14) - 1 do
+                    c.menu[#c.menu + 1] = { name = "Profile", effect = { kind = "keys" } }
+                end
+                local effect = N.Handle(s, inputs[r(#inputs)], c)
+                if effect and effect.kind == "keys" then
+                    N.OpenKeys(s, string.rep("x", r(30) - 1), "new")
+                end
+                assert(valid[s.screen], where)
+                assert(N.Button(s) ~= nil, where .. ": cursor off the card")
+                for _, list in ipairs({ s.picker, s.menu }) do
+                    assert(list.index >= 1, where)
+                    assert(list.top >= 1 and list.top <= list.index, where .. ": selection above the page")
+                    assert(list.index <= list.top + N.PAGE - 1, where .. ": selection below the page")
+                end
+                if s.keys then
+                    assert(N.KEYS[s.keys.row] and N.KEYS[s.keys.row][s.keys.col], where .. ": key cursor")
+                    assert(#s.keys.text <= math.max(N.MAX_NAME, 29), where)
+                end
+            end
+        end
+    end)
+
+    it("does not grow a name past the limit from the keyboard", function()
+        local s = N.New(COLUMNS)
+        N.OpenKeys(s, string.rep("a", N.MAX_NAME), "new")
+        N.Handle(s, "ACCEPT", ctx())
+        assert.are.equal(N.MAX_NAME, #s.keys.text)
+    end)
 end)

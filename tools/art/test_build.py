@@ -137,3 +137,19 @@ def test_schematic_buttons_do_not_overlap_and_drawing_is_repeatable():
                 )
                 assert apart, cid
         assert anchors["PADLSTICK"]["cx"] < 0.5 < anchors["PADRSTICK"]["cx"], cid
+
+
+def test_rendered_models_have_licences_and_anchors_inside_their_renders():
+    import render3d
+
+    for cid, m in render3d.MODELS.items():
+        assert m["license"] and m["license_url"].startswith("https://") and m["author"], cid
+        assert cid in build.ORDER, cid
+        for view in ("front", "back"):
+            assert os.path.exists(os.path.join(render3d.RENDERS, f"{cid}_{view}.png")), (cid, view)
+            for b, (cx, cy, w, h) in m[view].items():
+                assert cx - w / 2 >= 0 and cx + w / 2 <= 1 and cy - h / 2 >= 0 and cy + h / 2 <= 1, (cid, view, b)
+    with open(os.path.join(build.ROOT, "media", "controllers", "CREDITS.md"), encoding="utf-8") as f:
+        credits = f.read()
+    for cid, m in render3d.MODELS.items():
+        assert f"`{cid}.tga`" in credits and m["license"] in credits, cid

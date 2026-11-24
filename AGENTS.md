@@ -67,6 +67,20 @@ running, or set `GG_NATIVE_LUA=1` with Lua 5.1 + busted/luacheck/luacov/LuaLS in
 - Slash command errors leave the text in the chat box and Forever hides Lua errors;
   use `/console scriptErrors 1` when testing in game.
 
+## Controller pictures from 3D models
+
+`tools/art/render3d.py` (`npm run render`, needs Blender) renders each model in
+`MODELS` as line art (`blender_lineart.py`: flat fill, Freestyle contour and
+crease lines, orthographic, tilted so shoulders show) into `tools/art/renders/`.
+Models are downloaded into `tools/art/models/` (git-ignored, often large); the
+renders are committed and `npm run art` turns them into textures, so CI needs no
+Blender. Anchors are hand-placed fractions of the render per button - draw them
+over the render to check. Backs are the device turned over (R4 on the left).
+Each picture keeps its model's licence: `render3d.write_credits()` updates
+`media/controllers/CREDITS.md`, which ships with the addon. Only use models whose
+licence allows derivatives (CC BY / BY-SA / CC0, or Valve's CC BY-NC-SA); skip
+models tagged NoAI.
+
 ## End-to-end specs (in CI)
 
 `spec/e2e/` plays the whole addon against the fake client the way a player would,

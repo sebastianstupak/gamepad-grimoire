@@ -20,6 +20,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, HERE)
 import back  # noqa: E402
+import render3d  # noqa: E402
 import restyle  # noqa: E402
 import schematic  # noqa: E402
 
@@ -70,6 +71,11 @@ def fit(img):
     x, y = (CANVAS[0] - w) // 2, (CANVAS[1] - h) // 2
     canvas.alpha_composite(small, (x, y))
     return canvas, (x, y, w, h)
+
+
+def _fractions(table):
+    """render3d anchor table {button: (cx, cy, w, h)} -> build's anchor dicts."""
+    return {b: dict(cx=cx, cy=cy, w=w, h=h) for b, (cx, cy, w, h) in table.items()}
 
 
 def split_shoulders(anchors):
@@ -135,7 +141,11 @@ def main():
     defs = []
     stroke = max(2, round(RENDER_W / 1000 * 1.5 * 3))
     for cid in ORDER:
-        if cid in schematic.LAYOUTS:
+        rendered = render3d.MODELS.get(cid)
+        if rendered and os.path.exists(os.path.join(render3d.RENDERS, cid + "_front.png")):
+            img = Image.open(os.path.join(render3d.RENDERS, cid + "_front.png")).convert("RGBA")
+            m = dict(name=rendered["name"], anchors=_fractions(rendered["front"]))
+        elif cid in schematic.LAYOUTS:
             img, drawn = schematic.draw(schematic.LAYOUTS[cid], stroke)
             m = dict(name=schematic.LAYOUTS[cid]["name"], anchors=drawn)
         else:
@@ -167,8 +177,14 @@ def main():
             )
             for b, a in anchors.items()
         }
-        bimg, banchors = back.draw(img, drawing, cid, stroke=stroke)
-        bcanvas, _ = fit(bimg)
+        if rendered and os.path.exists(os.path.join(render3d.RENDERS, cid + "_back.png")):
+            # rendered back: its own framing (the body seen from behind)
+            bimg = Image.open(os.path.join(render3d.RENDERS, cid + "_back.png")).convert("RGBA")
+            banchors = _fractions(rendered["back"])
+            bcanvas, (x, y, w, h) = fit(bimg)
+        else:
+            bimg, banchors = back.draw(img, drawing, cid, stroke=stroke)
+            bcanvas, _ = fit(bimg)
         bcanvas.save(os.path.join(media, cid + "_back.tga"))
         bid = cid + "_back"
         defs.append(

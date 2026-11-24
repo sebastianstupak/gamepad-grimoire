@@ -13,3 +13,4 @@ tools/e2e/out/
 .ruff_cache/
 busted.out
 badges/
+tools/art/models/

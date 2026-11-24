@@ -189,4 +189,12 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [CONTRIBUTING.md](CONTRIBUTING
 
 ## License
 
-MIT. Controller drawings are derived from AL2009man's Gamepad-Asset-Pack (MIT).
+The code is MIT. Controller pictures are licensed per file, see
+[media/controllers/CREDITS.md](media/controllers/CREDITS.md):
+
+- The Steam Deck pictures are rendered from Valve's official Steam Deck CAD
+  ([gitlab.steamos.cloud/SteamDeck/hardware](https://gitlab.steamos.cloud/SteamDeck/hardware))
+  and are licensed [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+  like that model. Gamepad Grimoire is not made, endorsed or supported by Valve.
+- Other drawings are derived from AL2009man's Gamepad-Asset-Pack (MIT) or drawn
+  for this project (MIT).

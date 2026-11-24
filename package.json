@@ -18,6 +18,7 @@
     "check": "npm run format:check && npm run lint && npm run typecheck && npm run coverage && python -m pytest -q",
     "lua:image": "node tools/lua.mjs --build",
     "art": "python tools/art/build.py",
+    "render": "python tools/art/render3d.py",
     "e2e": "python tools/e2e/deck_e2e.py"
   },
   "devDependencies": {

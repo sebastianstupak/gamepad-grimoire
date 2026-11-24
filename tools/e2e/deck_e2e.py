@@ -78,10 +78,36 @@ class Deck:
         return self.sh(env + " xdotool " + args, check=False)
 
     def click(self, xy):
-        self.x(":1", f"mousemove {xy[0]} {xy[1]} click 1")
+        # Battle.net's web UI ignores a click that arrives without a hover first
+        x, y = xy
+        self.x(":1", f"mousemove {x - 3} {y - 3} sleep 0.4 mousemove {x} {y} sleep 0.4 mousedown 1 sleep 0.1 mouseup 1")
+
+    def focused(self):
+        """(window name, its size, screen size) of the focused window on the game display."""
+        out = self.sh(
+            "export DISPLAY=:1; w=$(xdotool getactivewindow); xdotool getwindowname $w;"
+            " xdotool getwindowgeometry $w | sed -n 's/.*Geometry: //p'; xdotool getdisplaygeometry",
+            check=False,
+        ).splitlines()
+        out += ["", "", ""]
+        return out[0].strip(), out[1].strip(), out[2].strip().replace(" ", "x")
+
+    def require_wow(self):
+        """Stops the run unless the full-screen WoW window has focus. Battle.net
+        windows (friends chat!) can take focus; typing must never reach them."""
+        name, size, screen = self.focused()
+        if name != "World of Warcraft" or size != screen:
+            raise SystemExit(f"stopped: '{name}' ({size}) has focus, not the WoW window - nothing typed")
+
+    def key(self, name):
+        """Presses a key in WoW (refuses when another window has focus)."""
+        self.require_wow()
+        self.x(":1", "key " + name)
 
     def chat(self, line):
-        """Types a chat line in WoW (only when no loading screen is up)."""
+        """Types a chat line in WoW (only when no loading screen is up; refuses when
+        another window has focus)."""
+        self.require_wow()
         self.x(":1", "key Return")
         time.sleep(0.5)
         self.x(":1", f"type --delay 35 {shlex.quote(line)}")
@@ -177,6 +203,7 @@ def restore_addons(deck):
 
 VPAD = "/home/deck/.local/share/gamepad-grimoire-e2e/vpad.py"
 VPAD_FIFO = "/tmp/gg-vpad.fifo"
+BNET_HIDDEN = "/tmp/gg-bnet-hidden"
 
 
 class VirtualPad:
@@ -185,6 +212,13 @@ class VirtualPad:
 
     def __init__(self, deck):
         self.deck = deck
+        # Battle.net reads controllers too and acts on them (opens friends chat, file
+        # browsers...): hide its windows while the virtual pad exists
+        deck.sh(
+            f"export DISPLAY=:1; xdotool search --name '^Battle.net' > {BNET_HIDDEN} 2>/dev/null;"
+            f" for w in $(cat {BNET_HIDDEN}); do xdotool windowunmap $w; done",
+            check=False,
+        )
         with open(os.path.join(ROOT, "tools", "e2e", "vpad.py"), "rb") as f:
             deck.sh(f"mkdir -p {os.path.dirname(VPAD)}")
             deck.put(f.read(), VPAD)
@@ -216,6 +250,11 @@ class VirtualPad:
         self.send("quit", wait=False)
         time.sleep(1)
         self.deck.sh("systemctl --user stop gg-vpad 2>/dev/null; rm -f " + VPAD_FIFO, check=False)
+        self.deck.sh(
+            f"export DISPLAY=:1; for w in $(cat {BNET_HIDDEN} 2>/dev/null); do xdotool windowmap $w; done;"
+            f" rm -f {BNET_HIDDEN}",
+            check=False,
+        )
 
 
 def keep_awake(deck, on=True):
@@ -312,12 +351,11 @@ def scenario(deck):
     shots = []
     for cid in controller_ids():
         deck.chat("/gg controller " + cid)
-        deck.chat("/gg show")
-        time.sleep(1)
-        shots.append((cid, deck.screenshot("10-card-" + cid)))
-        deck.chat("/gg show")
+        shots.append((cid, shot_with_card(deck, "10-card-" + cid)))
+        deck.chat("/gg hide")
     # peek: hold Shift (= LT on the default GamePadEmulateShift) like holding the trigger
     deck.chat("/gg controller steamdeck")
+    deck.require_wow()
     deck.x(":1", "keydown shift")
     time.sleep(1.2)
     peek = deck.screenshot("20-peek-lt")
@@ -330,45 +368,84 @@ def scenario(deck):
     return shots, peek, setup
 
 
+def card_visible(path):
+    """True when the card (a dark panel across the upper screen) is in the screenshot."""
+    im = Image.open(path).convert("RGB")
+    w, h = im.size
+    band = im.crop((int(w * 0.06), int(h * 0.12), int(w * 0.94), int(h * 0.5))).resize((112, 30))
+    dark = sum(1 for r, g, b in band.getdata() if r < 40 and g < 40 and b < 50)
+    return dark / (112 * 30) > 0.25
+
+
+def shot_with_card(deck, name, command="/gg show base"):
+    """Pins the card and screenshots it. Typed chat can get lost while the game is
+    busy, so the commands are idempotent and a missing card is retried once."""
+    for attempt in range(2):
+        deck.chat(command)
+        time.sleep(1)
+        path = deck.screenshot(name)
+        if card_visible(path):
+            return path
+        print("  ! no card on", name, "- retrying" if attempt == 0 else "- giving up")
+    return path
+
+
 def gamepad_scenario(deck):
-    """Everything through a (virtual) controller: setup navigation, the back of the
-    controller, paddles, the on-screen keyboard and held-button highlighting."""
+    """Everything through a (virtual) controller on the Steam Deck picture: setup
+    navigation, binding a back grip on the back of the Deck, the on-screen keyboard
+    and held buttons. A screenshot after every step, for reviewing the UI as well as
+    the result. The virtual pad's back buttons are not pressed: through Proton they
+    arrive in WoW as face buttons (P1 = B closes the setup), so the back grips are
+    reached with the D-pad, as a player would on a Deck whose grips go to Steam Input."""
     print("== gamepad")
     deck.chat("/gg profile delete Padx")  # leftover of an earlier run
     deck.chat("/gg profile use E2E Setup")
-    deck.chat("/gg controller xbox")  # the virtual pad is an Xbox Elite
+    deck.chat("/gg controller steamdeck")
     pad = VirtualPad(deck)
     shots = {}
+
+    def step(key, name, *buttons):
+        pad.press(*buttons)
+        time.sleep(0.4)
+        deck.require_wow()  # the pad must not have driven another window
+        shots[key] = deck.screenshot(name)
+
     try:
-        deck.chat("/gg setup")
         pad.press("DOWN")  # first input makes the virtual pad the active controller
+        # before the setup opens: while it is open it takes Enter, so typing in chat would act on it
         deck.chat("/gg diag")  # records the buttons the game sees (incl. paddles or not)
-        pad.press("VIEW")  # View / Select: back of the controller
-        shots["back"] = deck.screenshot("40-setup-back")
-        pad.press("PADDLE1")  # jumps to P1 if the game sees paddles
-        shots["paddle"] = deck.screenshot("41-setup-paddle")
-        pad.press("VIEW")  # front again
+        deck.chat("/gg setup")
+        time.sleep(0.8)
+        shots["open"] = deck.screenshot("39-setup-open")
+        step("back", "40-setup-back", "VIEW")  # View: back of the Deck
+        # back rows: left L2 L1 L4 L5, right R2 R1 R4 R5
+        step("paddle", "41-setup-paddle", "RIGHT", "DOWN", "DOWN")  # R4
+        step("paddle-picker", "41b-setup-paddle-picker", "A")  # spell list for R4
+        step("paddle-bound", "41c-setup-paddle-bound", "DOWN", "A")  # second spell on R4
+        step("front", "41d-setup-front", "VIEW")
         # menu from the bottom: Close, Capture, Card size, Controller, spec, Delete, Rename, Copy, New
-        pad.press("Y")
-        pad.press(*["DOWN"] * 25)
+        step("menu-pad", "41e-setup-menu", "Y", *["DOWN"] * 25)
         pad.press(*["UP"] * 8, "A")  # New empty profile...
         # "Pad": P (row 2, col 6), a (row 1, col 1), d (row 1, col 4)
         pad.press("DOWN", *["RIGHT"] * 5, "A", "UP", *["LEFT"] * 5, "A", *["RIGHT"] * 3, "A")
         shots["keys"] = deck.screenshot("42-setup-keyboard")
         pad.press("Y")  # done: profile "Pad" created and used
         pad.press("Y", *["DOWN"] * 25, *["UP"] * 6, "A")  # Rename Pad...
-        pad.press("DOWN", "DOWN", *["RIGHT"] * 3, "A", "Y")  # append "x" -> "Padx"
+        step("rename", "42b-setup-rename", "DOWN", "DOWN", *["RIGHT"] * 3, "A")  # append "x"
+        step("renamed", "42c-setup-renamed", "Y")  # "Padx"
         pad.press("B")  # close setup
-        deck.chat("/gg show")  # pin the card (not in setup: presses reach the game)
+        time.sleep(0.5)
+        shots["closed"] = deck.screenshot("42d-setup-closed")
+        shot_with_card(deck, "43-pinned")  # pin the card (not in setup: presses reach the game)
         pad.send("hold RB 2.5", wait=False)
         time.sleep(1.2)
         shots["held"] = deck.screenshot("43-held-rb")
         time.sleep(1.8)
-        pad.send("hold PADDLE3 2.5", wait=False)
+        deck.chat("/gg hide")
+        pad.send("hold LT 2", wait=False)  # peek with the real trigger
         time.sleep(1.2)
-        shots["held-paddle"] = deck.screenshot("44-held-paddle")
-        time.sleep(1.8)
-        deck.chat("/gg show")
+        shots["peek-pad"] = deck.screenshot("45-peek-pad")
+        time.sleep(1.2)
     finally:
         pad.close()
     deck.chat("/gg profile use E2E")
@@ -401,19 +478,17 @@ def chat_scenario(deck):
     deck.chat("/gg profile use Chat C")
     deck.chat("/gg controller dualsense")  # stored in Chat C
     deck.chat("/gg scale 1.3")
-    deck.chat("/gg show lt")
-    time.sleep(0.8)
-    shots["chat-show-lt"] = deck.screenshot("51-chat-show-lt")
-    deck.chat("/gg show")
+    shots["chat-show-lt"] = shot_with_card(deck, "51-chat-show-lt", "/gg show lt")
+    deck.chat("/gg hide")
     deck.chat("/gg scale auto")
     deck.chat("/gg export")
     time.sleep(0.8)
     shots["chat-export"] = deck.screenshot("52-chat-export")
-    deck.x(":1", "key Escape")
+    deck.key("Escape")
     deck.chat("/gg import")
     time.sleep(0.8)
     shots["chat-import"] = deck.screenshot("53-chat-import")
-    deck.x(":1", "key Escape")
+    deck.key("Escape")
     deck.chat("/gg setup")
     time.sleep(0.8)
     shots["chat-setup"] = deck.screenshot("54-chat-setup")
@@ -446,7 +521,7 @@ def setup_scenario(deck):
     time.sleep(0.8)
 
     def key(name):
-        deck.x(":1", "key " + name)
+        deck.key(name)
         time.sleep(0.5)
 
     key("Down")  # L1 row
@@ -469,7 +544,7 @@ def logout(deck):
     print("== logout")
     deck.chat("/logout")
     time.sleep(25)
-    deck.x(":1", "key alt+F4")
+    deck.key("alt+F4")
     for _ in range(20):
         time.sleep(2)
         if not deck.wow_running():
@@ -500,7 +575,8 @@ def check(sv):
     seen = re.findall(r'"(PAD\w+)"', diag_buttons.group(1)) if diag_buttons else []
     expect("the game sees the virtual gamepad", "PAD1" in seen)
     print("    buttons the game sees:", " ".join(seen) or "-")
-    print("    paddles reach the game:", "yes" if "PADPADDLE1" in seen else "no")
+    # listed is not the same as pressed: the virtual Elite's paddles arrive as face buttons
+    print("    back-button slots listed by the game:", "yes" if "PADPADDLE1" in seen else "no")
     expect("profile named with the on-screen keyboard (gamepad only)", '["Padx"]' in sv)
     chat_c = _block(sv, "Chat C") or ""
     expect("chat: profile new / copy / rename kept Chat A and Chat C", '["Chat A"]' in sv and chat_c)
@@ -508,6 +584,10 @@ def check(sv):
     expect("chat: controller choice saved in the profile", '"dualsense"' in chat_c)
     expect("chat: capture made a profile", '["Chat Keys"]' in sv)
     expect("chat: scale back to automatic", '["scale"]' not in (_block(sv, "settings") or ""))
+    expect(
+        "back grip R4 bound with the D-pad on the back of the Deck",
+        re.search(r'\["E2E Setup"\] = \{.*?\["BASE"\] = \{.*?\["PADPADDLE1"\] = \{[^}]*"spell"', sv, re.S),
+    )
     expect(
         "controller setup bound a spell to L1",
         re.search(r'\["E2E Setup"\] = \{.*?\["BASE"\] = \{.*?\["PADLSHOULDER"\] = \{[^}]*"spell"', sv, re.S),
@@ -530,7 +610,7 @@ def readme_images(shots, peek, sv, setup=None):
     os.makedirs(out, exist_ok=True)
     images = [("cheatsheet-" + c, c, p) for c, p in shots] + [("cheatsheet-peek-lt", "steamdeck", peek)]
     # setup / gamepad shots: crop with the card that was on screen
-    card_of = {"back": "xbox_back", "paddle": "xbox_back", "keys": "xbox", "held": "xbox", "held-paddle": "xbox"}
+    card_of = {"back": "steamdeck_back", "paddle": "steamdeck_back"}
     images += [("setup-" + k, card_of.get(k, "steamdeck"), v) for k, v in (setup or {}).items() if k in SETUP_SHOTS]
     for name, cid, path in images:
         rect = card_rect(sv, cid)
@@ -551,6 +631,7 @@ SETUP_SHOTS = {
     "back": "40-setup-back",
     "keys": "42-setup-keyboard",
     "held": "43-held-rb",
+    "paddle": "41c-setup-paddle-bound",
 }
 
 

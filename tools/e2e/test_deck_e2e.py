@@ -41,6 +41,10 @@ GamepadGrimoireDB = {
 ["id"] = 348,
 ["type"] = "spell",
 },
+["PADPADDLE1"] = {
+["id"] = 686,
+["type"] = "spell",
+},
 },
 },
 },
@@ -107,3 +111,36 @@ def test_chat_checks_follow_the_saved_profiles(capsys):
     renamed_back = SV.replace('["Chat C"]', '["Chat B"]')
     assert deck_e2e.check(renamed_back) is False
     assert "FAIL chat: renamed and deleted profiles are gone" in capsys.readouterr().out
+
+
+class FocusDeck(deck_e2e.Deck):
+    def __init__(self, focused_output):
+        self.out, self.typed = focused_output, []
+
+    def sh(self, cmd, check=True, timeout=300):
+        return self.out
+
+    def x(self, display, args):
+        self.typed.append(args)
+
+
+def test_nothing_is_typed_unless_the_full_screen_wow_window_has_focus():
+    import pytest
+
+    def lines(*parts):
+        return "".join(p + chr(10) for p in parts)
+
+    wow = FocusDeck(lines("World of Warcraft", "1280x800", "1280 800"))
+    wow.chat("/gg help")
+    assert wow.typed[0] == "key Return" and "/gg help" in wow.typed[1]
+    for other in (
+        lines("Battle.net - Chats and Groups", "1000x640", "1280 800"),
+        lines("World of Warcraft", "640x480", "1280 800"),  # Wine file browser on the WoW folder
+        "",
+    ):
+        deck = FocusDeck(other)
+        with pytest.raises(SystemExit, match="nothing typed"):
+            deck.chat("/gg help")
+        with pytest.raises(SystemExit):
+            deck.key("Escape")
+        assert deck.typed == []

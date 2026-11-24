@@ -416,6 +416,9 @@ def scenario(deck, pad=True):
     print("== scenario")
     hide_battlenet(deck)  # keep Battle.net from stealing focus for the whole run
     deck.focus_wow()
+    deck.chat("/reload")  # clean UI so no stray game menu is in the screenshots
+    time.sleep(12)
+    deck.focus_wow()
     deck.chat("/gg diag")
     deck.chat("/gg profile use Default")
     deck.chat("/gg profile delete E2E")  # leftovers of an earlier run

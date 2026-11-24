@@ -11,7 +11,7 @@ not made, endorsed or supported by the device makers.
 | `xbox_front.png`, `xbox_back.png` | [Xbox Series](tools/art/model.py) | Gamepad Grimoire | [MIT](https://opensource.org/licenses/MIT) |
 | `dualsense_front.png`, `dualsense_back.png` | [DualSense](https://sketchfab.com/3d-models/playstation-5-dualsense-878c1f882808477ab81c2fe86d5a3936) | AHarmlessPotato | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
 | `dualshock4_front.png`, `dualshock4_back.png` | [DualShock 4](tools/art/model.py) | Gamepad Grimoire | [MIT](https://opensource.org/licenses/MIT) |
-| `xbox360_front.png`, `xbox360_back.png` | [Xbox 360](https://sketchfab.com/3d-models/xbox-360-controller-08bb78e6d7344a5cbf339123bd138966) | Harpiart | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
+| `xbox360_front.png`, `xbox360_back.png` | [Xbox 360](tools/art/model.py) | Gamepad Grimoire | [MIT](https://opensource.org/licenses/MIT) |
 | `generic_front.png`, `generic_back.png` | [Generic gamepad](tools/art/model.py) | Gamepad Grimoire | [MIT](https://opensource.org/licenses/MIT) |
 | `rogally_front.png`, `rogally_back.png` | [ROG Ally](tools/art/model.py) | Gamepad Grimoire | [MIT](https://opensource.org/licenses/MIT) |
 | `legiongo_front.png`, `legiongo_back.png` | [Lenovo Legion Go](tools/art/model.py) | Gamepad Grimoire | [MIT](https://opensource.org/licenses/MIT) |

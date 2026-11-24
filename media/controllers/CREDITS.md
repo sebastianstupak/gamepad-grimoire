@@ -15,7 +15,6 @@ None of these pictures are made, endorsed or supported by the device makers.
 | Files | Model | Author | Licence |
 | --- | --- | --- | --- |
 | `dualsense.tga`, `dualsense_back.tga` | [Playstation 5 Dualsense](https://sketchfab.com/3d-models/playstation-5-dualsense-878c1f882808477ab81c2fe86d5a3936) | AHarmlessPotato | CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/) |
-| `xbox360.tga`, `xbox360_back.tga` | [Xbox 360 Controller](https://sketchfab.com/3d-models/xbox-360-controller-08bb78e6d7344a5cbf339123bd138966) | Harpiart | CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/) |
 
 ## Modelled for this project (MIT)
 
@@ -26,6 +25,7 @@ simplified line-art impressions, not exact replicas.
 | --- | --- |
 | `xbox.tga`, `xbox_back.tga` | Xbox Series |
 | `dualshock4.tga`, `dualshock4_back.tga` | DualShock 4 |
+| `xbox360.tga`, `xbox360_back.tga` | Xbox 360 |
 | `generic.tga`, `generic_back.tga` | Generic gamepad |
 | `rogally.tga`, `rogally_back.tga` | ROG Ally |
 | `legiongo.tga`, `legiongo_back.tga` | Lenovo Legion Go |

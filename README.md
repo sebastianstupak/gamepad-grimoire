@@ -192,11 +192,10 @@ The code is MIT. Controller pictures are licensed per file, see
   [Controller](https://gitlab.steamos.cloud/SteamHardware/SteamController)) and are
   licensed [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
   like those models. Gamepad Grimoire is not made, endorsed or supported by Valve.
-- The DualSense and Xbox 360 pictures are rendered from community 3D models on
-  Sketchfab, each [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) and
-  credited to its author in [media/controllers/CREDITS.md](media/controllers/CREDITS.md):
-  DualSense by AHarmlessPotato, Xbox 360 by Harpiart.
-- The Xbox, DualShock 4, ROG Ally, Legion Go, MSI Claw, 8BitDo Pro 2 and generic
-  pad are 3D models built for this project (`tools/art/model.py`) and are MIT;
+- The DualSense picture is rendered from a community 3D model on Sketchfab,
+  [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), credited to
+  AHarmlessPotato in [media/controllers/CREDITS.md](media/controllers/CREDITS.md).
+- The Xbox, Xbox 360, DualShock 4, ROG Ally, Legion Go, MSI Claw, 8BitDo Pro 2 and
+  generic pad are 3D models built for this project (`tools/art/model.py`) and are MIT;
   simplified line-art impressions, not exact replicas.
 - The Switch Pro picture is derived from AL2009man's Gamepad-Asset-Pack (MIT).

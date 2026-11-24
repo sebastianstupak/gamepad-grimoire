@@ -28,7 +28,9 @@ share setups with friends.
   controller, Y opens profiles and options, B closes. Profiles are named with an
   on-screen keyboard. No keyboard or chat needed.
 - **Front and back.** Back views show the Steam Deck's L4 / L5 / R4 / R5, Xbox Elite
-  paddles and DualSense Edge back buttons; the card turns around when you press one.
+  paddles and DualSense Edge back buttons (View turns the card around). Whether
+  their presses reach the game depends on the controller and Steam Input; see the
+  roadmap.
 - **Live highlight.** Held buttons light up on the card, so you can check what is where.
 - **Cheat sheet.** Hold LT or RT to peek at a layer; the card sizes itself to the screen.
 - **Mouse editing too.** On the open card, drag a spell, item or macro onto a row;
@@ -41,11 +43,11 @@ share setups with friends.
 
 ## Screenshots
 
-In-game screenshots from WoW: Forever on a Steam Deck, taken by the end-to-end test
-(`npm run e2e -- --readme`). The profile is a real Affliction warlock setup captured
-with `/gg capture`; the same binds are shown on every supported controller.
+In-game screenshots from WoW: Forever on a Steam Deck (1280x800), taken by the
+end-to-end test (`npm run e2e -- --readme`). The profile is a real Affliction
+warlock setup captured with `/gg capture`.
 
-### Steam Deck: holding LT (L2) to peek at the second layer
+### Steam Deck: holding L2 to peek at the second layer
 
 ![Gamepad Grimoire on a Steam Deck while holding L2](docs/images/cheatsheet-peek-lt.png)
 
@@ -57,21 +59,33 @@ with `/gg capture`; the same binds are shown on every supported controller.
 
 ![Controller setup menu: profiles, controller picture, card size](docs/images/setup-menu.png)
 
-### Steam Deck: pinned
+### The back of the Steam Deck
 
-![Gamepad Grimoire, Steam Deck](docs/images/cheatsheet-steamdeck.png)
+View turns the card around. Here R4 was chosen with the D-pad and bound with A:
 
-### Xbox Series
+![Back of the Steam Deck with a spell bound to R4](docs/images/setup-back-bound.png)
 
-![Gamepad Grimoire, Xbox Series controller](docs/images/cheatsheet-xbox.png)
+> **Steam Deck back grips:** with Steam Input on (the default), SteamOS keeps
+> L4 / L5 / R4 / R5 and sends the game keys or Steam actions instead, so binds on
+> them do not fire yet. When the game reports no back buttons, the back view says
+> so. See the roadmap.
 
-### PlayStation DualSense
+### Held buttons light up
 
-![Gamepad Grimoire, DualSense controller](docs/images/cheatsheet-dualsense.png)
+![The card with R1 held on a Steam Deck](docs/images/setup-held.png)
 
-### Nintendo Switch Pro
+### Every supported controller
 
-![Gamepad Grimoire, Switch Pro controller](docs/images/cheatsheet-switchpro.png)
+The same binds on each controller picture, with that controller's button names:
+
+<table>
+<tr><td width="50%"><b>Steam Deck</b><br><img src="docs/images/cheatsheet-steamdeck.png" alt="Gamepad Grimoire card for the Steam Deck"></td><td width="50%"><b>Xbox Series</b><br><img src="docs/images/cheatsheet-xbox.png" alt="Gamepad Grimoire card for the Xbox Series"></td></tr>
+<tr><td width="50%"><b>PlayStation DualSense</b><br><img src="docs/images/cheatsheet-dualsense.png" alt="Gamepad Grimoire card for the PlayStation DualSense"></td><td width="50%"><b>PlayStation DualShock 4</b><br><img src="docs/images/cheatsheet-dualshock4.png" alt="Gamepad Grimoire card for the PlayStation DualShock 4"></td></tr>
+<tr><td width="50%"><b>Nintendo Switch Pro</b><br><img src="docs/images/cheatsheet-switchpro.png" alt="Gamepad Grimoire card for the Nintendo Switch Pro"></td><td width="50%"><b>Xbox 360</b><br><img src="docs/images/cheatsheet-xbox360.png" alt="Gamepad Grimoire card for the Xbox 360"></td></tr>
+<tr><td width="50%"><b>Steam Controller</b><br><img src="docs/images/cheatsheet-steamcontroller.png" alt="Gamepad Grimoire card for the Steam Controller"></td><td width="50%"><b>8BitDo Pro 2</b><br><img src="docs/images/cheatsheet-8bitdo.png" alt="Gamepad Grimoire card for the 8BitDo Pro 2"></td></tr>
+<tr><td width="50%"><b>ROG Ally</b><br><img src="docs/images/cheatsheet-rogally.png" alt="Gamepad Grimoire card for the ROG Ally"></td><td width="50%"><b>Lenovo Legion Go</b><br><img src="docs/images/cheatsheet-legiongo.png" alt="Gamepad Grimoire card for the Lenovo Legion Go"></td></tr>
+<tr><td width="50%"><b>MSI Claw</b><br><img src="docs/images/cheatsheet-msiclaw.png" alt="Gamepad Grimoire card for the MSI Claw"></td><td width="50%"><b>Generic gamepad</b><br><img src="docs/images/cheatsheet-generic.png" alt="Gamepad Grimoire card for the Generic gamepad"></td></tr>
+</table>
 
 ## Slash commands
 
@@ -81,7 +95,8 @@ the keyboard fallback.
 | Command | What it does |
 | --- | --- |
 | `/gg setup` | Controller setup (same as LT+R3) |
-| `/gg show [lt\|rt]` | Pin or unpin the cheat sheet (or hold LT/RT to peek) |
+| `/gg show [base\|lt\|rt]` | Pin or unpin the cheat sheet; with a layer, pin it on that layer (or hold LT/RT to peek) |
+| `/gg hide` | Hide the pinned cheat sheet |
 | `/gg profile` | List profiles (`*` marks the active one) |
 | `/gg profile use <name>` | Switch this character to a profile |
 | `/gg profile new <name>` | New empty profile |
@@ -100,32 +115,32 @@ the keyboard fallback.
 
 Controller support (front view, then back view where the device has buttons there):
 
-| Device | Front picture | Back / extra buttons |
-| --- | --- | --- |
-| Steam Deck (LCD, OLED) | Done | Done: L4, L5, R4, R5 |
-| Xbox Series X/S, Xbox One | Done | Done (triggers and bumpers) |
-| Xbox Elite Series 2 | Uses the Xbox picture | Done: paddles P1 to P4 |
-| Xbox 360 | Done | Done (triggers and bumpers) |
-| PlayStation DualSense | Done | |
-| PlayStation DualSense Edge | Uses the DualSense picture | Done: the two back buttons |
-| PlayStation DualShock 4 | Done | Done (triggers and bumpers) |
-| Nintendo Switch Pro | Done | Done (triggers and bumpers) |
-| Nintendo Switch 2 Pro | Planned | Planned: GL / GR back buttons |
-| 8BitDo Pro 2 | Done | Done: back buttons P1, P2 |
-| 8BitDo Ultimate | Planned | |
-| Steam Controller | Done | Done: grip buttons LG, RG |
-| ROG Ally / Ally X | Done | Done: M1, M2 |
-| Lenovo Legion Go | Done | Done: M2, M3, Y1, Y2 |
-| MSI Claw | Done | Done: M1, M2 |
-| Generic gamepad | Done | Done (triggers and bumpers) |
-| Joy-Cons, Switch 2 Pro, arcade sticks | Planned | |
+| Device | Front picture | Back buttons drawn | Back buttons reach the game |
+| --- | --- | --- | --- |
+| Steam Deck (LCD, OLED) | Done | L4, L5, R4, R5 | No with Steam Input (they become keys); planned: bind them as keys |
+| Xbox Series X/S, Xbox One | Done | (triggers and bumpers) | |
+| Xbox Elite Series 2 | Uses the Xbox picture | P1 to P4 | Unverified (a virtual Elite's paddles arrive as face buttons) |
+| Xbox 360 | Done | (triggers and bumpers) | |
+| PlayStation DualSense | Done | (triggers and bumpers) | |
+| PlayStation DualSense Edge | Uses the DualSense picture | The two back buttons | Unverified |
+| PlayStation DualShock 4 | Done | (triggers and bumpers) | |
+| Nintendo Switch Pro | Done | (triggers and bumpers) | |
+| Nintendo Switch 2 Pro | Planned | Planned: GL / GR | |
+| 8BitDo Pro 2 | Done | P1, P2 | Unverified |
+| 8BitDo Ultimate | Planned | | |
+| Steam Controller | Done | Grip buttons LG, RG | Unverified |
+| ROG Ally / Ally X | Done | M1, M2 | Unverified |
+| Lenovo Legion Go | Done | M2, M3, Y1, Y2 | Unverified |
+| MSI Claw | Done | M1, M2 | Unverified |
+| Generic gamepad | Done | (triggers and bumpers) | |
+| Joy-Cons, arcade sticks | Planned | | |
 
 Features:
 
-- Controller-only text entry for naming profiles and pasting share strings (the
-  on-screen keyboard of Steam / the OS works meanwhile).
+- Back grips that Steam Input turns into keys (Steam Deck): bind those keys too.
+- Pasting share strings with the controller (profiles are already named with the
+  on-screen keyboard).
 - Blizzard's own button glyphs on the card (confirmed available on WoW: Forever).
-- Settings in the game's Settings panel.
 - Localization.
 - Retail and Classic clients in addition to WoW: Forever.
 - First release on CurseForge and Wago.

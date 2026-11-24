@@ -60,6 +60,10 @@ running, or set `GG_NATIVE_LUA=1` with Lua 5.1 + busted/luacheck/luacov/LuaLS in
   `GetSpecialization` (talent groups instead), `C_EncodingUtil` compression works,
   Blizzard gamepad glyph atlases exist, Steam Input reports the controller as
   "Generic" with ids 0000:0000 (no auto-detection - players choose the picture).
+- **Back buttons through Proton** (verified on the Deck): the game *lists*
+  PADPADDLE1-4 for a virtual Xbox Elite, but their presses arrive as face buttons
+  (P1 = B). The Deck's own L4 L5 R4 R5 go to Steam Input (keys / Steam actions),
+  never to the game as paddles. Do not claim a back button works from the list alone.
 - Slash command errors leave the text in the chat box and Forever hides Lua errors;
   use `/console scriptErrors 1` when testing in game.
 
@@ -83,5 +87,9 @@ commands, screenshots every controller card, drives the setup with a virtual gam
 (uinput), runs every slash command once (`chat_scenario`), logs out and checks the
 saved data.
 It disables DeckSetup during the run and restores `AddOns.txt` afterwards (only while
-WoW is closed - WoW rewrites that file on exit). Use `--readme` to refresh
+WoW is closed - WoW rewrites that file on exit). Battle.net also reads controllers
+and opens windows (friends chat, file browser) on pad input: the rig hides its
+windows while the virtual pad runs, and `Deck.chat` / `Deck.key` refuse to type
+unless the full-screen WoW window has focus. Keep it that way: typed text must never
+reach a Battle.net chat. Use `--readme` to refresh
 `docs/images/cheatsheet-*.png`. Always leave the game logged out.

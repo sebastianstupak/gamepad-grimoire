@@ -38,6 +38,7 @@ describe("e2e: chat commands", function()
             "import",
             "show",
             "hide",
+            "flip",
             "scale",
             "reload",
             "diag",
@@ -156,6 +157,15 @@ describe("e2e: chat commands", function()
         assert.is_true(any(me:chat("/gg show lt"), "cheat sheet pinned"))
         assert.are.equal("LT", select(2, me.ns.CheatSheet.State()))
         assert.is_true(any(me:chat("/gg show back"), "usage: /gg show"))
+    end)
+
+    it("/gg flip shows the back of the controller, and the front again", function()
+        me:chat("/gg controller steamdeck")
+        assert.is_true(any(me:chat("/gg flip"), "back of the controller"))
+        assert.is_true(me:sees("Steam Deck %(back%)"))
+        assert.is_true(me:sees("^L4$") and me:sees("^R5$"))
+        assert.is_true(any(me:chat("/gg flip"), "front of the controller"))
+        assert.is_false(me:sees("Steam Deck %(back%)"))
     end)
 
     it("/gg show base and /gg hide pin and hide whatever the state was", function()

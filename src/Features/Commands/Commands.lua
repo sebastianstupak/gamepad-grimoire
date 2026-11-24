@@ -45,6 +45,7 @@ local HELP = {
     "/gg show - pin / unpin the cheat sheet (or hold a trigger to peek)",
     "/gg show base|lt|rt - pin it on that layer",
     "/gg hide - hide the pinned cheat sheet",
+    "/gg flip - turn the card around: front / back of the controller",
     "/gg scale <0.5-2.5|auto> - cheat sheet size",
     "/gg reload - re-apply bindings",
     "/gg diag - check this client and the addon (saved for bug reports)",
@@ -141,6 +142,14 @@ function handlers.hide()
         ns.CheatSheet.Toggle()
     end
     say("cheat sheet hidden")
+end
+
+function handlers.flip()
+    if not ns.CheatSheet.State() then
+        ns.CheatSheet.Toggle()
+    end
+    local side = ns.CheatSheet.Flip()
+    say("cheat sheet: " .. side .. " of the controller")
 end
 
 function handlers.setup()

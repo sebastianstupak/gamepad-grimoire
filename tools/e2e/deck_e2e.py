@@ -316,26 +316,76 @@ def ensure_gaming_mode(deck):
     raise SystemExit("could not switch the Deck to Gaming Mode")
 
 
+def network_up(deck):
+    """True when a Blizzard host resolves/answers. Right after the Deck wakes the
+    network is dead for a bit; starting Battle.net then makes its launcher hang
+    before it ever starts the signed-in client."""
+    return (
+        deck.sh(
+            "ping -c1 -W2 us.actual.battle.net >/dev/null 2>&1 && echo ok ||"
+            " { getent hosts us.actual.battle.net >/dev/null 2>&1 && echo ok; }",
+            check=False,
+        ).strip()
+        == "ok"
+    )
+
+
+def kill_battlenet(deck):
+    """Tear down a stuck Battle.net launch - its launcher/agent can hang before the
+    signed-in client ever starts. Kills the Wine-side client/launcher/agent (their
+    cmdline is the Windows path, so anchored on ^C: and self-safe) and the Linux-side
+    launch (reaper/proton in the prefix, minus shells), so Steam marks the game
+    stopped and the next rungameid starts fresh."""
+    deck.sh(
+        r"pkill -9 -f '^C:.Program Files .x86..Battle\.net' 2>/dev/null;"
+        r" pkill -9 -f '^C:.ProgramData.Battle\.net' 2>/dev/null;"
+        " for p in $(pgrep -f 'compatdata/2153225858/pfx'); do "
+        "c=$(cat /proc/$p/comm 2>/dev/null); "
+        'case "$c" in bash | sh | ssh | pgrep | pkill | grep) continue ;; esac; '
+        'kill -9 "$p" 2>/dev/null; done',
+        check=False,
+    )
+    time.sleep(5)
+
+
+def ensure_battlenet(deck, tries=4):
+    """Bring Battle.net up and signed in (Battle.net.exe --from-launcher).
+
+    steam rungameid reliably starts the Battle.net *launcher*, but after sleep the
+    network is dead for a while and the launcher hangs before it starts the signed-in
+    client. Wait for the network, launch, and if the launcher does not reach the
+    signed-in client, tear it down and try again."""
+    if deck.bnet_running():
+        return
+    for attempt in range(1, tries + 1):
+        for _ in range(30):  # ~60s for the network to come back after a wake
+            if network_up(deck):
+                break
+            time.sleep(2)
+        else:
+            print("  ! network still down")
+        deck.sh(
+            "export DISPLAY=:0 XAUTHORITY=$(ls /run/user/1000/xauth_* 2>/dev/null | head -1); "
+            f"steam -ifrunning steam://rungameid/{GAME_ID} >/dev/null 2>&1 &",
+            check=False,
+        )
+        print(f"  launching Battle.net (try {attempt})")
+        for _ in range(45):  # ~90s for the launcher to reach the signed-in client
+            time.sleep(2)
+            if deck.bnet_running():
+                print("  Battle.net signed in")
+                time.sleep(5)  # let the WoW tab settle
+                return
+        print("  ! launcher did not sign in; tearing it down and retrying")
+        kill_battlenet(deck)
+    raise SystemExit("Battle.net did not sign in after several tries")
+
+
 def launch(deck):
     print("== launch")
     ensure_gaming_mode(deck)
     deck.x(":0", "mousemove_relative 5 5")  # wake Steam's screensaver
-    deck.sh(
-        "export DISPLAY=:0 XAUTHORITY=$(ls /run/user/1000/xauth_* 2>/dev/null | head -1); "
-        f"steam -ifrunning steam://rungameid/{GAME_ID} >/dev/null 2>&1 &",
-        check=False,
-    )
-    if not deck.bnet_running():
-        print("  starting Battle.net")
-        for _ in range(60):
-            time.sleep(3)
-            if deck.bnet_running():
-                break
-        else:
-            raise SystemExit("Battle.net did not start")
-        time.sleep(45)  # UI + automatic sign-in
-    else:
-        time.sleep(8)
+    ensure_battlenet(deck)
     deck.screenshot("00-battlenet")
     deck.click(WOWF_ICON)
     time.sleep(3)

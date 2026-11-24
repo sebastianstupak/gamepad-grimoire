@@ -1,5 +1,5 @@
 # CI tool versions; locked with hashes into requirements-ci.txt:
 #   uv pip compile --generate-hashes --python-version 3.13 --python-platform x86_64-manylinux_2_28 tools/requirements-ci.in -o tools/requirements-ci.txt
 -r art/requirements.txt
-pytest==9.0.2
+pytest==9.2.0
 ruff==0.17.5

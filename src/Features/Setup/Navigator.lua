@@ -45,7 +45,9 @@ Navigator.MAX_NAME = 24
 ---Opens the keyboard with `text` to edit; ACCEPT on Done returns
 ---{ kind = purpose, text = ... }.
 function Navigator.OpenKeys(state, text, purpose)
-    state.keys = { text = text or "", row = 1, col = 1, upper = true, purpose = purpose }
+    text = text or ""
+    -- capital first letter for a new name; editing a name continues in lower case
+    state.keys = { text = text, row = 1, col = 1, upper = text == "", purpose = purpose }
     state.screen = "keys"
 end
 

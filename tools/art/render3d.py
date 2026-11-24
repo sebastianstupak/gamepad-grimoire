@@ -108,6 +108,152 @@ MODELS = {
             "PADLSHOULDER": (0.815, 0.080, 0.110, 0.045),
         },
     ),
+    "xbox": dict(
+        name="Xbox Series",
+        credit_name="Xbox Elite Controller",
+        file="xbox.glb",
+        source="https://sketchfab.com/3d-models/xbox-elite-controller-32aad0ff25f7446b8afe649ea3cc9e43",
+        author="Rusfort",
+        license="CC BY 4.0",
+        license_url="https://creativecommons.org/licenses/by/4.0/",
+        forward="+z",
+        up="-y",
+        tilt_deg=18,
+        min_line_px=10,
+        front={
+            "PADLSTICK": (0.3700, 0.3050, 0.1200, 0.1500),
+            "PADRSTICK": (0.7200, 0.4450, 0.1200, 0.1500),
+            "PADDPAD": (0.6200, 0.3100, 0.1200, 0.1500),
+            "PAD1": (0.2300, 0.4900, 0.0500, 0.0650),
+            "PAD2": (0.2780, 0.4300, 0.0500, 0.0650),
+            "PAD3": (0.1650, 0.4300, 0.0500, 0.0650),
+            "PAD4": (0.2300, 0.3700, 0.0500, 0.0650),
+            "PADBACK": (0.4200, 0.4700, 0.0450, 0.0550),
+            "PADFORWARD": (0.5700, 0.4700, 0.0450, 0.0550),
+            "PADSYSTEM": (0.5000, 0.5700, 0.0500, 0.0650),
+            "PADLSHOULDER": (0.3300, 0.2050, 0.1300, 0.0500),
+            "PADRSHOULDER": (0.6700, 0.2050, 0.1300, 0.0500),
+            "PADLTRIGGER": (0.2400, 0.2000, 0.0600, 0.0500),
+            "PADRTRIGGER": (0.7600, 0.2000, 0.0600, 0.0500),
+        },
+        back={
+            "PADPADDLE1": (0.3150, 0.4800, 0.0500, 0.0900),
+            "PADPADDLE2": (0.3300, 0.5400, 0.0500, 0.0900),
+            "PADPADDLE3": (0.6850, 0.4800, 0.0500, 0.0900),
+            "PADPADDLE4": (0.6700, 0.5400, 0.0500, 0.0900),
+            "PADRSHOULDER": (0.3300, 0.2950, 0.1100, 0.0450),
+            "PADLSHOULDER": (0.6700, 0.2950, 0.1100, 0.0450),
+            "PADRTRIGGER": (0.2450, 0.2850, 0.0700, 0.0500),
+            "PADLTRIGGER": (0.7550, 0.2850, 0.0700, 0.0500),
+        },
+    ),
+    "dualsense": dict(
+        name="DualSense",
+        credit_name="Playstation 5 Dualsense",
+        file="dualsense.glb",
+        source="https://sketchfab.com/3d-models/playstation-5-dualsense-878c1f882808477ab81c2fe86d5a3936",
+        author="AHarmlessPotato",
+        license="CC BY 4.0",
+        license_url="https://creativecommons.org/licenses/by/4.0/",
+        forward="-z",
+        up="+y",
+        tilt_deg=18,
+        min_line_px=10,
+        front={
+            "PADLSTICK": (0.3500, 0.2250, 0.1100, 0.1700),
+            "PADRSTICK": (0.6500, 0.2250, 0.1100, 0.1700),
+            "PADDPAD": (0.1900, 0.1900, 0.1500, 0.1900),
+            "PAD1": (0.8100, 0.2700, 0.0450, 0.0550),
+            "PAD2": (0.8800, 0.1900, 0.0450, 0.0550),
+            "PAD3": (0.7400, 0.1900, 0.0450, 0.0550),
+            "PAD4": (0.8100, 0.1550, 0.0450, 0.0550),
+            "PADSYSTEM": (0.5000, 0.3000, 0.0450, 0.0500),
+            "PADBACK": (0.4200, 0.1400, 0.0350, 0.0450),
+            "PADFORWARD": (0.5800, 0.1400, 0.0350, 0.0450),
+            "PADLSHOULDER": (0.2500, 0.1000, 0.1200, 0.0500),
+            "PADRSHOULDER": (0.7500, 0.1000, 0.1200, 0.0500),
+            "PADLTRIGGER": (0.1700, 0.1000, 0.0600, 0.0500),
+            "PADRTRIGGER": (0.8300, 0.1000, 0.0600, 0.0500),
+        },
+        back={
+            "PADPADDLE1": (0.2600, 0.6000, 0.0600, 0.1200),
+            "PADPADDLE3": (0.7400, 0.6000, 0.0600, 0.1200),
+            "PADLSHOULDER": (0.6800, 0.3000, 0.0900, 0.0450),
+            "PADRSHOULDER": (0.3200, 0.3000, 0.0900, 0.0450),
+            "PADLTRIGGER": (0.7400, 0.2300, 0.0600, 0.0500),
+            "PADRTRIGGER": (0.2600, 0.2300, 0.0600, 0.0500),
+        },
+    ),
+    "dualshock4": dict(
+        name="DualShock 4",
+        credit_name="DualShock 4 PlayStation Controller",
+        file="dualshock4.glb",
+        source="https://sketchfab.com/3d-models/dualshock-4-playstation-controller-e3c2f0dc16524fc19cdde45bad1de1a9",
+        author="shaielwolf",
+        license="CC BY 4.0",
+        license_url="https://creativecommons.org/licenses/by/4.0/",
+        forward="-y",
+        up="+z",
+        tilt_deg=18,
+        min_line_px=10,
+        front={
+            "PADLSTICK": (0.3400, 0.5550, 0.1300, 0.1700),
+            "PADRSTICK": (0.6600, 0.5550, 0.1300, 0.1700),
+            "PADDPAD": (0.1900, 0.3900, 0.1600, 0.2200),
+            "PAD1": (0.8100, 0.4800, 0.0500, 0.0600),
+            "PAD2": (0.8900, 0.3900, 0.0500, 0.0600),
+            "PAD3": (0.7300, 0.3900, 0.0500, 0.0600),
+            "PAD4": (0.8100, 0.3000, 0.0500, 0.0600),
+            "PADSYSTEM": (0.5000, 0.5500, 0.0450, 0.0500),
+            "PADBACK": (0.3000, 0.3700, 0.0280, 0.0700),
+            "PADFORWARD": (0.7000, 0.3700, 0.0280, 0.0700),
+            "PADLSHOULDER": (0.2200, 0.1850, 0.1200, 0.0450),
+            "PADRSHOULDER": (0.7800, 0.1850, 0.1200, 0.0450),
+            "PADLTRIGGER": (0.2100, 0.1100, 0.0900, 0.0550),
+            "PADRTRIGGER": (0.7900, 0.1100, 0.0900, 0.0550),
+        },
+        back={
+            "PADRTRIGGER": (0.2000, 0.1700, 0.1000, 0.0800),
+            "PADLTRIGGER": (0.8000, 0.1700, 0.1000, 0.0800),
+            "PADRSHOULDER": (0.3000, 0.1050, 0.1400, 0.0500),
+            "PADLSHOULDER": (0.7000, 0.1050, 0.1400, 0.0500),
+        },
+    ),
+    "xbox360": dict(
+        name="Xbox 360",
+        credit_name="Xbox 360 Controller",
+        file="xbox360.glb",
+        source="https://sketchfab.com/3d-models/xbox-360-controller-08bb78e6d7344a5cbf339123bd138966",
+        author="Harpiart",
+        license="CC BY 4.0",
+        license_url="https://creativecommons.org/licenses/by/4.0/",
+        forward="+z",
+        up="+y",
+        tilt_deg=18,
+        min_line_px=10,
+        front={
+            "PADLSTICK": (0.2500, 0.3600, 0.1300, 0.1500),
+            "PADRSTICK": (0.6300, 0.5200, 0.1400, 0.1600),
+            "PADDPAD": (0.3600, 0.5200, 0.1700, 0.1900),
+            "PAD1": (0.7700, 0.4200, 0.0500, 0.0550),
+            "PAD2": (0.8500, 0.3200, 0.0500, 0.0550),
+            "PAD3": (0.6800, 0.3200, 0.0500, 0.0550),
+            "PAD4": (0.7700, 0.2300, 0.0500, 0.0550),
+            "PADSYSTEM": (0.5000, 0.4000, 0.0500, 0.0500),
+            "PADBACK": (0.4000, 0.4200, 0.0400, 0.0450),
+            "PADFORWARD": (0.6100, 0.4200, 0.0400, 0.0450),
+            "PADLSHOULDER": (0.3200, 0.1300, 0.1400, 0.0500),
+            "PADRSHOULDER": (0.6800, 0.1300, 0.1400, 0.0500),
+            "PADLTRIGGER": (0.2500, 0.0800, 0.0800, 0.0600),
+            "PADRTRIGGER": (0.7500, 0.0800, 0.0800, 0.0600),
+        },
+        back={
+            "PADRSHOULDER": (0.2500, 0.1500, 0.1100, 0.0550),
+            "PADLSHOULDER": (0.7500, 0.1500, 0.1100, 0.0550),
+            "PADRTRIGGER": (0.3200, 0.0950, 0.0800, 0.0500),
+            "PADLTRIGGER": (0.6800, 0.0950, 0.0800, 0.0500),
+        },
+    ),
     "generic": dict(
         name="Generic gamepad",
         params="generic.json",
@@ -353,6 +499,9 @@ def render(cid, m, blender, width):
             width=width,
             crease_deg=m.get("crease_deg", 140),
         )
+        for opt in ("crease", "min_line_px", "outer_px", "inner_px"):
+            if opt in m:
+                job[opt] = m[opt]
         job_path = base + ".job.json"
         with open(job_path, "w", encoding="utf-8") as f:
             json.dump(job, f)
@@ -372,7 +521,8 @@ def render(cid, m, blender, width):
 def write_credits():
     """Credits next to the renders and next to the textures (shipped in the addon)."""
     media = os.path.join(os.path.dirname(os.path.dirname(HERE)), "media", "controllers")
-    cad = {cid: m for cid, m in MODELS.items() if not m.get("builder")}
+    cad = {cid: m for cid, m in MODELS.items() if not m.get("builder") and m["license"].startswith("CC BY-NC")}
+    community = {cid: m for cid, m in MODELS.items() if not m.get("builder") and m["license"] == "CC BY 4.0"}
     built = {cid: m for cid, m in MODELS.items() if m.get("builder")}
     shipped = [
         "# Controller pictures",
@@ -388,6 +538,18 @@ def write_credits():
     for cid, m in cad.items():
         shipped.append(
             f"| `{cid}.tga`, `{cid}_back.tga` | {m['name']} 3D model ({m['source']}) | {m['author']}"
+            f" | {m['license']} ({m['license_url']}) |"
+        )
+    shipped += [
+        "",
+        "## Rendered from community 3D models (CC BY - credit the author)",
+        "",
+        "| Files | Model | Author | Licence |",
+        "| --- | --- | --- | --- |",
+    ]
+    for cid, m in community.items():
+        shipped.append(
+            f"| `{cid}.tga`, `{cid}_back.tga` | [{m.get('credit_name', m['name'])}]({m['source']}) | {m['author']}"
             f" | {m['license']} ({m['license_url']}) |"
         )
     shipped += [

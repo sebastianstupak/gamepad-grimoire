@@ -8,6 +8,10 @@ not made, endorsed or supported by the device makers.
 | --- | --- | --- | --- |
 | `steamdeck_front.png`, `steamdeck_back.png` | [Steam Deck](https://gitlab.steamos.cloud/SteamDeck/hardware) | Valve Corporation | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
 | `steamcontroller_front.png`, `steamcontroller_back.png` | [Steam Controller](https://gitlab.steamos.cloud/SteamHardware/SteamController) | Valve Corporation | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `xbox_front.png`, `xbox_back.png` | [Xbox Series](https://sketchfab.com/3d-models/xbox-elite-controller-32aad0ff25f7446b8afe649ea3cc9e43) | Rusfort | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
+| `dualsense_front.png`, `dualsense_back.png` | [DualSense](https://sketchfab.com/3d-models/playstation-5-dualsense-878c1f882808477ab81c2fe86d5a3936) | AHarmlessPotato | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
+| `dualshock4_front.png`, `dualshock4_back.png` | [DualShock 4](https://sketchfab.com/3d-models/dualshock-4-playstation-controller-e3c2f0dc16524fc19cdde45bad1de1a9) | shaielwolf | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
+| `xbox360_front.png`, `xbox360_back.png` | [Xbox 360](https://sketchfab.com/3d-models/xbox-360-controller-08bb78e6d7344a5cbf339123bd138966) | Harpiart | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
 | `generic_front.png`, `generic_back.png` | [Generic gamepad](tools/art/model.py) | Gamepad Grimoire | [MIT](https://opensource.org/licenses/MIT) |
 | `rogally_front.png`, `rogally_back.png` | [ROG Ally](tools/art/model.py) | Gamepad Grimoire | [MIT](https://opensource.org/licenses/MIT) |
 | `legiongo_front.png`, `legiongo_back.png` | [Lenovo Legion Go](tools/art/model.py) | Gamepad Grimoire | [MIT](https://opensource.org/licenses/MIT) |

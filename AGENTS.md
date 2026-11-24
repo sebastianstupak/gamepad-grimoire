@@ -72,9 +72,15 @@ running, or set `GG_NATIVE_LUA=1` with Lua 5.1 + busted/luacheck/luacov/LuaLS in
 `tools/art/render3d.py` (`npm run render`, needs Blender) renders each model in
 `MODELS` as line art (`blender_lineart.py`: flat fill, Freestyle contour and
 crease lines, orthographic, tilted so shoulders show) into `tools/art/renders/`.
-Two kinds of model:
+Three kinds of model:
 - **Official CAD** (Steam Deck, Steam Controller): downloaded into
   `tools/art/models/` (git-ignored, large) from the `url`; CC BY-NC-SA, credited.
+- **Community 3D** (Xbox, DualSense, DualShock 4, Xbox 360): CC BY glb placed by
+  hand in `tools/art/models/` (Sketchfab needs a login; `fetch` prints where).
+  Each model sits at its own orientation (`forward`/`up` differ per model, found by
+  eye); detailed scans may need `min_line_px`/`crease` tuning. Anchors are hand-
+  placed fractions (overlay a grid on the render to read coordinates). CC BY needs
+  the author credited: keep `credit_name`/`author` and media/controllers/CREDITS.md.
 - **Built** (`builder=True`: generic, ROG Ally, Legion Go, MSI Claw, 8BitDo):
   a parametric mesh from `tools/art/model.py` + `tools/art/params/<id>.json`
   (named controls in millimetres); MIT. `model.py` also emits each control's 3D

@@ -101,7 +101,15 @@ def lineset(name, thickness, **sel):
 
 
 lineset("outer", job.get("outer_px", 3.4) * scale, select_external_contour=True)
-lineset("inner", job.get("inner_px", 1.2) * scale, select_silhouette=True, select_border=True, select_crease=True)
+# crease lines show panel seams and button edges, but on rough/scanned meshes they
+# turn into noise; a model can switch them off and keep only silhouette + borders
+lineset(
+    "inner",
+    job.get("inner_px", 1.2) * scale,
+    select_silhouette=True,
+    select_border=True,
+    select_crease=job.get("crease", True),
+)
 
 # camera: looks at the front (or back), tilted down from above by tilt_deg
 fwd, up = axis(job.get("forward", "+z")), axis(job.get("up", "+y"))

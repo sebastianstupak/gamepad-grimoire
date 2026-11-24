@@ -144,20 +144,3 @@ def test_nothing_is_typed_unless_the_full_screen_wow_window_has_focus():
         with pytest.raises(SystemExit):
             deck.key("Escape")
         assert deck.typed == []
-
-
-def test_readme_gallery_has_a_row_per_controller_with_its_back_when_captured(tmp_path):
-    import shutil
-
-    shutil.copytree(os.path.join(deck_e2e.ROOT, "src"), tmp_path / "src")
-    images = tmp_path / "docs" / "images"
-    images.mkdir(parents=True)
-    for name in ("cheatsheet-xbox.png", "cheatsheet-steamdeck.png", "cheatsheet-steamdeck-back.png"):
-        (images / name).write_bytes(b"png")
-    (tmp_path / "README.md").write_text("a\n<!-- gallery:start -->\nold\n<!-- gallery:end -->\nb\n", encoding="utf-8")
-    deck_e2e.update_readme_gallery(str(tmp_path))
-    text = (tmp_path / "README.md").read_text(encoding="utf-8")
-    assert "old" not in text and text.startswith("a\n") and text.endswith("b\n")
-    assert text.count("<tr>") == 2  # controllers without pictures are left out
-    assert "<b>Steam Deck (back)</b>" in text and "cheatsheet-steamdeck-back.png" in text
-    assert "<b>Xbox Series</b>" in text and "cheatsheet-xbox-back.png" not in text

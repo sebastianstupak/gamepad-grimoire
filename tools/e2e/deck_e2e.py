@@ -655,39 +655,6 @@ def readme_images(shots, peek, sv, setup=None):
         bottom = min(H, int((rect["bottom"] + 0.2) * H))
         im.crop((0, 0, W, bottom)).save(os.path.join(out, name + ".png"), optimize=True)
         print(f"  docs/images/{name}.png")
-    update_readme_gallery()
-
-
-GALLERY_START, GALLERY_END = "<!-- gallery:start -->", "<!-- gallery:end -->"
-
-
-def gallery_html(root=ROOT):
-    """README gallery: one row per controller, front and (when captured) back."""
-    names = {}
-    with open(os.path.join(root, "src", "Features", "Controllers", "Definitions.lua"), encoding="utf-8") as f:
-        for cid, name in re.findall(r'id = "(\w+)",\s*name = "([^"]+)"', f.read()):
-            names[cid] = name
-    rows = []
-    for cid in controller_ids():
-        cells = []
-        for suffix, label in (("", names.get(cid, cid)), ("-back", names.get(cid + "_back", cid + " (back)"))):
-            rel = f"docs/images/cheatsheet-{cid}{suffix}.png"
-            if os.path.exists(os.path.join(root, rel)):
-                cells.append(f'<td width="50%"><b>{label}</b><br><img src="{rel}" alt="Card for the {label}"></td>')
-        if cells:
-            rows.append("<tr>" + "".join(cells) + "</tr>")
-    return "\n".join(["<table>", *rows, "</table>"])
-
-
-def update_readme_gallery(root=ROOT):
-    path = os.path.join(root, "README.md")
-    with open(path, encoding="utf-8") as f:
-        text = f.read()
-    a, b = text.index(GALLERY_START) + len(GALLERY_START), text.index(GALLERY_END)
-    text = text[:a] + "\n" + gallery_html(root) + "\n" + text[b:]
-    with open(path, "w", encoding="utf-8", newline="\n") as f:
-        f.write(text)
-    print("  README gallery updated")
 
 
 SETUP_SHOTS = {

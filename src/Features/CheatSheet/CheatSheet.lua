@@ -237,7 +237,9 @@ function CheatSheet.ViewName()
 end
 
 ---Highlights held buttons; a held button that only exists on the other side
----(L4, a paddle...) flips the card to that side.
+---(L4, a paddle...) flips the card to that side. Not during the controller
+---setup: its buttons navigate (View flips, A opens the list...) and the setup
+---flips the card itself for back buttons.
 ---@param pressed table<string, boolean>
 function CheatSheet.ShowPressed(pressed)
     if not (shownLayer and card) then
@@ -248,11 +250,8 @@ function CheatSheet.ShowPressed(pressed)
     for button in pairs(pressed) do
         if not lastPressed[button] then
             local _, side = ns.Controllers.Registry.ViewFor(front, button)
-            if side and side ~= view and not def.anchors[button] then
+            if not setupMode and side and side ~= view and not def.anchors[button] then
                 CheatSheet.Flip(side)
-                if CheatSheet.onFlipped then
-                    CheatSheet.onFlipped(button)
-                end
                 break
             end
         end

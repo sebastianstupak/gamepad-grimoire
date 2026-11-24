@@ -272,11 +272,12 @@ describe("Setup (controller-only configuration)", function()
         assert.is_true((ns.CheatSheet.State()))
     end)
 
-    it("follows the card when a back button is held while setting up", function()
+    it("leaves flipping to the setup: held navigation buttons only light up", function()
         ns.Profiles.ActiveProfile().controller = "steamdeck"
         ns.Setup.Open()
-        assert.are.equal("front", ns.CheatSheet.ViewName())
-        ns.CheatSheet.ShowPressed({ PADPADDLE3 = true })
+        press("PADPADDLE3") -- L4: the setup turns the card and selects its row
+        assert.are.equal("back", ns.CheatSheet.ViewName())
+        ns.CheatSheet.ShowPressed({ PADPADDLE3 = true, PAD1 = true }) -- A held to open the list
         assert.are.equal("back", ns.CheatSheet.ViewName())
         assert.are.equal("PADPADDLE3", button())
     end)

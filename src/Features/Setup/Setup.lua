@@ -416,13 +416,6 @@ end
 
 function M:OnEnable()
     ns.CheatSheet.pinAction = Setup.Toggle
-    -- the card flipped itself because a back button was pressed
-    ns.CheatSheet.onFlipped = function(button)
-        if state then
-            syncColumns(button)
-            render()
-        end
-    end
     ns.Events.OnGame("PLAYER_REGEN_DISABLED", function()
         Setup.Close()
     end)

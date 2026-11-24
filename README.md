@@ -47,7 +47,21 @@ In-game screenshots from WoW: Forever on a Steam Deck (1280x800), taken by the
 end-to-end test (`npm run e2e -- --readme`). The profile is a real Affliction
 warlock setup captured with `/gg capture`.
 
-### Steam Deck: holding L2 to peek at the second layer
+### Steam Deck: front and back
+
+<table>
+<tr><td width="50%"><b>Front</b><br><img src="docs/images/cheatsheet-steamdeck.png" alt="Gamepad Grimoire card for the Steam Deck, front"></td>
+<td width="50%"><b>Back: R4 bound in the controller setup</b><br><img src="docs/images/setup-back-bound.png" alt="Back of the Steam Deck with a spell bound to R4"></td></tr>
+</table>
+
+View (or `/gg flip`) turns the card around.
+
+> **Steam Deck back grips:** with Steam Input on (the default), SteamOS keeps
+> L4 / L5 / R4 / R5 and sends the game keys or Steam actions instead, so binds on
+> them do not fire yet. When the game reports no back buttons, the back view says
+> so. See the roadmap.
+
+### Holding L2 to peek at the second layer
 
 ![Gamepad Grimoire on a Steam Deck while holding L2](docs/images/cheatsheet-peek-lt.png)
 
@@ -59,17 +73,6 @@ warlock setup captured with `/gg capture`.
 
 ![Controller setup menu: profiles, controller picture, card size](docs/images/setup-menu.png)
 
-### The back of the Steam Deck
-
-View turns the card around. Here R4 was chosen with the D-pad and bound with A:
-
-![Back of the Steam Deck with a spell bound to R4](docs/images/setup-back-bound.png)
-
-> **Steam Deck back grips:** with Steam Input on (the default), SteamOS keeps
-> L4 / L5 / R4 / R5 and sends the game keys or Steam actions instead, so binds on
-> them do not fire yet. When the game reports no back buttons, the back view says
-> so. See the roadmap.
-
 ### Held buttons light up
 
 ![The card with R1 held on a Steam Deck](docs/images/setup-held.png)
@@ -78,14 +81,22 @@ View turns the card around. Here R4 was chosen with the D-pad and bound with A:
 
 The same binds on each controller picture, with that controller's button names:
 
+<!-- gallery:start -->
 <table>
-<tr><td width="50%"><b>Steam Deck</b><br><img src="docs/images/cheatsheet-steamdeck.png" alt="Gamepad Grimoire card for the Steam Deck"></td><td width="50%"><b>Xbox Series</b><br><img src="docs/images/cheatsheet-xbox.png" alt="Gamepad Grimoire card for the Xbox Series"></td></tr>
-<tr><td width="50%"><b>PlayStation DualSense</b><br><img src="docs/images/cheatsheet-dualsense.png" alt="Gamepad Grimoire card for the PlayStation DualSense"></td><td width="50%"><b>PlayStation DualShock 4</b><br><img src="docs/images/cheatsheet-dualshock4.png" alt="Gamepad Grimoire card for the PlayStation DualShock 4"></td></tr>
-<tr><td width="50%"><b>Nintendo Switch Pro</b><br><img src="docs/images/cheatsheet-switchpro.png" alt="Gamepad Grimoire card for the Nintendo Switch Pro"></td><td width="50%"><b>Xbox 360</b><br><img src="docs/images/cheatsheet-xbox360.png" alt="Gamepad Grimoire card for the Xbox 360"></td></tr>
-<tr><td width="50%"><b>Steam Controller</b><br><img src="docs/images/cheatsheet-steamcontroller.png" alt="Gamepad Grimoire card for the Steam Controller"></td><td width="50%"><b>8BitDo Pro 2</b><br><img src="docs/images/cheatsheet-8bitdo.png" alt="Gamepad Grimoire card for the 8BitDo Pro 2"></td></tr>
-<tr><td width="50%"><b>ROG Ally</b><br><img src="docs/images/cheatsheet-rogally.png" alt="Gamepad Grimoire card for the ROG Ally"></td><td width="50%"><b>Lenovo Legion Go</b><br><img src="docs/images/cheatsheet-legiongo.png" alt="Gamepad Grimoire card for the Lenovo Legion Go"></td></tr>
-<tr><td width="50%"><b>MSI Claw</b><br><img src="docs/images/cheatsheet-msiclaw.png" alt="Gamepad Grimoire card for the MSI Claw"></td><td width="50%"><b>Generic gamepad</b><br><img src="docs/images/cheatsheet-generic.png" alt="Gamepad Grimoire card for the Generic gamepad"></td></tr>
+<tr><td width="50%"><b>Xbox Series</b><br><img src="docs/images/cheatsheet-xbox.png" alt="Card for the Xbox Series"></td></tr>
+<tr><td width="50%"><b>DualSense</b><br><img src="docs/images/cheatsheet-dualsense.png" alt="Card for the DualSense"></td></tr>
+<tr><td width="50%"><b>Switch Pro</b><br><img src="docs/images/cheatsheet-switchpro.png" alt="Card for the Switch Pro"></td></tr>
+<tr><td width="50%"><b>Steam Deck</b><br><img src="docs/images/cheatsheet-steamdeck.png" alt="Card for the Steam Deck"></td></tr>
+<tr><td width="50%"><b>DualShock 4</b><br><img src="docs/images/cheatsheet-dualshock4.png" alt="Card for the DualShock 4"></td></tr>
+<tr><td width="50%"><b>Xbox 360</b><br><img src="docs/images/cheatsheet-xbox360.png" alt="Card for the Xbox 360"></td></tr>
+<tr><td width="50%"><b>Steam Controller</b><br><img src="docs/images/cheatsheet-steamcontroller.png" alt="Card for the Steam Controller"></td></tr>
+<tr><td width="50%"><b>ROG Ally</b><br><img src="docs/images/cheatsheet-rogally.png" alt="Card for the ROG Ally"></td></tr>
+<tr><td width="50%"><b>Legion Go</b><br><img src="docs/images/cheatsheet-legiongo.png" alt="Card for the Legion Go"></td></tr>
+<tr><td width="50%"><b>MSI Claw</b><br><img src="docs/images/cheatsheet-msiclaw.png" alt="Card for the MSI Claw"></td></tr>
+<tr><td width="50%"><b>8BitDo Pro 2</b><br><img src="docs/images/cheatsheet-8bitdo.png" alt="Card for the 8BitDo Pro 2"></td></tr>
+<tr><td width="50%"><b>Generic gamepad</b><br><img src="docs/images/cheatsheet-generic.png" alt="Card for the Generic gamepad"></td></tr>
 </table>
+<!-- gallery:end -->
 
 ## Slash commands
 
@@ -97,6 +108,7 @@ the keyboard fallback.
 | `/gg setup` | Controller setup (same as LT+R3) |
 | `/gg show [base\|lt\|rt]` | Pin or unpin the cheat sheet; with a layer, pin it on that layer (or hold LT/RT to peek) |
 | `/gg hide` | Hide the pinned cheat sheet |
+| `/gg flip` | Turn the card around: front or back of the controller (View in the setup) |
 | `/gg profile` | List profiles (`*` marks the active one) |
 | `/gg profile use <name>` | Switch this character to a profile |
 | `/gg profile new <name>` | New empty profile |

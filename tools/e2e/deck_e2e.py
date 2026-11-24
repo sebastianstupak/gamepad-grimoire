@@ -338,7 +338,7 @@ def launch(deck):
     time.sleep(50)
 
 
-def scenario(deck):
+def scenario(deck, pad=True):
     print("== scenario")
     deck.chat("/gg diag")
     deck.chat("/gg profile use Default")
@@ -352,6 +352,10 @@ def scenario(deck):
     for cid in controller_ids():
         deck.chat("/gg controller " + cid)
         shots.append((cid, shot_with_card(deck, "10-card-" + cid)))
+        deck.chat("/gg flip")  # the back of the controller
+        time.sleep(1)
+        shots.append((cid + "_back", deck.screenshot("11-back-" + cid)))
+        deck.chat("/gg flip")
         deck.chat("/gg hide")
     # peek: hold Shift (= LT on the default GamePadEmulateShift) like holding the trigger
     deck.chat("/gg controller steamdeck")
@@ -361,7 +365,8 @@ def scenario(deck):
     peek = deck.screenshot("20-peek-lt")
     deck.x(":1", "keyup shift")
     setup = setup_scenario(deck)
-    setup.update(gamepad_scenario(deck))
+    if pad:
+        setup.update(gamepad_scenario(deck))
     setup.update(chat_scenario(deck))
     deck.chat("/gg controller auto")
     deck.chat("/gg diag")
@@ -535,9 +540,34 @@ def setup_scenario(deck):
     time.sleep(0.5)
     menu = deck.screenshot("32-setup-menu")
     key("Escape")  # back to the rows
+    # the back of the Deck (V = View): rows left L2 L1 L4 L5, right R2 R1 R4 R5
+    key("v")
+    key("Right")
+    key("Down")
+    key("Down")  # R4
+    key("Return")
+    key("Down")
+    key("Return")  # second spell on R4
+    time.sleep(0.5)
+    back = deck.screenshot("33-setup-back-bound")
+    key("v")  # front again
+    # on-screen keyboard: menu from the bottom (Close, Capture, Card size,
+    # Controller, spec, Delete, Rename, Copy, New), New empty profile...
+    key("Tab")
+    for _ in range(25):
+        key("Down")
+    for _ in range(8):
+        key("Up")
+    key("Return")
+    for ch in "deck":
+        key(ch)  # a real keyboard types into the on-screen keyboard
+    time.sleep(0.5)
+    keys = deck.screenshot("34-setup-keyboard")
+    key("Escape")  # cancel the name: back to the menu
+    key("Escape")  # rows
     key("Escape")  # close setup
     deck.chat("/gg profile use E2E")
-    return {"rows": rows, "picker": picker, "menu": menu}
+    return {"rows": rows, "picker": picker, "menu": menu, "back": back, "keys": keys}
 
 
 def logout(deck):
@@ -558,7 +588,7 @@ def saved_variables(deck):
     return data.decode("utf-8", errors="replace") if data else ""
 
 
-def check(sv):
+def check(sv, pad=True):
     print("== checks")
     results = []
 
@@ -573,11 +603,13 @@ def check(sv):
     expect("captured binds applied", re.search(r'\["applied"\] = [1-9]', sv))
     diag_buttons = re.search(r'\["buttons"\] = \{([^}]*)\}', sv, re.S)
     seen = re.findall(r'"(PAD\w+)"', diag_buttons.group(1)) if diag_buttons else []
-    expect("the game sees the virtual gamepad", "PAD1" in seen)
+    if pad:
+        expect("the game sees the virtual gamepad", "PAD1" in seen)
     print("    buttons the game sees:", " ".join(seen) or "-")
     # listed is not the same as pressed: the virtual Elite's paddles arrive as face buttons
     print("    back-button slots listed by the game:", "yes" if "PADPADDLE1" in seen else "no")
-    expect("profile named with the on-screen keyboard (gamepad only)", '["Padx"]' in sv)
+    if pad:
+        expect("profile named with the on-screen keyboard (gamepad only)", '["Padx"]' in sv)
     chat_c = _block(sv, "Chat C") or ""
     expect("chat: profile new / copy / rename kept Chat A and Chat C", '["Chat A"]' in sv and chat_c)
     expect("chat: renamed and deleted profiles are gone", '["Chat B"]' not in sv and '["Chat Gone"]' not in sv)
@@ -585,7 +617,7 @@ def check(sv):
     expect("chat: capture made a profile", '["Chat Keys"]' in sv)
     expect("chat: scale back to automatic", '["scale"]' not in (_block(sv, "settings") or ""))
     expect(
-        "back grip R4 bound with the D-pad on the back of the Deck",
+        "back grip R4 bound on the back of the Deck",
         re.search(r'\["E2E Setup"\] = \{.*?\["BASE"\] = \{.*?\["PADPADDLE1"\] = \{[^}]*"spell"', sv, re.S),
     )
     expect(
@@ -608,9 +640,10 @@ def readme_images(shots, peek, sv, setup=None):
     so the card is shown as the overlay it is, over the game."""
     out = os.path.join(ROOT, "docs", "images")
     os.makedirs(out, exist_ok=True)
-    images = [("cheatsheet-" + c, c, p) for c, p in shots] + [("cheatsheet-peek-lt", "steamdeck", peek)]
+    images = [("cheatsheet-" + c.replace("_back", "-back"), c, p) for c, p in shots]
+    images += [("cheatsheet-peek-lt", "steamdeck", peek)]
     # setup / gamepad shots: crop with the card that was on screen
-    card_of = {"back": "steamdeck_back", "paddle": "steamdeck_back"}
+    card_of = {"back": "steamdeck_back"}
     images += [("setup-" + k, card_of.get(k, "steamdeck"), v) for k, v in (setup or {}).items() if k in SETUP_SHOTS]
     for name, cid, path in images:
         rect = card_rect(sv, cid)
@@ -622,16 +655,48 @@ def readme_images(shots, peek, sv, setup=None):
         bottom = min(H, int((rect["bottom"] + 0.2) * H))
         im.crop((0, 0, W, bottom)).save(os.path.join(out, name + ".png"), optimize=True)
         print(f"  docs/images/{name}.png")
+    update_readme_gallery()
+
+
+GALLERY_START, GALLERY_END = "<!-- gallery:start -->", "<!-- gallery:end -->"
+
+
+def gallery_html(root=ROOT):
+    """README gallery: one row per controller, front and (when captured) back."""
+    names = {}
+    with open(os.path.join(root, "src", "Features", "Controllers", "Definitions.lua"), encoding="utf-8") as f:
+        for cid, name in re.findall(r'id = "(\w+)",\s*name = "([^"]+)"', f.read()):
+            names[cid] = name
+    rows = []
+    for cid in controller_ids():
+        cells = []
+        for suffix, label in (("", names.get(cid, cid)), ("-back", names.get(cid + "_back", cid + " (back)"))):
+            rel = f"docs/images/cheatsheet-{cid}{suffix}.png"
+            if os.path.exists(os.path.join(root, rel)):
+                cells.append(f'<td width="50%"><b>{label}</b><br><img src="{rel}" alt="Card for the {label}"></td>')
+        if cells:
+            rows.append("<tr>" + "".join(cells) + "</tr>")
+    return "\n".join(["<table>", *rows, "</table>"])
+
+
+def update_readme_gallery(root=ROOT):
+    path = os.path.join(root, "README.md")
+    with open(path, encoding="utf-8") as f:
+        text = f.read()
+    a, b = text.index(GALLERY_START) + len(GALLERY_START), text.index(GALLERY_END)
+    text = text[:a] + "\n" + gallery_html(root) + "\n" + text[b:]
+    with open(path, "w", encoding="utf-8", newline="\n") as f:
+        f.write(text)
+    print("  README gallery updated")
 
 
 SETUP_SHOTS = {
     "rows": "30-setup-rows",
     "picker": "31-setup-picker",
     "menu": "32-setup-menu",
-    "back": "40-setup-back",
-    "keys": "42-setup-keyboard",
+    "back": "33-setup-back-bound",
+    "keys": "34-setup-keyboard",
     "held": "43-held-rb",
-    "paddle": "41c-setup-paddle-bound",
 }
 
 
@@ -643,6 +708,7 @@ def controller_ids():
 
 
 SHOT_NAMES = [(cid, "10-card-" + cid) for cid in controller_ids()]
+SHOT_NAMES += [(cid + "_back", "11-back-" + cid) for cid in controller_ids()]
 
 
 def readme_from_last_run():
@@ -661,6 +727,7 @@ def main():
     ap.add_argument("--no-launch", action="store_true", help="WoW is already in the world")
     ap.add_argument("--keep-running", action="store_true", help="do not log out at the end")
     ap.add_argument("--readme", action="store_true", help="update docs/images from the screenshots")
+    ap.add_argument("--no-pad", action="store_true", help="skip the virtual gamepad scenario")
     ap.add_argument("--readme-only", action="store_true", help="only re-crop docs/images from the last run")
     a = ap.parse_args()
     if a.readme_only:
@@ -674,7 +741,7 @@ def main():
         install(deck)
         disable_conflicting(deck)
         launch(deck)
-    shots, peek, setup = scenario(deck)
+    shots, peek, setup = scenario(deck, pad=not a.no_pad)
     if a.keep_running:
         return
     logout(deck)
@@ -685,7 +752,7 @@ def main():
     os.makedirs(OUT, exist_ok=True)
     with open(os.path.join(OUT, "SavedVariables.lua"), "w", encoding="utf-8") as f:
         f.write(sv)
-    ok = check(sv)
+    ok = check(sv, pad=not a.no_pad)
     if a.readme:
         readme_images(shots, peek, sv, setup)
     sys.exit(0 if ok else 1)

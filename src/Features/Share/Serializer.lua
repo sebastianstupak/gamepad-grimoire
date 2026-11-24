@@ -79,6 +79,9 @@ function Serializer.Deserialize(s)
         if nodes > Serializer.MAX_NODES then
             error("too many values")
         end
+        if pos > #s then
+            error("unexpected end of data")
+        end
         local c = s:sub(pos, pos)
         if c == "n" then
             local stop = s:find(";", pos + 1, true)

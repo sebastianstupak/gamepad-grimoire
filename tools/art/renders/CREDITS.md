@@ -7,3 +7,4 @@ not made, endorsed or supported by the device makers.
 | Pictures | Model | Author | Licence |
 | --- | --- | --- | --- |
 | `steamdeck_front.png`, `steamdeck_back.png` | [Steam Deck](https://gitlab.steamos.cloud/SteamDeck/hardware) | Valve Corporation | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| `steamcontroller_front.png`, `steamcontroller_back.png` | [Steam Controller](https://gitlab.steamos.cloud/SteamHardware/SteamController) | Valve Corporation | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |

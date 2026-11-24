@@ -35,7 +35,9 @@ META = {
     "switchpro": dict(family="nintendo", labelStyle="Reverse", hidden=[]),
     "dualshock4": dict(family="playstation", labelStyle="Shapes", hidden=[]),
     "xbox360": dict(family="xbox", labelStyle="Letters", hidden=[], labels={"PADBACK": "Back", "PADFORWARD": "Start"}),
-    "steamcontroller": dict(family="valve", labelStyle="Letters", hidden=[], labels={"PADDPAD": "LPad"}),
+    "steamcontroller": dict(
+        family="valve", labelStyle="Letters", hidden=["LPAD", "RPAD", "QAM", "PADSYSTEM"], labels={}
+    ),
     # drawn from a layout description (tools/art/schematic.py): no vector source exists
     "rogally": dict(family="xbox", labelStyle="Letters", hidden=[], labels={"PADSOCIAL": "CC", "PADSYSTEM": "Armoury"}),
     "legiongo": dict(

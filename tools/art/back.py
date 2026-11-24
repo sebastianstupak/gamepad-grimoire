@@ -56,10 +56,12 @@ PADDLES = {
         "PADPADDLE1": ("P2", 0.76, 0.66, 0.04, 0.16),
     },
     "generic": {},
-    # Steam Controller grip buttons
+    # Steam Controller (2026): four back buttons, same R4/R5/L4/L5 convention as the Deck
     "steamcontroller": {
-        "PADPADDLE3": ("LG", 0.17, 0.66, 0.05, 0.17),
-        "PADPADDLE1": ("RG", 0.83, 0.66, 0.05, 0.17),
+        "PADPADDLE3": ("L4", 0.09, 0.55, 0.03, 0.2),
+        "PADPADDLE4": ("L5", 0.09, 0.76, 0.03, 0.2),
+        "PADPADDLE1": ("R4", 0.91, 0.55, 0.03, 0.2),
+        "PADPADDLE2": ("R5", 0.91, 0.76, 0.03, 0.2),
     },
 }
 

@@ -140,7 +140,7 @@ Controller support (front view, then back view where the device has buttons ther
 | Nintendo Switch 2 Pro | Planned | Planned: GL / GR | |
 | 8BitDo Pro 2 | Done | P1, P2 | Unverified |
 | 8BitDo Ultimate | Planned | | |
-| Steam Controller | Done | Grip buttons LG, RG | Unverified |
+| Steam Controller (2026) | Done (Valve CAD) | Four back buttons | Unverified |
 | ROG Ally / Ally X | Done | M1, M2 | Unverified |
 | Lenovo Legion Go | Done | M2, M3, Y1, Y2 | Unverified |
 | MSI Claw | Done | M1, M2 | Unverified |
@@ -192,9 +192,10 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [CONTRIBUTING.md](CONTRIBUTING
 The code is MIT. Controller pictures are licensed per file, see
 [media/controllers/CREDITS.md](media/controllers/CREDITS.md):
 
-- The Steam Deck pictures are rendered from Valve's official Steam Deck CAD
-  ([gitlab.steamos.cloud/SteamDeck/hardware](https://gitlab.steamos.cloud/SteamDeck/hardware))
-  and are licensed [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
-  like that model. Gamepad Grimoire is not made, endorsed or supported by Valve.
+- The Steam Deck and Steam Controller pictures are rendered from Valve's official
+  CAD ([Deck](https://gitlab.steamos.cloud/SteamDeck/hardware),
+  [Controller](https://gitlab.steamos.cloud/SteamHardware/SteamController)) and are
+  licensed [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+  like those models. Gamepad Grimoire is not made, endorsed or supported by Valve.
 - Other drawings are derived from AL2009man's Gamepad-Asset-Pack (MIT) or drawn
   for this project (MIT).

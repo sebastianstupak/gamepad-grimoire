@@ -1,0 +1,187 @@
+{
+ "outline": [
+  [
+   0,
+   55
+  ],
+  [
+   80,
+   55
+  ],
+  [
+   116,
+   53
+  ],
+  [
+   133,
+   46
+  ],
+  [
+   141,
+   30
+  ],
+  [
+   143,
+   2
+  ],
+  [
+   139,
+   -26
+  ],
+  [
+   129,
+   -46
+  ],
+  [
+   111,
+   -56
+  ],
+  [
+   92,
+   -54
+  ],
+  [
+   76,
+   -41
+  ],
+  [
+   60,
+   -34
+  ],
+  [
+   0,
+   -34
+  ]
+ ],
+ "body_thickness": 30,
+ "body_bevel": 7,
+ "face_z": 15,
+ "grip": {
+  "w": 32,
+  "h": 44,
+  "depth": 28,
+  "x": 114,
+  "y": -34,
+  "z": 19,
+  "tilt": 20,
+  "splay": 10
+ },
+ "bumper": {
+  "x": 116,
+  "y": 50,
+  "w": 44,
+  "h": 13,
+  "t": 13,
+  "z": 6,
+  "tilt": -12
+ },
+ "screen": [
+  0,
+  6,
+  126,
+  80,
+  8
+ ],
+ "stick_r": 13,
+ "dpad_arm": 15,
+ "dpad_thick": 5,
+ "controls": {
+  "PADLSTICK": {
+   "type": "stick",
+   "x": -108,
+   "y": 22,
+   "r": 13
+  },
+  "PADRSTICK": {
+   "type": "stick",
+   "x": 108,
+   "y": -22,
+   "r": 13
+  },
+  "PADDPAD": {
+   "type": "dpad",
+   "x": -108,
+   "y": -22
+  },
+  "PAD1": {
+   "type": "button",
+   "x": 108,
+   "y": 8,
+   "r": 8
+  },
+  "PAD2": {
+   "type": "button",
+   "x": 120,
+   "y": 22,
+   "r": 8
+  },
+  "PAD3": {
+   "type": "button",
+   "x": 96,
+   "y": 22,
+   "r": 8
+  },
+  "PAD4": {
+   "type": "button",
+   "x": 108,
+   "y": 36,
+   "r": 8
+  },
+  "PADBACK": {
+   "type": "button",
+   "x": -56,
+   "y": 46,
+   "r": 5
+  },
+  "PADFORWARD": {
+   "type": "button",
+   "x": 56,
+   "y": 46,
+   "r": 5
+  },
+  "PADSYSTEM": {
+   "type": "button",
+   "x": 120,
+   "y": 44,
+   "r": 5
+  },
+  "PADSOCIAL": {
+   "type": "button",
+   "x": -120,
+   "y": 44,
+   "r": 5
+  },
+  "PADLSHOULDER": {
+   "type": "bumper",
+   "x": -116,
+   "y": 50
+  },
+  "PADRSHOULDER": {
+   "type": "bumper",
+   "x": 116,
+   "y": 50
+  },
+  "PADLTRIGGER": {
+   "type": "point",
+   "x": -132,
+   "y": 44
+  },
+  "PADRTRIGGER": {
+   "type": "point",
+   "x": 132,
+   "y": 44
+  }
+ },
+ "back": {
+  "PADPADDLE3": {
+   "x": -96,
+   "y": -40,
+   "r": 7
+  },
+  "PADPADDLE1": {
+   "x": 96,
+   "y": -40,
+   "r": 7
+  }
+ }
+}

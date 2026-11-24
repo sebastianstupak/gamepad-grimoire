@@ -197,5 +197,7 @@ The code is MIT. Controller pictures are licensed per file, see
   [Controller](https://gitlab.steamos.cloud/SteamHardware/SteamController)) and are
   licensed [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
   like those models. Gamepad Grimoire is not made, endorsed or supported by Valve.
-- Other drawings are derived from AL2009man's Gamepad-Asset-Pack (MIT) or drawn
-  for this project (MIT).
+- The ROG Ally, Legion Go, MSI Claw, 8BitDo Pro 2 and generic pad are 3D models
+  built for this project (`tools/art/model.py`) and are MIT; simplified line-art
+  impressions, not exact replicas.
+- Any remaining drawings are derived from AL2009man's Gamepad-Asset-Pack (MIT).

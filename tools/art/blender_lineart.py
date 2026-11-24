@@ -139,11 +139,24 @@ bpy.context.view_layer.update()
 scene.render.filepath = job["out_png"]
 bpy.ops.render.render(write_still=True)
 
-if job.get("out_json"):  # 2D position of named 3D points, 0..1 from the top left
-    anchors = {}
-    for name, p in job.get("points", {}).items():
+if job.get("out_json"):  # project named 3D controls to 2D anchors (cx, cy, w, h), 0..1
+
+    def project(p):
         co = world_to_camera_view(scene, cam, Vector(p))
-        anchors[name] = [co.x, 1 - co.y]
+        return co.x, 1 - co.y
+
+    anchors = {}
+    for name, spec in job.get("points", {}).items():
+        if isinstance(spec, dict):  # {p:[x,y,z], hx, hy}: project centre and extents for a box
+            x, y, z = spec["p"]
+            hx, hy = spec.get("hx", 5), spec.get("hy", 5)
+            cx, cy = project((x, y, z))
+            xs = [project((x + sx, y, z))[0] for sx in (-hx, hx)]
+            ys = [project((x, y + sy, z))[1] for sy in (-hy, hy)]
+            anchors[name] = [cx, cy, abs(xs[1] - xs[0]), abs(ys[1] - ys[0])]
+        else:
+            cx, cy = project(spec)
+            anchors[name] = [cx, cy]
     with open(job["out_json"], "w", encoding="utf-8") as f:
         json.dump({"points": anchors}, f, indent=1)
 print("RENDERED", job["out_png"])

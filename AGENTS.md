@@ -72,10 +72,17 @@ running, or set `GG_NATIVE_LUA=1` with Lua 5.1 + busted/luacheck/luacov/LuaLS in
 `tools/art/render3d.py` (`npm run render`, needs Blender) renders each model in
 `MODELS` as line art (`blender_lineart.py`: flat fill, Freestyle contour and
 crease lines, orthographic, tilted so shoulders show) into `tools/art/renders/`.
-Models are downloaded into `tools/art/models/` (git-ignored, often large); the
-renders are committed and `npm run art` turns them into textures, so CI needs no
-Blender. Anchors are hand-placed fractions of the render per button - draw them
-over the render to check. Backs are the device turned over (R4 on the left).
+Two kinds of model:
+- **Official CAD** (Steam Deck, Steam Controller): downloaded into
+  `tools/art/models/` (git-ignored, large) from the `url`; CC BY-NC-SA, credited.
+- **Built** (`builder=True`: generic, ROG Ally, Legion Go, MSI Claw, 8BitDo):
+  a parametric mesh from `tools/art/model.py` + `tools/art/params/<id>.json`
+  (named controls in millimetres); MIT. `model.py` also emits each control's 3D
+  point, which `blender_lineart.py` projects to the 2D anchor box - so anchors are
+  computed, not hand-placed. Draw them over the render to check.
+
+The renders are committed and `npm run art` turns them into textures, so CI needs
+no Blender. Backs are the device turned over (R4 on the left).
 Each picture keeps its model's licence: `render3d.write_credits()` updates
 `media/controllers/CREDITS.md`, which ships with the addon. Only use models whose
 licence allows derivatives (CC BY / BY-SA / CC0, or Valve's CC BY-NC-SA); skip

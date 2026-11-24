@@ -1,0 +1,58 @@
+{
+ "outline": [
+  [0, 55],
+  [16, 57],
+  [38, 55],
+  [57, 48],
+  [71, 33],
+  [79, 11],
+  [76, -14],
+  [65, -38],
+  [48, -53],
+  [31, -52],
+  [19, -36],
+  [9, -28],
+  [0, -27]
+ ],
+ "body_thickness": 22,
+ "body_bevel": 6,
+ "face_z": 11,
+ "grip": {
+  "w": 26,
+  "h": 37,
+  "depth": 24,
+  "x": 53,
+  "y": -35,
+  "z": 19,
+  "tilt": 20,
+  "splay": 12
+ },
+ "bumper": {
+  "x": 52,
+  "y": 48,
+  "w": 40,
+  "h": 11,
+  "t": 11,
+  "z": 5,
+  "tilt": -10
+ },
+ "stick_r": 12,
+ "dpad_arm": 14,
+ "dpad_thick": 5,
+ "controls": {
+  "PADLSTICK": { "type": "stick", "x": -32, "y": 17, "r": 12 },
+  "PADRSTICK": { "type": "stick", "x": 15, "y": -17, "r": 12 },
+  "PADDPAD": { "type": "dpad", "x": -15, "y": -17 },
+  "PAD1": { "type": "button", "x": 41, "y": 3, "r": 7 },
+  "PAD2": { "type": "button", "x": 53, "y": 17, "r": 7 },
+  "PAD3": { "type": "button", "x": 29, "y": 17, "r": 7 },
+  "PAD4": { "type": "button", "x": 41, "y": 31, "r": 7 },
+  "PADSYSTEM": { "type": "button", "x": 0, "y": 40, "r": 6 },
+  "PADBACK": { "type": "button", "x": -14, "y": 27, "r": 5 },
+  "PADFORWARD": { "type": "button", "x": 14, "y": 27, "r": 5 },
+  "PADLSHOULDER": { "type": "bumper", "x": -52, "y": 48 },
+  "PADRSHOULDER": { "type": "bumper", "x": 52, "y": 48 },
+  "PADLTRIGGER": { "type": "point", "x": -58, "y": 53 },
+  "PADRTRIGGER": { "type": "point", "x": 58, "y": 53 }
+ }
+}

@@ -59,9 +59,7 @@ Licensed CC BY-NC-SA 4.0 like the model; credited to Valve. Not endorsed by Valv
 Each CC BY 4.0, credited to its author in [media/controllers/CREDITS.md](media/controllers/CREDITS.md).
 
 <table>
-<tr><td><b>Xbox</b>: front and back<br><img src="docs/images/art/xbox.png" alt="Xbox controller picture, front and back"></td></tr>
 <tr><td><b>DualSense</b>: front and back<br><img src="docs/images/art/dualsense.png" alt="DualSense controller picture, front and back"></td></tr>
-<tr><td><b>DualShock 4</b>: front and back<br><img src="docs/images/art/dualshock4.png" alt="DualShock 4 controller picture, front and back"></td></tr>
 <tr><td><b>Xbox 360</b>: front and back<br><img src="docs/images/art/xbox360.png" alt="Xbox 360 controller picture, front and back"></td></tr>
 </table>
 
@@ -70,6 +68,8 @@ Each CC BY 4.0, credited to its author in [media/controllers/CREDITS.md](media/c
 Parametric 3D models (`tools/art/model.py`), MIT; simplified impressions, not exact replicas.
 
 <table>
+<tr><td><b>Xbox</b>: front and back<br><img src="docs/images/art/xbox.png" alt="Xbox controller picture, front and back"></td></tr>
+<tr><td><b>DualShock 4</b>: front and back<br><img src="docs/images/art/dualshock4.png" alt="DualShock 4 controller picture, front and back"></td></tr>
 <tr><td><b>ROG Ally</b>: front and back<br><img src="docs/images/art/rogally.png" alt="ROG Ally controller picture, front and back"></td></tr>
 <tr><td><b>Lenovo Legion Go</b>: front and back<br><img src="docs/images/art/legiongo.png" alt="Lenovo Legion Go controller picture, front and back"></td></tr>
 <tr><td><b>MSI Claw</b>: front and back<br><img src="docs/images/art/msiclaw.png" alt="MSI Claw controller picture, front and back"></td></tr>
@@ -225,12 +225,11 @@ The code is MIT. Controller pictures are licensed per file, see
   [Controller](https://gitlab.steamos.cloud/SteamHardware/SteamController)) and are
   licensed [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
   like those models. Gamepad Grimoire is not made, endorsed or supported by Valve.
-- The Xbox, DualSense, DualShock 4 and Xbox 360 pictures are rendered from
-  community 3D models on Sketchfab, each [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
-  and credited to its author in [media/controllers/CREDITS.md](media/controllers/CREDITS.md):
-  Xbox by gosevg, DualSense by AHarmlessPotato, DualShock 4 by shaielwolf,
-  Xbox 360 by Harpiart.
-- The ROG Ally, Legion Go, MSI Claw, 8BitDo Pro 2 and generic pad are 3D models
-  built for this project (`tools/art/model.py`) and are MIT; simplified line-art
-  impressions, not exact replicas.
+- The DualSense and Xbox 360 pictures are rendered from community 3D models on
+  Sketchfab, each [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) and
+  credited to its author in [media/controllers/CREDITS.md](media/controllers/CREDITS.md):
+  DualSense by AHarmlessPotato, Xbox 360 by Harpiart.
+- The Xbox, DualShock 4, ROG Ally, Legion Go, MSI Claw, 8BitDo Pro 2 and generic
+  pad are 3D models built for this project (`tools/art/model.py`) and are MIT;
+  simplified line-art impressions, not exact replicas.
 - The Switch Pro picture is derived from AL2009man's Gamepad-Asset-Pack (MIT).

@@ -5,6 +5,8 @@ versions: [SemVer](https://semver.org).
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-11-25
+
 ### Added
 - Controller pictures (Xbox Series, DualSense, Switch Pro, Steam Deck) in one
   line-art style, with measured button anchors and automatic detection.

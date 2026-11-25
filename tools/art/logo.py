@@ -22,7 +22,7 @@ DARKH = "#17151e"
 
 # geometry in a 0..100 square (viewBox units)
 G = dict(
-    tile_r=22,
+    tile_r=0,
     body=(12, 88, 32, 68),
     body_r=12.5,
     screen=(37, 63, 40, 60),

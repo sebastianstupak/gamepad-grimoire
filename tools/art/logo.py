@@ -1,192 +1,124 @@
-"""Logo render: an original stylized handheld (Deck-like), 3/4 angle, Cycles.
+"""Generate the project logo: a flat 2-color Steam Deck-style handheld + spark.
 
-Not Valve's CAD -- an own, MIT, generic handheld so the brand mark carries no
-CC-BY-NC-SA / trade-dress baggage. Dark body + purple glowing screen (grimoire).
+One parametric design emits both the vector source and a raster export:
 
-Two steps -- this renders the device on transparent; logo_compose.py adds the
-dark aura, diagonal tile-fill, bloom and vignette:
+    python tools/art/logo.py            # writes docs/images/logo.svg + logo.png
 
-    blender -b --factory-startup -P tools/art/logo.py -- device.png
-    python tools/art/logo_compose.py device.png docs/images/logo.png
+The SVG is the source of truth; the PNG (transparent, 1024px) is for CurseForge
+and the README. An own, MIT mark -- dark rounded tile, brand-purple handheld.
 """
 
-import sys
+import math
+import os
 
-import bpy
-from mathutils import Vector
+from PIL import Image, ImageDraw
 
-OUT = sys.argv[sys.argv.index("--") + 1]
+PUR = (184, 150, 255)
+DARK = (23, 21, 30)
+PURA = (*PUR, 255)
+DARKA = (*DARK, 255)
+PURH = "#b896ff"
+DARKH = "#17151e"
 
-# --- tweakables -------------------------------------------------------------
-CAM_LOC = (2.5, -4.4, 4.6)
-CAM_AIM = (0, 0, 0.10)
-CAM_LENS = 78
-YAW = 0.34  # device yaw (a readable 3/4); diagonal tile-fill is done in post
-PURPLE = (0.45, 0.22, 0.95)
-# ---------------------------------------------------------------------------
-
-bpy.ops.wm.read_factory_settings(use_empty=True)
-scene = bpy.context.scene
-scene.render.engine = "CYCLES"
-try:
-    scene.cycles.device = "GPU"
-    bpy.context.preferences.addons["cycles"].preferences.get_devices()
-except Exception:
-    pass
-scene.cycles.samples = 200
-scene.cycles.use_denoising = True
-scene.render.resolution_x = scene.render.resolution_y = 1024
-scene.render.film_transparent = True  # device only; bg/aura composited in post
-# AgX (Blender's default) desaturates bright emission to near-white; Standard
-# keeps the purple screen/accents vivid.
-scene.view_settings.view_transform = "Standard"
-
-world = bpy.data.worlds.new("w")
-scene.world = world
-world.use_nodes = True
-bg = world.node_tree.nodes["Background"]
-bg.inputs[0].default_value = (0.008, 0.008, 0.011, 1)
-bg.inputs[1].default_value = 1.0
+# geometry in a 0..100 square (viewBox units)
+G = dict(
+    tile_r=22,
+    body=(12, 88, 32, 68),
+    body_r=12.5,
+    screen=(37, 63, 40, 60),
+    screen_r=2.6,
+    lx=23.5,
+    rx=76.5,
+    ytop=42.5,
+    ybot=57.5,
+    stick=4.4,
+    arm=3.8,
+    armw=2.2,
+    boff=4.6,
+    br=2.1,
+    sparkles=((84.5, 21, 4.2), (90.5, 28, 2.1)),
+)
+DOTS = ((0, -1), (0, 1), (-1, 0), (1, 0))
 
 
-def mat(name, color, metallic=0.0, rough=0.5, coat=0.0, emit=None, emit_str=0.0):
-    m = bpy.data.materials.new(name)
-    m.use_nodes = True
-    b = m.node_tree.nodes["Principled BSDF"]
-    b.inputs["Base Color"].default_value = (*color, 1)
-    b.inputs["Metallic"].default_value = metallic
-    b.inputs["Roughness"].default_value = rough
-    for n in ("Coat Weight", "Coat"):
-        if n in b.inputs:
-            b.inputs[n].default_value = coat
-            break
-    if emit is not None:
-        if "Emission Color" in b.inputs:
-            b.inputs["Emission Color"].default_value = (*emit, 1)
-        if "Emission Strength" in b.inputs:
-            b.inputs["Emission Strength"].default_value = emit_str
-    return m
+def _sparkle_pts(cx, cy, R, waist=0.30):
+    pts = []
+    for i in range(4):
+        a = math.radians(90 * i)
+        pts.append((cx + R * math.cos(a), cy - R * math.sin(a)))
+        a2 = math.radians(90 * i + 45)
+        pts.append((cx + R * waist * math.cos(a2), cy - R * waist * math.sin(a2)))
+    return pts
 
 
-BODY = mat("body", (0.021, 0.021, 0.027), rough=0.40, coat=0.25)
-GLASS = mat("glass", (0.003, 0.003, 0.005), rough=0.06, coat=0.85)
-SCREEN = mat("screen", (0.10, 0.05, 0.28), emit=PURPLE, emit_str=1.05)
-RUBBER = mat("rubber", (0.014, 0.014, 0.018), rough=0.55)
-RING = mat("ring", PURPLE, emit=PURPLE, emit_str=1.8)
-BTN = mat("btn", (0.03, 0.03, 0.04), rough=0.30, emit=(0.30, 0.14, 0.7), emit_str=1.0)
-DARK = mat("dark", (0.028, 0.028, 0.036), rough=0.32)
-
-rig = bpy.data.objects.new("rig", None)
-scene.collection.objects.link(rig)
-parts = []
-
-
-def _finish(o, m):
-    bpy.ops.object.shade_smooth()
-    if m:
-        o.data.materials.append(m)
-    parts.append(o)
-    return o
-
-
-def box(sx, sy, sz, loc, m, bevel=0.0, seg=3):
-    bpy.ops.mesh.primitive_cube_add(size=1, location=loc)
-    o = bpy.context.active_object
-    o.dimensions = (sx, sy, sz)
-    bpy.ops.object.transform_apply(scale=True)
-    if bevel > 0:
-        bv = o.modifiers.new("b", "BEVEL")
-        bv.width = bevel
-        bv.segments = seg
-    return _finish(o, m)
+def to_svg(g):
+    bx0, bx1, by0, by1 = g["body"]
+    sx0, sx1, sy0, sy1 = g["screen"]
+    lx, rx, yt, yb = g["lx"], g["rx"], g["ytop"], g["ybot"]
+    st, arm, aw, boff, br = g["stick"], g["arm"], g["armw"], g["boff"], g["br"]
+    e = [f'<rect width="100" height="100" rx="{g["tile_r"]}" fill="{DARKH}"/>']
+    e.append(f'<rect x="{bx0}" y="{by0}" width="{bx1 - bx0}" height="{by1 - by0}" rx="{g["body_r"]}" fill="{PURH}"/>')
+    e.append(
+        f'<rect x="{sx0}" y="{sy0}" width="{sx1 - sx0}" height="{sy1 - sy0}" rx="{g["screen_r"]}" fill="{DARKH}"/>'
+    )
+    e.append(f'<circle cx="{lx}" cy="{yt}" r="{st}" fill="{DARKH}"/>')
+    e.append(
+        f'<rect x="{lx - aw / 2}" y="{yb - arm}" width="{aw}" height="{2 * arm}" rx="{aw * 0.35:.2f}" fill="{DARKH}"/>'
+    )
+    e.append(
+        f'<rect x="{lx - arm}" y="{yb - aw / 2}" width="{2 * arm}" height="{aw}" rx="{aw * 0.35:.2f}" fill="{DARKH}"/>'
+    )
+    for dx, dy in DOTS:
+        e.append(f'<circle cx="{rx + dx * boff}" cy="{yt + dy * boff}" r="{br}" fill="{DARKH}"/>')
+    e.append(f'<circle cx="{rx}" cy="{yb}" r="{st}" fill="{DARKH}"/>')
+    for cx, cy, R in g["sparkles"]:
+        pts = " ".join(f"{x:.2f},{y:.2f}" for x, y in _sparkle_pts(cx, cy, R))
+        e.append(f'<polygon points="{pts}" fill="{PURH}"/>')
+    inner = "\n  ".join(e)
+    return (
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" '
+        f'width="1024" height="1024">\n  {inner}\n</svg>\n'
+    )
 
 
-def cyl(r, depth, loc, m, verts=48):
-    bpy.ops.mesh.primitive_cylinder_add(vertices=verts, radius=r, depth=depth, location=loc)
-    o = bpy.context.active_object
-    bv = o.modifiers.new("b", "BEVEL")
-    bv.width = min(0.02, r * 0.2)
-    bv.segments = 2
-    return _finish(o, m)
+def to_png(g, path, px=1024, ss=4):
+    w = px * ss
+    im = Image.new("RGBA", (w, w), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    k = w / 100.0
+
+    def rr(x0, y0, x1, y1, r, fill):
+        d.rounded_rectangle([x0 * k, y0 * k, x1 * k, y1 * k], radius=r * k, fill=fill)
+
+    def cc(cx, cy, r, fill):
+        d.ellipse([(cx - r) * k, (cy - r) * k, (cx + r) * k, (cy + r) * k], fill=fill)
+
+    bx0, bx1, by0, by1 = g["body"]
+    sx0, sx1, sy0, sy1 = g["screen"]
+    lx, rx, yt, yb = g["lx"], g["rx"], g["ytop"], g["ybot"]
+    st, arm, aw, boff, br = g["stick"], g["arm"], g["armw"], g["boff"], g["br"]
+    rr(0, 0, 100, 100, g["tile_r"], DARKA)
+    rr(bx0, by0, bx1, by1, g["body_r"], PURA)
+    rr(sx0, sy0, sx1, sy1, g["screen_r"], DARKA)
+    cc(lx, yt, st, DARKA)
+    rr(lx - aw / 2, yb - arm, lx + aw / 2, yb + arm, aw * 0.35, DARKA)
+    rr(lx - arm, yb - aw / 2, lx + arm, yb + aw / 2, aw * 0.35, DARKA)
+    for dx, dy in DOTS:
+        cc(rx + dx * boff, yt + dy * boff, br, DARKA)
+    cc(rx, yb, st, DARKA)
+    for cx, cy, R in g["sparkles"]:
+        d.polygon([(x * k, y * k) for x, y in _sparkle_pts(cx, cy, R)], fill=PURA)
+    im.resize((px, px), Image.LANCZOS).save(path)
 
 
-def sphere(r, loc, m, scale_z=1.0):
-    bpy.ops.mesh.primitive_uv_sphere_add(segments=48, ring_count=24, radius=r, location=loc)
-    o = bpy.context.active_object
-    o.scale = (1, 1, scale_z)
-    return _finish(o, m)
+def main():
+    here = os.path.dirname(os.path.abspath(__file__))
+    out = os.path.join(os.path.dirname(os.path.dirname(here)), "docs", "images")
+    with open(os.path.join(out, "logo.svg"), "w", encoding="utf-8", newline="\n") as f:
+        f.write(to_svg(G))
+    to_png(G, os.path.join(out, "logo.png"))
+    print("wrote docs/images/logo.svg + logo.png")
 
 
-def torus(major, minor, loc, m):
-    bpy.ops.mesh.primitive_torus_add(major_radius=major, minor_radius=minor, location=loc)
-    return _finish(bpy.context.active_object, m)
-
-
-def stick(x, y):
-    top = 0.11
-    cyl(0.15, 0.12, (x, y, top + 0.04), RUBBER)
-    sphere(0.155, (x, y, top + 0.10), RUBBER, scale_z=0.55)
-    torus(0.165, 0.018, (x, y, top + 0.06), RING)
-
-
-def dpad(x, y):
-    z = 0.145
-    box(0.34, 0.12, 0.05, (x, y, z), DARK, bevel=0.02, seg=2)
-    box(0.12, 0.34, 0.05, (x, y, z), DARK, bevel=0.02, seg=2)
-
-
-def face_buttons(x, y):
-    z = 0.155
-    d = 0.16
-    for dx, dy in ((0, d), (0, -d), (-d, 0), (d, 0)):
-        cyl(0.072, 0.05, (x + dx, y + dy, z), BTN)
-
-
-# body slab (front faces +Z)
-box(2.7, 1.05, 0.22, (0, 0, 0), BODY, bevel=0.085, seg=6)
-# screen, slightly proud, dark glass + emissive content
-box(1.52, 0.80, 0.055, (0, 0, 0.12), GLASS, bevel=0.015, seg=2)
-box(1.40, 0.70, 0.010, (0, 0, 0.150), SCREEN)
-# left wing: stick (top) + d-pad (bottom)
-stick(-0.98, 0.24)
-dpad(-0.98, -0.26)
-# right wing: face buttons (top) + stick (bottom)
-face_buttons(0.98, 0.24)
-stick(0.98, -0.26)
-# shoulder nubs on the back edge
-box(0.46, 0.14, 0.11, (-0.92, 0.50, 0.08), BODY, bevel=0.04, seg=3)
-box(0.46, 0.14, 0.11, (0.92, 0.50, 0.08), BODY, bevel=0.04, seg=3)
-
-for p in parts:
-    p.parent = rig
-rig.rotation_euler = (0.0, 0.0, YAW)
-
-
-def area(name, loc, energy, size, color=(1, 1, 1)):
-    light = bpy.data.lights.new(name, "AREA")
-    light.energy = energy
-    light.size = size
-    light.color = color
-    o = bpy.data.objects.new(name, light)
-    o.location = loc
-    scene.collection.objects.link(o)
-    o.rotation_euler = (Vector((0, 0, 0.2)) - Vector(loc)).to_track_quat("-Z", "Y").to_euler()
-
-
-area("key", (2.2, -2.6, 4.6), 320, 3)
-area("rim", (-3.0, 3.2, 2.6), 650, 4, color=(0.62, 0.42, 1.0))
-area("fill", (-2.6, -3.2, 1.9), 180, 9)
-
-cam_d = bpy.data.cameras.new("cam")
-cam = bpy.data.objects.new("cam", cam_d)
-scene.collection.objects.link(cam)
-scene.camera = cam
-cam.location = CAM_LOC
-cam.rotation_euler = (Vector(CAM_AIM) - Vector(CAM_LOC)).to_track_quat("-Z", "Y").to_euler()
-cam_d.lens = CAM_LENS
-
-# Bloom is added in post with PIL (tools/art handles it); Blender 5.1 reworked
-# the compositor into a node-group API we skip here.
-scene.render.filepath = OUT
-bpy.ops.render.render(write_still=True)
-print("RENDERED", OUT)
+if __name__ == "__main__":
+    main()

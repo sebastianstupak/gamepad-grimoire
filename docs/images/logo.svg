@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="1024" height="1024">
+  <rect width="100" height="100" rx="22" fill="#17151e"/>
+  <rect x="12" y="32" width="76" height="36" rx="12.5" fill="#b896ff"/>
+  <rect x="37" y="40" width="26" height="20" rx="2.6" fill="#17151e"/>
+  <circle cx="23.5" cy="42.5" r="4.4" fill="#17151e"/>
+  <rect x="22.4" y="53.7" width="2.2" height="7.6" rx="0.77" fill="#17151e"/>
+  <rect x="19.7" y="56.4" width="7.6" height="2.2" rx="0.77" fill="#17151e"/>
+  <circle cx="76.5" cy="37.9" r="2.1" fill="#17151e"/>
+  <circle cx="76.5" cy="47.1" r="2.1" fill="#17151e"/>
+  <circle cx="71.9" cy="42.5" r="2.1" fill="#17151e"/>
+  <circle cx="81.1" cy="42.5" r="2.1" fill="#17151e"/>
+  <circle cx="76.5" cy="57.5" r="4.4" fill="#17151e"/>
+  <polygon points="88.70,21.00 85.39,20.11 84.50,16.80 83.61,20.11 80.30,21.00 83.61,21.89 84.50,25.20 85.39,21.89" fill="#b896ff"/>
+  <polygon points="92.60,28.00 90.95,27.55 90.50,25.90 90.05,27.55 88.40,28.00 90.05,28.45 90.50,30.10 90.95,28.45" fill="#b896ff"/>
+</svg>

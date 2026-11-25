@@ -8,6 +8,7 @@
 [![Security](https://github.com/sebastianstupak/gamepad-grimoire/actions/workflows/security.yml/badge.svg)](https://github.com/sebastianstupak/gamepad-grimoire/actions/workflows/security.yml)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/sebastianstupak/gamepad-grimoire/badge)](https://scorecard.dev/viewer/?uri=github.com/sebastianstupak/gamepad-grimoire)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![CurseForge](https://img.shields.io/curseforge/dt/1830038?logo=curseforge&logoColor=white&label=CurseForge&color=F16436)](https://www.curseforge.com/wow/addons/gamepad-grimoire)
 ![WoW: Forever](https://img.shields.io/badge/WoW-Forever%201.60-c8a2ff)
 
 A World of Warcraft addon for playing with a controller: bind spells, items and
@@ -15,7 +16,8 @@ macros to every button, see your binds on a picture of *your* controller, and se
 it all up without touching the keyboard.
 
 > **Status:** early development — verified in game on WoW: Forever 1.60.1 (Steam Deck)
-> by an automated end-to-end test. Not yet on CurseForge/Wago; see [Install](#install).
+> by an automated end-to-end test. Now on
+> [CurseForge](https://www.curseforge.com/wow/addons/gamepad-grimoire); see [Install](#install).
 
 ![Gamepad Grimoire on a Steam Deck: the pinned cheat sheet, each button lighting up as it is held, a peek at a layer, then a flip to the back](docs/images/demo.webp)
 
@@ -37,13 +39,13 @@ it all up without touching the keyboard.
 
 ## Install
 
-Until the CurseForge/Wago release, install manually:
+**CurseForge** — search *Gamepad Grimoire* in the CurseForge app, or get it from the
+[project page](https://www.curseforge.com/wow/addons/gamepad-grimoire).
 
-1. Download the repo (**Code → Download ZIP**, or clone it).
-2. Copy the addon into WoW's `Interface/AddOns/` as a folder named **`GamepadGrimoire`**
-   — it needs the `.toc`, `src/` and `media/` (the repo without `tools/`, `spec/`
-   and `docs/`).
-3. Enable **Gamepad Grimoire** on the character screen.
+**Manual** — download a build from
+[Releases](https://github.com/sebastianstupak/gamepad-grimoire/releases), unzip the
+**`GamepadGrimoire`** folder into WoW's `Interface/AddOns/`, and enable it on the
+character screen.
 
 On a Steam Deck, [wow-steamdeck-setup](https://github.com/sebastianstupak/wow-steamdeck-setup)
 has an `install-addon.sh` that pushes an addon over SSH.
@@ -86,7 +88,7 @@ Every controller above has a front and back picture. Still to come:
 - Steam Deck / handheld **back grips** that Steam Input turns into keys — bind those
   keys too (today the game can't see them as controller buttons).
 - Pasting share strings with the controller; Blizzard's own button glyphs on the card.
-- Localization; Retail and Classic clients; first CurseForge/Wago release.
+- Localization; Retail and Classic clients; a Wago release.
 
 ## Contributing
 

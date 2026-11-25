@@ -6,6 +6,8 @@
 ## SavedVariables: GamepadGrimoireDB
 ## Category: Interface Enhancements
 ## X-License: MIT
+# CurseForge upload: once the project exists, replace the line below with
+#   ## X-Curse-Project-ID: <your project id>
 
 src\Core\Namespace.lua
 src\Core\Wow.lua

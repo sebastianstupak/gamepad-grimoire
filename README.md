@@ -1,3 +1,5 @@
+<p align="center"><img src="docs/images/logo.png" alt="Gamepad Grimoire" width="160"></p>
+
 # Gamepad Grimoire
 
 [![CI](https://github.com/sebastianstupak/gamepad-grimoire/actions/workflows/ci.yml/badge.svg)](https://github.com/sebastianstupak/gamepad-grimoire/actions/workflows/ci.yml)

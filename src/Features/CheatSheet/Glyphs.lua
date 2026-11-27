@@ -116,3 +116,34 @@ end
 function Glyphs.LayerTrigger(family, layer)
     return Glyphs.Label(family, layer == "LT" and "PADLTRIGGER" or "PADRTRIGGER")
 end
+
+local MODIFIERS = { SHIFT = true, CTRL = true, ALT = true }
+
+---Renders a WoW key chord in this controller's button names: "SHIFT-PADRSTICK"
+---becomes "L2+R3" on a Steam Deck, because LT (its "L2") is what emulates Shift.
+---A modifier with no emulating trigger keeps its raw name. Pure.
+---@param def table controller definition
+---@param modifiers table<string, string> layer -> modifier, from `LayerModifiers`
+---@param key string? a WoW binding key ("NONE" / nil / "" => no chord)
+---@return string? label nil when the key is off
+function Glyphs.Chord(def, modifiers, key)
+    if not key or key == "" or key == "NONE" then
+        return nil
+    end
+    local triggerFor = {} -- modifier -> the trigger button that emulates it
+    for layer, mod in pairs(modifiers) do
+        triggerFor[mod] = layer == "LT" and "PADLTRIGGER" or "PADRTRIGGER"
+    end
+    local parts, button = {}, key
+    while true do
+        local mod, rest = button:match("^(%u+)%-(.+)$")
+        if not (mod and MODIFIERS[mod]) then
+            break
+        end
+        local trigger = triggerFor[mod]
+        parts[#parts + 1] = trigger and Glyphs.For(def, trigger) or mod
+        button = rest
+    end
+    parts[#parts + 1] = Glyphs.For(def, button)
+    return table.concat(parts, "+")
+end

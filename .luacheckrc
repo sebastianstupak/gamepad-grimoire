@@ -12,7 +12,7 @@ ignore = {
 files["src/Core/Wow.lua"] = {
   read_globals = {
     "C_CVar", "C_EncodingUtil", "C_GamePad", "C_Spell", "ClearOverrideBindings", "CreateFrame",
-    "DEFAULT_CHAT_FRAME", "GetCVar", "GetRealmName", "GetSpecialization", "GetSpellInfo",
+    "DEFAULT_CHAT_FRAME", "GetCVar", "SetCVar", "GetRealmName", "GetSpecialization", "GetSpellInfo",
     "InCombatLockdown", "SetOverrideBinding", "SetOverrideBindingItem", "SetOverrideBindingMacro",
     "SetOverrideBindingSpell", "UnitName",
     "C_Item", "C_Texture", "C_Timer", "GetActionInfo", "GetActionTexture", "GetBindingAction", "GetBuildInfo",

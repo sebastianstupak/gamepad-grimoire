@@ -78,6 +78,21 @@ describe("CheatSheet", function()
             assert.equal("L2", G.LayerTrigger("playstation", "LT"))
             assert.equal("Up", G.Label("valve", "PADDUP"))
         end)
+
+        it("renders a key chord in the controller's own button names", function()
+            local ns = Addon.load()
+            local G = ns.CheatSheet.Glyphs
+            local deck = ns.Controllers.Registry.Get("steamdeck")
+            local mods = { LT = "SHIFT", RT = "CTRL" }
+            -- "Shift" is really the LT trigger ("L2") emulating it on a Deck
+            assert.equal("L2+R3", G.Chord(deck, mods, "SHIFT-PADRSTICK"))
+            assert.equal("R2+Y", G.Chord(deck, mods, "CTRL-PAD4"))
+            assert.equal("R3", G.Chord(deck, mods, "PADRSTICK"))
+            assert.is_nil(G.Chord(deck, mods, "NONE"))
+            assert.is_nil(G.Chord(deck, mods, nil))
+            -- a modifier that no trigger emulates keeps its raw name
+            assert.equal("SHIFT+R3", G.Chord(deck, {}, "SHIFT-PADRSTICK"))
+        end)
     end)
 
     describe("peek and pin", function()
@@ -105,6 +120,15 @@ describe("CheatSheet", function()
             local s = { heldFor = 0 }
             assert.equal("BASE", CS.Step(s, nil, 0.05, true, false))
             assert.is_nil(CS.Step(s, "LT", 1, false, true))
+        end)
+
+        it("points the pin chord's modifier at a trigger when none emulates it", function()
+            assert.same({ "GamePadEmulateShift", "PADLTRIGGER" }, { CS.EmulateFix("SHIFT-PADRSTICK", {}) })
+            -- the left trigger already holds Shift, so Ctrl goes to the right one
+            assert.same({ "GamePadEmulateCtrl", "PADRTRIGGER" }, { CS.EmulateFix("CTRL-PAD4", { LT = "SHIFT" }) })
+            assert.is_nil(CS.EmulateFix("SHIFT-PADRSTICK", { LT = "SHIFT" })) -- already works
+            assert.is_nil(CS.EmulateFix("PADRSTICK", {})) -- no modifier
+            assert.is_nil(CS.EmulateFix("NONE", {}))
         end)
     end)
 
@@ -160,6 +184,15 @@ describe("CheatSheet", function()
                 { kind = "command", value = "CLICK GamepadGrimoireToggle:LeftButton", priority = true },
                 wow.bindingsOf("GamepadGrimoireToggle")["SHIFT-PADRSTICK"]
             )
+        end)
+
+        it("sets a trigger to emulate the pin chord's Shift when the client has none", function()
+            _G.GamepadGrimoireDB = nil
+            local _, w = Addon.load()
+            w.cvars.GamePadEmulateShift = nil
+            w.fire("ADDON_LOADED", "GamepadGrimoire")
+            w.fire("PLAYER_LOGIN")
+            assert.equal("PADLTRIGGER", w.cvars.GamePadEmulateShift)
         end)
 
         it("peeks at the LT layer while the trigger is held, then hides", function()

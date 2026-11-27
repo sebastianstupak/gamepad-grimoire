@@ -112,6 +112,9 @@ function Fake.new()
     function W.GetCVar(name)
         return state.cvars[name]
     end
+    function W.SetCVar(name, value)
+        state.cvars[name] = value
+    end
     function W.GetSpellName(id)
         return state.spells[id]
     end

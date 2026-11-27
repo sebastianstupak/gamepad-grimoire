@@ -12,6 +12,32 @@ CheatSheet.DEFAULT_PIN_KEY = "SHIFT-PADRSTICK"
 CheatSheet.TOGGLE_BUTTON = "GamepadGrimoireToggle"
 
 local MOD_LAYER = { SHIFT = "shift", CTRL = "ctrl" }
+local EMULATE_CVAR = { SHIFT = "GamePadEmulateShift", CTRL = "GamePadEmulateCtrl", ALT = "GamePadEmulateAlt" }
+
+---The pin chord uses a modifier ("SHIFT-PADRSTICK"); on a pad that modifier must
+---be a held trigger (GamePadEmulate*). When nothing emulates it the chord can't
+---be pressed with the controller, so we pick a trigger for it. Pure: returns the
+---CVar and the trigger to set, or nil when the chord already works (or needs no
+---modifier). Prefers the left trigger unless it already holds another modifier.
+---@param pinKey string?
+---@param modifiers table<string, string> layer -> modifier, from `LayerModifiers`
+---@return string? cvar, string? trigger
+function CheatSheet.EmulateFix(pinKey, modifiers)
+    if not pinKey or pinKey == "NONE" then
+        return nil
+    end
+    local cvar = EMULATE_CVAR[pinKey:match("^(%u+)%-") or ""]
+    if not cvar then
+        return nil
+    end
+    local mod = pinKey:match("^(%u+)%-")
+    for _, m in pairs(modifiers) do
+        if m == mod then
+            return nil -- a trigger already emulates it
+        end
+    end
+    return cvar, modifiers.LT and "PADRTRIGGER" or "PADLTRIGGER"
+end
 
 ---Which layer the held modifiers select. Pure.
 ---@param shift boolean
@@ -303,6 +329,12 @@ function M:OnEnable()
     end)
     local pinKey = settings().pinKey or CheatSheet.DEFAULT_PIN_KEY
     if pinKey ~= "NONE" and not ns.Wow.InCombatLockdown() then
+        -- make sure a trigger emulates the chord's modifier, else it cannot be
+        -- pressed on the controller at all
+        local cvar, trigger = CheatSheet.EmulateFix(pinKey, ns.Bindings.Model.LayerModifiers(ns.Wow.GetCVar))
+        if cvar then
+            ns.Wow.SetCVar(cvar, trigger)
+        end
         -- priority binding: the pin key works whatever the profile puts there
         ns.Wow.SetOverrideBinding(toggle, true, pinKey, "CLICK " .. CheatSheet.TOGGLE_BUTTON .. ":LeftButton")
     end

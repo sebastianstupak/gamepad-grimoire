@@ -54,6 +54,15 @@ function W.GetCVar(name)
     return GetCVar(name)
 end
 
+---@param name string
+---@param value string
+function W.SetCVar(name, value)
+    if C_CVar and C_CVar.SetCVar then
+        return C_CVar.SetCVar(name, value)
+    end
+    return SetCVar(name, value)
+end
+
 ---@param spellID number
 ---@return string?
 function W.GetSpellName(spellID)

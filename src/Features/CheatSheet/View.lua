@@ -239,8 +239,9 @@ function View.Build(def, buttons)
         for layer in pairs(state.modifiers) do
             layerOf[layer == "LT" and "PADLTRIGGER" or "PADRTRIGGER"] = layer
         end
+        local pinChord = Glyphs.Chord(def, state.modifiers, state.pinKey)
         self.title:SetText("Gamepad Grimoire |cff8a8f9c- " .. state.profile .. " - " .. def.name .. "|r")
-        self.pinTip:SetText(state.pinned and "|cffffd100PINNED|r" or (state.pinKey and ("pin: " .. state.pinKey) or ""))
+        self.pinTip:SetText(state.pinned and "|cffffd100PINNED|r" or (pinChord and ("pin: " .. pinChord) or ""))
         for _, t in ipairs(self.tabs) do
             local on = t.layer == state.layer
             t.bg:SetColorTexture(unpack(on and C.held or C.row))
@@ -314,7 +315,7 @@ function View.Build(def, buttons)
                 .. " / "
                 .. Glyphs.LayerTrigger(def.family, "RT")
                 .. " to peek at a layer  -  "
-                .. (state.pinKey and (state.pinKey .. " opens setup") or "/gg setup")
+                .. (pinChord and (pinChord .. " opens setup") or "/gg setup")
         )
     end
 

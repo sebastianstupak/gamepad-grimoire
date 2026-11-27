@@ -248,6 +248,9 @@ describe("Setup (controller-only configuration)", function()
         local before = button()
         scripts.OnGamePadButtonDown(input, "PADDDOWN")
         assert.are_not.equal(before, button())
+        -- a button the setup uses is consumed, so it does not also fire the
+        -- player's own binding (jump / cast) while they are editing
+        assert.same({ false }, rawget(input, "calls").SetPropagateGamePadInput)
         scripts.OnKeyDown(input, "F5") -- not ours: passes through to the game
         assert.same({ true }, rawget(input, "calls").SetPropagateKeyboardInput)
         scripts.OnKeyDown(input, "ESCAPE") -- ours: kept

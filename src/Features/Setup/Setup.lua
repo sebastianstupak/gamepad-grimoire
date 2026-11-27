@@ -339,8 +339,11 @@ end
 local function capture(on)
     if not input then
         input = ns.Wow.CreateFrame("Frame", "GamepadGrimoireSetupInput", ns.Wow.UIParent)
-        input:SetScript("OnGamePadButtonDown", function(_, button)
-            Setup.Press(button)
+        input:SetScript("OnGamePadButtonDown", function(self, button)
+            -- buttons the setup uses are consumed; the rest still reach the game.
+            -- Without this every press also fired the player's own bindings
+            -- (jump / cast / ...) while they were editing the layout.
+            self:SetPropagateGamePadInput(not Setup.Press(button))
         end)
         input:SetScript("OnKeyDown", function(self, key)
             -- keys the setup does not use (chat, movement...) keep working
